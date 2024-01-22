@@ -19,10 +19,6 @@
 #ifdef ENABLE_AIRCOPY
 	#include "app/aircopy.h"
 #endif
-#ifdef ENABLE_PMR_MODE
-	#include "app/pmr.h"
-	#include "frequencies.h"
-#endif
 #include "bsp/dp32g030/gpio.h"
 #include "driver/bk4819.h"
 #include "driver/keyboard.h"
@@ -44,15 +40,7 @@ BOOT_Mode_t BOOT_GetMode(void)
 	{
 		if (GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT)) {
 			// PTT not pressed
-		#ifdef ENABLE_PMR_MODE		
-			if ( gPMR_Mode_Active ) {
-				return BOOT_MODE_PMR;
-			} else {
-				return BOOT_MODE_NORMAL;
-			}
-		#else
 			return BOOT_MODE_NORMAL;
-		#endif
 		}
 		Keys[i] = KEYBOARD_Poll();
 		SYSTEM_DelayMs(20);
@@ -72,32 +60,10 @@ BOOT_Mode_t BOOT_GetMode(void)
 		if (Keys[0] == KEY_SIDE2)
 			return BOOT_MODE_AIRCOPY;
 	#endif
-	#ifdef ENABLE_PMR_MODE
-		// if PMR Mode, boots in normal
-		if (Keys[0] == KEY_SIDE2) {
-			if ( gPMR_Mode_Active ) {
-				gPMR_Mode_Active = false;
-				SETTINGS_SavePMR();
-				return BOOT_MODE_NORMAL;
-			} else {
-				gPMR_Mode_Active = true;
-				SETTINGS_SavePMR();
-				return BOOT_MODE_PMR;
-			}
-		}
-	#endif
 	}
 
-	#ifdef ENABLE_PMR_MODE
-		if ( gPMR_Mode_Active ) {
-			return BOOT_MODE_PMR;
-		} else {
-			return BOOT_MODE_NORMAL;
-		}
-	#else
-		return BOOT_MODE_NORMAL;
-	#endif
-	
+	return BOOT_MODE_NORMAL;
+
 }
 
 void BOOT_ProcessMode(BOOT_Mode_t Mode)
@@ -105,35 +71,6 @@ void BOOT_ProcessMode(BOOT_Mode_t Mode)
 	if (Mode == BOOT_MODE_F_LOCK) {
 		GUI_SelectNextDisplay(DISPLAY_MENU);
 	}
-	#ifdef ENABLE_PMR_MODE
-	else if (Mode == BOOT_MODE_PMR) {
-
-		gEeprom.DUAL_WATCH               = DUAL_WATCH_OFF;
-		gEeprom.BATTERY_SAVE             = 0;
-		#ifdef ENABLE_VOX
-			gEeprom.VOX_SWITCH           = false;
-		#endif
-		gEeprom.CROSS_BAND_RX_TX         = CROSS_BAND_OFF;
-		gEeprom.AUTO_KEYPAD_LOCK         = false;
-		gEeprom.KEY_1_SHORT_PRESS_ACTION = ACTION_OPT_NONE;
-		gEeprom.KEY_1_LONG_PRESS_ACTION  = ACTION_OPT_NONE;
-		gEeprom.KEY_2_SHORT_PRESS_ACTION = ACTION_OPT_NONE;
-		gEeprom.KEY_2_LONG_PRESS_ACTION  = ACTION_OPT_NONE;
-		gEeprom.KEY_M_LONG_PRESS_ACTION  = ACTION_OPT_NONE;
-
-		RADIO_InitInfo(gRxVfo, FREQ_CHANNEL_LAST - 1, PMRFrequencyTable[gPMR_Channel - 1]);
-
-		gRxVfo->CHANNEL_BANDWIDTH        = BANDWIDTH_NARROW;
-		gRxVfo->OUTPUT_POWER             = OUTPUT_POWER_LOW;
-
-		RADIO_ConfigureSquelchAndOutputPower(gRxVfo);
-
-		gCurrentVfo = gRxVfo;
-
-		RADIO_SetupRegisters(true);
-		GUI_SelectNextDisplay(DISPLAY_PMR);
-	}
-	#endif
 	#ifdef ENABLE_AIRCOPY
 		else
 		if (Mode == BOOT_MODE_AIRCOPY)

@@ -259,10 +259,6 @@ typedef struct {
 
 extern EEPROM_Config_t gEeprom;
 
-#ifdef ENABLE_PMR_MODE
-	void SETTINGS_SavePMR();
-#endif
-
 void     SETTINGS_InitEEPROM(void);
 void     SETTINGS_LoadCalibration(void);
 uint32_t SETTINGS_FetchChannelFrequency(const int channel);

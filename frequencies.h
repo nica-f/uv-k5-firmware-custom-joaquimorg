@@ -76,11 +76,6 @@ typedef enum {
 
 extern const uint16_t gStepFrequencyTable[];
 
-#ifdef ENABLE_PMR_MODE
-	extern const uint32_t PMRFrequencyTable[16];
-#endif
-
-
 FREQUENCY_Band_t FREQUENCY_GetBand(uint32_t Frequency);
 uint8_t          FREQUENCY_CalculateOutputPower(uint8_t TxpLow, uint8_t TxpMid, uint8_t TxpHigh, int32_t LowerLimit, int32_t Middle, int32_t UpperLimit, int32_t Frequency);
 uint32_t 		 FREQUENCY_RoundToStep(uint32_t freq, uint16_t step);

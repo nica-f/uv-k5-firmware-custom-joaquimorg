@@ -36,9 +36,6 @@
 #ifdef ENABLE_FMRADIO
 	#include "app/fm.h"
 #endif
-#ifdef ENABLE_PMR_MODE
-	#include "app/pmr.h"
-#endif
 #include "app/generic.h"
 #include "app/main.h"
 #include "app/menu.h"
@@ -97,10 +94,6 @@ void (*ProcessKeysFunctions[])(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) 
 
 #ifdef ENABLE_FMRADIO
 	[DISPLAY_FM] = &FM_ProcessKeys,
-#endif
-
-#ifdef ENABLE_PMR_MODE
-	[DISPLAY_PMR] = &PMR_ProcessKeys,
 #endif
 
 #ifdef ENABLE_MESSENGER

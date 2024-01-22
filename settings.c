@@ -20,9 +20,6 @@
 #ifdef ENABLE_FMRADIO
 	#include "app/fm.h"
 #endif
-#ifdef ENABLE_PMR_MODE
-	#include "app/pmr.h"
-#endif
 #include "driver/bk1080.h"
 #include "driver/bk4819.h"
 #include "driver/eeprom.h"
@@ -41,16 +38,6 @@ static const uint32_t gDefaultFrequencyTable[] =
 
 EEPROM_Config_t gEeprom = { 0 };
 
-#ifdef ENABLE_PMR_MODE
-void SETTINGS_SavePMR() {
-	uint8_t Data[8] = {0};
-	EEPROM_ReadBuffer(0x0E70, Data, 8);
-	Data[3] = 0xFF;
-	if (!gPMR_Mode_Active) Data[3] &= ~(1u << 7);
-	EEPROM_WriteBuffer(0x0E70, Data);
-}
-#endif
-
 void SETTINGS_InitEEPROM(void)
 {
 	uint8_t Data[16] = {0};
@@ -59,10 +46,6 @@ void SETTINGS_InitEEPROM(void)
 	gEeprom.CHAN_1_CALL          = IS_MR_CHANNEL(Data[0]) ? Data[0] : MR_CHANNEL_FIRST;
 	gEeprom.SQUELCH_LEVEL        = (Data[1] < 10) ? Data[1] : 1;
 	gEeprom.TX_TIMEOUT_TIMER     = (Data[2] < 11) ? Data[2] : 1;
-
-	#ifdef ENABLE_PMR_MODE
-		gPMR_Mode_Active        = !!(Data[3] & (1u << 7));
-	#endif
 
 	gEeprom.KEY_LOCK             = (Data[4] <  2) ? Data[4] : false;
 	#ifdef ENABLE_VOX
@@ -483,12 +466,6 @@ void SETTINGS_SaveVfoIndices(void)
 
 void SETTINGS_SaveSettings(void)
 {
-
-	#ifdef ENABLE_PMR_MODE
-		if ( gPMR_Mode_Active ) {
-			return;
-		}
-	#endif
 
 	uint8_t  State[8];
 	uint32_t Password[2];

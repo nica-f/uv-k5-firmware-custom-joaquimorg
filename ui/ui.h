@@ -30,10 +30,6 @@ enum GUI_DisplayType_t
 	DISPLAY_FM,
 #endif
 
-#ifdef ENABLE_PMR_MODE
-	DISPLAY_PMR,
-#endif
-
 #ifdef ENABLE_MESSENGER
 	DISPLAY_MSG,
 #endif

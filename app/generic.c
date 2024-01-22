@@ -22,9 +22,6 @@
 #ifdef ENABLE_FMRADIO
 	#include "app/fm.h"
 #endif
-#ifdef ENABLE_PMR_MODE
-	#include "app/pmr.h"
-#endif
 #include "app/generic.h"
 #include "app/menu.h"
 #include "app/scanner.h"
@@ -62,18 +59,13 @@ void GENERIC_Key_F(bool bKeyPressed, bool bKeyHeld)
 		else // released
 		{
 
-			#ifdef ENABLE_PMR_MODE
-				if ( !gPMR_Mode_Active ) {
-				#ifdef ENABLE_FMRADIO
-					if ((gFmRadioMode || gScreenToDisplay != DISPLAY_MAIN) && gScreenToDisplay != DISPLAY_FM)
-						return;
-				#else
-					if (gScreenToDisplay != DISPLAY_MAIN)
-						return;
-				#endif
-				}
+			#ifdef ENABLE_FMRADIO
+				if ((gFmRadioMode || gScreenToDisplay != DISPLAY_MAIN) && gScreenToDisplay != DISPLAY_FM)
+					return;
+			#else
+				if (gScreenToDisplay != DISPLAY_MAIN)
+					return;
 			#endif
-
 
 			gWasFKeyPressed = !gWasFKeyPressed; // toggle F function
 
@@ -170,11 +162,6 @@ void GENERIC_Key_PTT(bool bKeyPressed)
 #ifdef ENABLE_FMRADIO
 	if (gScreenToDisplay == DISPLAY_FM)
 		goto start_tx;	// listening to the FM radio .. start TX'ing
-#endif
-
-#ifdef ENABLE_PMR_MODE
-	if (gScreenToDisplay == DISPLAY_PMR)
-		goto start_tx;	// PMR Mode
 #endif
 
 	if (gCurrentFunction == FUNCTION_TRANSMIT && gRTTECountdown == 0)

@@ -59,9 +59,6 @@ ENABLE_MESSENGER_DELIVERY_NOTIFICATION	?= 1
 ENABLE_MESSENGER_NOTIFICATION			?= 1
 ENABLE_MESSENGER_UART					?= 1
 
-# Work in progress
-ENABLE_PMR_MODE               ?= 0
-
 #### INTERNAL USE ####
 ENABLE_SCREEN_DUMP			  ?= 1
 
@@ -104,13 +101,6 @@ else
 	WHERE = which
 	DEL = del
 	K5PROG = utils/k5prog/k5prog -D -F -YYY -p /dev/ttyUSB3 -b
-endif
-
-#------------------------------------------------------------------------------
-#ENABLE_AIRCOPY
-#ENABLE_PMR_MODE
-ifeq ($(ENABLE_AIRCOPY)$(ENABLE_PMR_MODE),11)
-$(error !!!!!!! CANNOT HAVE PMR MODE AND AIRCOPY ENABLED AT SAME TIME)
 endif
 
 #------------------------------------------------------------------------------
@@ -212,9 +202,6 @@ endif
 ifeq ($(ENABLE_UART),1)
 	C_SRC += app/uart.c
 endif
-ifeq ($(ENABLE_PMR_MODE),1)
-	C_SRC += app/pmr.c
-endif
 ifeq ($(ENABLE_MESSENGER),1)
 	C_SRC += app/messenger.c
 endif
@@ -229,9 +216,6 @@ ifeq ($(ENABLE_FMRADIO),1)
 endif
 ifeq ($(ENABLE_PWRON_PASSWORD),1)
 	C_SRC += ui/lock.c
-endif
-ifeq ($(ENABLE_PMR_MODE),1)
-	C_SRC += ui/pmr.c
 endif
 ifeq ($(ENABLE_MESSENGER),1)
 	C_SRC += ui/messenger.c
@@ -256,9 +240,6 @@ CFLAGS += -DAUTHOR_STRING=\"$(AUTHOR_STRING)\" -DVERSION_STRING=\"$(VERSION_STRI
 
 ifeq ($(ENABLE_SCREEN_DUMP),1)
 	CFLAGS += -DENABLE_SCREEN_DUMP
-endif
-ifeq ($(ENABLE_PMR_MODE),1)
-	CFLAGS  += -DENABLE_PMR_MODE
 endif
 ifeq ($(ENABLE_SPECTRUM),1)
 	CFLAGS += -DENABLE_SPECTRUM

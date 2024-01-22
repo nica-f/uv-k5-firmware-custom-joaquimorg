@@ -30,10 +30,6 @@
 #ifdef ENABLE_FMRADIO
 	#include "ui/fmradio.h"
 #endif
-#ifdef ENABLE_PMR_MODE
-	#include "ui/pmr.h"
-	#include "app/pmr.h"
-#endif
 #ifdef ENABLE_MESSENGER
 	#include "ui/messenger.h"
 #endif
@@ -61,10 +57,6 @@ void (*UI_DisplayFunctions[])(void) = {
 	[DISPLAY_FM] = &UI_DisplayFM,
 #endif
 
-#ifdef ENABLE_PMR_MODE
-	[DISPLAY_PMR] = &UI_DisplayPMR,
-#endif
-
 #ifdef ENABLE_MESSENGER
 	[DISPLAY_MSG] = &UI_DisplayMSG,
 #endif
@@ -88,19 +80,13 @@ void GUI_SelectNextDisplay(GUI_DisplayType_t Display)
 	if (Display == DISPLAY_INVALID)
 		return;
 
-	#ifdef ENABLE_PMR_MODE
-	if ( Display == DISPLAY_MAIN && gPMR_Mode_Active) {
-		Display = DISPLAY_PMR;
-	}
-	#endif
-
 	if (gScreenToDisplay != Display)
 	{
 		DTMF_clear_input_box();
 
 		gInputBoxIndex       = 0;
 		gIsInSubMenu         = false;
-		gCssBackgroundScan         = false;
+		gCssBackgroundScan   = false;
 		gScanStateDir        = SCAN_OFF;
 		#ifdef ENABLE_FMRADIO
 			gFM_ScanState    = FM_SCAN_OFF;
