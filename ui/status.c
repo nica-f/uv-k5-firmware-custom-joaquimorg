@@ -40,27 +40,27 @@
 void UI_DisplayStatus()
 {
 	gUpdateStatus = false;
-	memset(gStatusLine, 0, sizeof(gStatusLine));
+	//memset(gFrameBuffer[0], 0, sizeof(gFrameBuffer[0]));
 
-	uint8_t     *line = gStatusLine;
-	unsigned int x    = 0;
+	//uint8_t     *line = gFrameBuffer[0];
+	//unsigned int x    = 0;
 	// **************
 
 	// POWER-SAVE indicator
 	if (gCurrentFunction == FUNCTION_TRANSMIT) {
 
-		memcpy(line + x, BITMAP_TX, sizeof(BITMAP_TX));
+		//memcpy(line + x, BITMAP_TX, sizeof(BITMAP_TX));
 	}
 	else if (FUNCTION_IsRx()) {
 
-		memcpy(line + x, BITMAP_RX, sizeof(BITMAP_RX));
+		//memcpy(line + x, BITMAP_RX, sizeof(BITMAP_RX));
 	}
 	else if (gCurrentFunction == FUNCTION_POWER_SAVE) {
 
-		memcpy(line + x, BITMAP_POWERSAVE, sizeof(BITMAP_POWERSAVE));
+		//memcpy(line + x, BITMAP_POWERSAVE, sizeof(BITMAP_POWERSAVE));
 	}
-	x += 8;
-	unsigned int x1 = x;
+	//x += 8;
+	//unsigned int x1 = x;
 
 #ifdef ENABLE_NOAA
 	if (gIsNoaaMode) { // NOASS SCAN indicator
@@ -214,5 +214,5 @@ void UI_DisplayStatus()
 
 	// **************
 
-	ST7565_BlitStatusLine();
+	UI_statusUpdate();
 }

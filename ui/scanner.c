@@ -31,7 +31,7 @@ void UI_DisplayScanner(void)
 	bool bCentered;
 	uint8_t Start;
 
-	UI_DisplayClear();
+	UI_displayClear();
 
 	if (gScanSingleFrequency || (gScanCssState != SCAN_CSS_STATE_OFF && gScanCssState != SCAN_CSS_STATE_FAILED)) {
 		sprintf(String, "FREQ:%u.%05u", (uint16_t)gScanFrequency / 100000, (uint16_t)gScanFrequency % 100000);
@@ -79,5 +79,5 @@ void UI_DisplayScanner(void)
 
 	UI_PrintString(pPrintStr, Start, bCentered ? 127 : 0, 5, 8);
 
-	ST7565_BlitFullScreen();
+	UI_displayUpdate();
 }

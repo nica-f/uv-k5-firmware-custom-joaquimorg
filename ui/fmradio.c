@@ -33,7 +33,7 @@ void UI_DisplayFM(void)
 {
 	char String[16] = {0};
 	char *pPrintStr = String;
-	UI_DisplayClear();
+	UI_displayClear();
 
 	UI_PrintString("FM", 2, 0, 0, 8);
 
@@ -90,13 +90,13 @@ void UI_DisplayFM(void)
 		}
 
 		UI_DisplayFrequency(String, 36, 1, gInputBoxIndex == 0);  // frequency
-		ST7565_BlitFullScreen();
+		UI_displayUpdate();
 		return;
 	}
 
 	UI_PrintString(String, 0, 127, 1, 10);
 
-	ST7565_BlitFullScreen();
+	UI_displayUpdate();
 }
 
 #endif

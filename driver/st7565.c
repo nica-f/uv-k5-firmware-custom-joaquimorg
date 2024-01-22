@@ -29,6 +29,39 @@
 	uint8_t contrast = 31;  // 0 ~ 63
 #endif
 
+uint8_t gFrameBuffer[FRAME_LINES][LCD_WIDTH];
+
+void ST7565_WriteByte(uint8_t Value);
+void ST7565_SelectColumnAndLine(uint8_t Column, uint8_t Line);
+
+static inline void ST7565_LowLevelWrite(uint8_t Value)
+{
+	/* Wait for space in the fifo */
+	while ((SPI0->FIFOST & SPI_FIFOST_TFF_MASK) != SPI_FIFOST_TFF_BITS_NOT_FULL) {}
+	SPI0->WDR = Value;
+}
+
+void ST7565_BlitFullScreen(bool onlystatus)
+{
+	SPI_ToggleMasterMode(&SPI0->CR, false);
+	ST7565_WriteByte(0x40);
+	uint8_t lines = FRAME_LINES;
+	if (onlystatus) {
+		lines = 1;
+	}
+	for (unsigned line = 0; line < lines; line++) {
+		ST7565_SelectColumnAndLine(4, line);
+		GPIO_SetBit(&GPIOB->DATA, GPIOB_PIN_ST7565_A0);
+		for (unsigned column = 0; column < LCD_WIDTH; column++) {
+            ST7565_LowLevelWrite(gFrameBuffer[line][column]);
+		}
+		SPI_WaitForUndocumentedTxFifoStatusBit();
+	}
+	
+	SPI_ToggleMasterMode(&SPI0->CR, true);
+}
+
+/*
 uint8_t gStatusLine[LCD_WIDTH];
 uint8_t gFrameBuffer[FRAME_LINES][LCD_WIDTH];
 
@@ -84,6 +117,7 @@ void ST7565_FillScreen(uint8_t value)
 	}
 	SPI_ToggleMasterMode(&SPI0->CR, true);
 }
+*/
 
 // Software reset
 const uint8_t ST7565_CMD_SOFTWARE_RESET = 0xE2;
@@ -182,7 +216,8 @@ void ST7565_Init(void)
 	SPI_WaitForUndocumentedTxFifoStatusBit();
 	SPI_ToggleMasterMode(&SPI0->CR, true);
 
-	ST7565_FillScreen(0x00);
+	//ST7565_FillScreen(0x00);
+	ST7565_BlitFullScreen(false);
 }
 
 void ST7565_FixInterfGlitch(void)

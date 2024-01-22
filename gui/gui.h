@@ -23,7 +23,7 @@
 
 void GUI_drawStatus(void);
 
-void        GUI_inputAppendKey(const KEY_Code_t key);
+//void        GUI_inputAppendKey(const KEY_Code_t key);
 uint8_t     GUI_inputGetSize();
 uint32_t    GUI_inputGetNumber();
 

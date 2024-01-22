@@ -455,8 +455,7 @@ static void CMD_0803() // dumps the LCD screen memory to the PC. Not used in the
 {
 	const uint16_t screenDumpIdByte = 0xEFAB;
 	UART_Send(&screenDumpIdByte, 2);
-	UART_Send(gStatusLine, 128);
-	UART_Send(gFrameBuffer, 896);
+	UART_Send(gFrameBuffer, 1024);
 }
 #endif
 

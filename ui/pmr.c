@@ -103,11 +103,11 @@ void UI_DisplayPMR(void)
 {
 	char String[16] = { 0 };
 
-	UI_DisplayClear();
+	UI_displayClear();
 
 	if(gLowBattery && !gLowBatteryConfirmed) {
 		UI_DisplayPopup("LOW BATTERY");
-		ST7565_BlitFullScreen();
+		UI_displayUpdate();
 		return;
 	}
 
@@ -115,7 +115,7 @@ void UI_DisplayPMR(void)
 	{	// tell user how to unlock the keyboard
 		UI_PrintString("Long press #", 0, LCD_WIDTH, 1, 8);
 		UI_PrintString("to unlock",    0, LCD_WIDTH, 3, 8);
-		ST7565_BlitFullScreen();
+		UI_displayUpdate();
 		return;
 	}
 
@@ -159,7 +159,7 @@ void UI_DisplayPMR(void)
 	}
 
 	ST7565_BlitStatusLine();
-	ST7565_BlitFullScreen();
+	UI_displayUpdate();
 }
 
 #endif

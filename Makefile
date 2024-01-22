@@ -177,6 +177,7 @@ C_SRC += \
 
 C_SRC += \
 	gui/ui.c \
+	gui/gui.c \
 	gui/font_10.c \
 	gui/font_small.c \
 	gui/font_n_16.c \

@@ -32,6 +32,7 @@
 #include "misc.h"
 #include "radio.h"
 #include "settings.h"
+#include "gui/ui.h"
 #include "ui/helper.h"
 #include "ui/inputbox.h"
 #include "ui/main.h"
@@ -60,6 +61,186 @@ const char *VfoStateStr[] = {
 };
 
 // ***************************************************************************
+
+#if 1
+
+void MainVFO_showRSSI(void) {
+
+    const uint8_t yPosVFO = 37;
+
+    // 0x26 '&' RSSI Empty
+    // 0x3F '?' RSSI Sep
+    // 0x40 '@' RSSI Box
+
+    UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO + 3, true, false, gEeprom.RX_VFO == 0 ? "SA" : "SB");
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, 18, 0, yPosVFO, true, false, "1?3?5?7?9?20?60?90");
+
+    const int16_t s0_dBm   = -gEeprom.S0_LEVEL;                  // S0 .. base level
+	const int16_t rssi_dBm =
+		BK4819_GetRSSI_dBm()
+/*#ifdef ENABLE_AM_FIX
+		+ ((gSetting_AM_fix && gRxVfo->Modulation == MODULATION_AM) ? AM_fix_get_gain_diff() : 0)
+#endif*/
+		+ dBmCorrTable[gRxVfo->Band];
+
+    int s0_9 = gEeprom.S0_LEVEL - gEeprom.S9_LEVEL;
+	const uint8_t s_level = MIN(MAX((int32_t)(rssi_dBm - s0_dBm)*100 / (s0_9*100/9), 0), 9); // S0 - S9
+	uint8_t overS9dBm = MIN(MAX(rssi_dBm + gEeprom.S9_LEVEL, 0), 99);
+	uint8_t overS9Bars = MIN(overS9dBm/10, 9);
+
+    uint8_t bar[19];
+    memset(bar, '&', sizeof(bar));
+    bar[18] = 0x00;
+
+    memset(bar, '@', s_level + overS9Bars);
+
+    if(overS9Bars != 0) {
+        UI_printf(&font_small, TEXT_ALIGN_LEFT, 91, 0, yPosVFO + 4, true, false, "S9+%2d", overS9dBm);
+    }
+
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, 18, 0, yPosVFO + 6, true, false, "%s", bar);
+
+    /*int16_t rssi = BK4819_GetRSSI();
+	uint8_t level;
+
+	if (rssi >= settings_RSSI_CALIB[gRxVfo->Band][3]) {
+		level = 6;
+	} else if (rssi >= settings_RSSI_CALIB[gRxVfo->Band][2]) {
+		level = 4;
+	} else if (rssi >= settings_RSSI_CALIB[gRxVfo->Band][1]) {
+		level = 2;
+	} else if (rssi >= settings_RSSI_CALIB[gRxVfo->Band][0]) {
+		level = 1;
+	} else {
+		level = 0;
+	}
+
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, 100, 0, 51, true, false, "%u", level);*/
+
+    //UI_printf(&font_small, TEXT_ALIGN_LEFT, 9, 0, yPosVFO + 6, true, false,    "@@@@@@@@@&&&&&&&&&");
+    //@@@@@@@@@&&&&&&&&&
+}
+
+void UI_DisplayMain(void) {
+
+    char String[17] = { 0 };
+    uint8_t vfoNumA;
+    uint8_t vfoNumB;
+
+    if(gEeprom.TX_VFO == 0) {
+        vfoNumA = 0;
+        vfoNumB = 1;
+    } else {
+        vfoNumA = 1;
+        vfoNumB = 0;
+    }
+
+    const VFO_Info_t *vfoInfoA = &gEeprom.VfoInfo[vfoNumA];
+    const VFO_Info_t *vfoInfoB = &gEeprom.VfoInfo[vfoNumB];
+
+    const bool isChannelModeA = IS_MR_CHANNEL(gEeprom.ScreenChannel[vfoNumA]);
+    const bool isChannelModeB = IS_MR_CHANNEL(gEeprom.ScreenChannel[vfoNumB]);
+
+    uint32_t frequency;
+    uint8_t  yPosVFO = 22;
+
+	// clear the screen
+	UI_displayClear();
+
+    // VFO A
+    UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO - 7, false, true, vfoNumA == 0 ? "A" : "B");
+
+    // Frequency A
+    frequency = vfoInfoA->pRX->Frequency;
+    if ( frequency > _1GHz_in_KHz ) {
+        UI_printf(&font_n_20, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO, true, false, "%1u.%3u.%03u", (frequency / 100000000), (frequency / 100000) % 1000, (frequency % 100000) / 100);
+    } else {
+        UI_printf(&font_n_20, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO, true, false, "%3u.%03u", (frequency / 100000), (frequency % 100000) / 100);
+    }
+    UI_printf(&font_n_16,   TEXT_ALIGN_LEFT, 78, 90, yPosVFO - 2, true, false, "%02u", (frequency % 100));
+
+    // Modulation A
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, 92, 0, yPosVFO - 9, false, true, gModulationStr[vfoInfoA->Modulation]);
+    // OUTPUT_POWER
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + 3, 0, yPosVFO - 9, false, true, gSubMenu_TXP[vfoInfoA->OUTPUT_POWER % 3]);
+    // BANDWIDTH A
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, 92, 0, yPosVFO - 1, false, true, gSubMenu_W_N[vfoInfoA->CHANNEL_BANDWIDTH]);
+
+    if ( vfoInfoA->Modulation == MODULATION_FM ) {
+        // DCS/CT/DCR A
+        const unsigned int code_type = vfoInfoA->pRX->CodeType;
+        if ( code_type > 0 ) {
+            const char *code_list[] = {"CT", "DCS", "DCR"};
+            UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + 3, 0, yPosVFO - 1, false, true, code_list[code_type - 1]);
+        }
+    }
+    if (vfoInfoA->freq_config_RX.Frequency != vfoInfoA->freq_config_TX.Frequency) {
+        // show the TX offset symbol
+        if(vfoInfoA->TX_OFFSET_FREQUENCY_DIRECTION <=2 ) {
+            const char dir_list[] = "\0+-";
+            UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO, true, false, "%c", dir_list[vfoInfoA->TX_OFFSET_FREQUENCY_DIRECTION]);
+        }
+    }
+
+    if ( isChannelModeA ) {
+        // Channel Name A
+        memcpy(String, vfoInfoA->Name, 16);
+        if (String[0] == 0) {
+            UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO + 7, true, false, "CH-%03u", gEeprom.ScreenChannel[vfoNumA] + 1);
+        } else {
+            UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO + 8, true, false, "M%03u", gEeprom.ScreenChannel[vfoNumA] + 1);
+            UI_printf(&font_10, TEXT_ALIGN_RIGHT, UI_nextX + 1, 90, yPosVFO + 8, true, false, String);
+        }
+    } else {
+        UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO + 7, true, false, "VFO");
+    }
+
+
+    yPosVFO = 61;
+    // VFO B
+    UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO - 4, true, false, vfoNumA == 0 ? "B" : "A");
+
+    // Frequency B
+    frequency = vfoInfoB->pRX->Frequency;
+    if ( frequency > _1GHz_in_KHz ) {
+        UI_printf(&font_n_16, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO - 4, true, false, "%1u.%3u.%03u.%02u", (frequency / 100000000), (frequency / 100000) % 1000, (frequency % 100000) / 100, (frequency % 100));
+    } else {
+        UI_printf(&font_n_16, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO - 4, true, false, "%3u.%03u.%02u", (frequency / 100000), (frequency % 100000) / 100, (frequency % 100));
+    }
+    // Modulation B
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, 78, 0, yPosVFO - 10, true, false, gModulationStr[vfoInfoB->Modulation]);
+    // OUTPUT_POWER
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, 78, 0, yPosVFO - 4, true, false, gSubMenu_W_N[vfoInfoB->CHANNEL_BANDWIDTH]);
+
+    if ( isChannelModeB ) {
+        // Channel Name B
+        memcpy(String, vfoInfoB->Name, 16);
+        if (String[0] == 0) {
+            UI_printf(&font_small, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO + 2, true, false, "CH-%03u", gEeprom.ScreenChannel[vfoNumB] + 1);
+        } else {
+            UI_printf(&font_small, TEXT_ALIGN_LEFT, 2, 20, yPosVFO + 2, true, false, "M%03u", gEeprom.ScreenChannel[vfoNumB] + 1);
+            UI_printf(&font_small, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO + 2, true, false, String);
+        }
+    } else {
+        UI_printf(&font_small, TEXT_ALIGN_LEFT, 2, 20, yPosVFO + 2, true, false, "VFO");
+    }
+
+
+	UI_displayUpdate();
+}
+
+void UI_MAIN_TimeSlice500ms(void)
+{
+	if(gScreenToDisplay==DISPLAY_MAIN) {
+
+		if(FUNCTION_IsRx()) {
+			MainVFO_showRSSI();
+			UI_displayUpdate();
+		}
+	}
+}
+
+#else
 
 #ifndef ENABLE_RSSI_BAR
 
@@ -159,7 +340,7 @@ void UI_DisplayAudioBar(void)
 		DrawLevelBar(62, line, bars);
 
 		if (gCurrentFunction == FUNCTION_TRANSMIT)
-			ST7565_BlitFullScreen();
+			UI_displayUpdate();
 	}
 }
 #endif
@@ -225,8 +406,8 @@ void DisplayRSSIBar(const bool now)
 	UI_PrintStringSmallNormal(str, 2, 0, line);
 	DrawLevelBar(bar_x, line, s_level + overS9Bars);
 
-	if (now)
-		ST7565_BlitLine(line);
+	/*if (now)
+		ST7565_BlitLine(line);*/
 #else
 	int16_t rssi = BK4819_GetRSSI();
 	uint8_t Level;
@@ -248,7 +429,7 @@ void DisplayRSSIBar(const bool now)
 		memset(pLine, 0, 23);
 	DrawSmallAntennaAndBars(pLine, Level);
 	if (now)
-		ST7565_BlitFullScreen();
+		UI_displayUpdate();
 #endif
 
 }
@@ -315,11 +496,11 @@ void UI_DisplayMain(void)
 	center_line = CENTER_LINE_NONE;
 
 	// clear the screen
-	UI_DisplayClear();
+	UI_displayClear();
 
 	if(gLowBattery && !gLowBatteryConfirmed) {
 		UI_DisplayPopup("LOW BATTERY");
-		ST7565_BlitFullScreen();
+		UI_displayUpdate();
 		return;
 	}
 
@@ -327,7 +508,7 @@ void UI_DisplayMain(void)
 	{	// tell user how to unlock the keyboard
 		UI_PrintString("Long press #", 0, LCD_WIDTH, 1, 8);
 		UI_PrintString("to unlock",    0, LCD_WIDTH, 3, 8);
-		ST7565_BlitFullScreen();
+		UI_displayUpdate();
 		return;
 	}
 
@@ -851,7 +1032,7 @@ void UI_DisplayMain(void)
 		}
 	}
 
-	ST7565_BlitFullScreen();
+	UI_displayUpdate();
 }
-
+#endif
 // ***************************************************************************

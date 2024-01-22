@@ -26,24 +26,24 @@ bool UI_updateDisplay = false;
 bool UI_updateStatus = false;
 uint8_t UI_nextX = 0;
 
-void UI_DisplayClear() {
-	memset(gFrameBuffer, 0, sizeof(gFrameBuffer));
+void UI_displayClear(void) {
+	for (int i = 1; i < FRAME_LINES; i++) {
+        memset(gFrameBuffer[i], 0, sizeof(gFrameBuffer[i]));
+    }
 }
 
 void UI_displayUpdate(void) {
-	if ( UI_updateDisplay ) {		
-		//ST7565_BlitFullScreen(false);
-		ST7565_BlitFullScreen();
+	//if ( UI_updateDisplay ) {		
+		ST7565_BlitFullScreen(false);
 		UI_updateDisplay = false;
-	}
+	//}
 }
 
 void UI_statusUpdate(void) {
-	if ( UI_updateStatus ) {		
-		//ST7565_BlitFullScreen(true);
-		ST7565_BlitStatusLine();
+	//if ( UI_updateStatus ) {		
+		ST7565_BlitFullScreen(true);
 		UI_updateStatus = false;
-	}
+	//}
 }
 
 /**************************************************************************/

@@ -45,7 +45,7 @@ void PutPixelStatus(uint8_t x, uint8_t y, bool fill);
 void DrawVLine(int sy, int ey, int nx, bool fill);
 void GUI_DisplaySmallest(const char *pString, uint8_t x, uint8_t y, bool statusbar, bool fill);
 
-void UI_DisplayClear();
+void UI_displayClear();
 */
 
 void UI_GenerateChannelString(__attribute__((unused)) char *pString, __attribute__((unused)) const uint8_t Channel);
@@ -69,6 +69,6 @@ void PutPixelStatus(__attribute__((unused)) uint8_t x, __attribute__((unused)) u
 void DrawVLine(__attribute__((unused)) int sy, __attribute__((unused)) int ey, __attribute__((unused)) int nx, __attribute__((unused)) bool fill);
 void GUI_DisplaySmallest(__attribute__((unused)) const char *pString, __attribute__((unused)) uint8_t x, __attribute__((unused)) uint8_t y, __attribute__((unused)) bool statusbar, __attribute__((unused)) bool fill);
 
-//void UI_DisplayClear();
+//void UI_displayClear();
 
 #endif

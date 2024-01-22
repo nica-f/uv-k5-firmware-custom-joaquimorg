@@ -14,8 +14,8 @@
  *     limitations under the License.
  */
 
-#ifndef UI_H
-#define UI_H
+#ifndef G_UI_H
+#define G_UI_H
 
 #include <stdint.h>
 #include <string.h>
@@ -34,7 +34,7 @@ enum TEXT_Align_e {
 };
 typedef enum TEXT_Align_e TEXT_Align_t;
 
-void UI_DisplayClear();
+void UI_displayClear(void);
 
 void UI_displayUpdate(void);
 void UI_statusUpdate(void);

@@ -146,12 +146,12 @@ const t_menu_item MenuList[] =
 
 const uint8_t FIRST_HIDDEN_MENU_ITEM = MENU_F_LOCK;
 
-const char gSubMenu_TXP[][5] =
+/*const char gSubMenu_TXP[][5] =
 {
 	"LOW",
 	"MID",
 	"HIGH"
-};
+};*/
 
 const char gSubMenu_SFT_D[][4] =
 {
@@ -160,12 +160,12 @@ const char gSubMenu_SFT_D[][4] =
 	"-"
 };
 
-const char gSubMenu_W_N[][9] =
+/*const char gSubMenu_W_N[][9] =
 {
 	"WIDE",
 	"NARROW",
 	"NARROWER"
-};
+};*/
 
 const char gSubMenu_OFF_ON[][4] =
 {
@@ -182,7 +182,7 @@ const char gSubMenu_SAVE[][4] =
 	"1:4"
 };
 
-const char gSubMenu_TOT[][7] =
+/*const char gSubMenu_TOT[][7] =
 {
 	"30 sec",
 	"1 min",
@@ -195,7 +195,7 @@ const char gSubMenu_TOT[][7] =
 	"8 min",
 	"9 min",
 	"15 min"
-};
+};*/
 
 const char gSubMenu_RXMode[][17] =
 {
@@ -295,7 +295,7 @@ const char gSubMenu_F_LOCK[][27] =
 	"UNLOCK\nALL",
 };
 
-const char gSubMenu_BACKLIGHT[][7] =
+/*const char gSubMenu_BACKLIGHT[][7] =
 {
 	"OFF",
 	"5 sec",
@@ -305,7 +305,7 @@ const char gSubMenu_BACKLIGHT[][7] =
 	"2 min",
 	"4 min",
 	"ON"
-};
+};*/
 
 const char gSubMenu_RX_TX[][6] =
 {
@@ -411,7 +411,7 @@ void UI_DisplayMenu(void)
 	char               Contact[16];
 #endif
 
-	UI_DisplayClear();
+	UI_displayClear();
 
 #ifndef ENABLE_CUSTOM_MENU_LAYOUT
 		// original menu layout
@@ -982,5 +982,5 @@ void UI_DisplayMenu(void)
 		UI_PrintString(pPrintStr, menu_item_x1, menu_item_x2, 5, 8);
 	}
 
-	ST7565_BlitFullScreen();
+	UI_displayUpdate();
 }

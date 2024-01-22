@@ -133,12 +133,12 @@ enum
 extern const uint8_t FIRST_HIDDEN_MENU_ITEM;
 extern const t_menu_item MenuList[];
 
-extern const char        gSubMenu_TXP[3][5];
+//extern const char        gSubMenu_TXP[3][5];
 extern const char        gSubMenu_SFT_D[3][4];
-extern const char        gSubMenu_W_N[3][9];
+//extern const char        gSubMenu_W_N[3][9];
 extern const char        gSubMenu_OFF_ON[2][4];
 extern const char        gSubMenu_SAVE[5][4];
-extern const char        gSubMenu_TOT[11][7];
+//extern const char        gSubMenu_TOT[11][7];
 extern const char		 gSubMenu_RXMode[4][17];
 
 #ifdef ENABLE_VOICE
@@ -157,7 +157,7 @@ extern const char        gSubMenu_PONMSG[4][8];
 extern const char        gSubMenu_ROGER[8][11];
 extern const char        gSubMenu_RESET[2][4];
 extern const char		 gSubMenu_F_LOCK[F_LOCK_LEN][27];
-extern const char        gSubMenu_BACKLIGHT[8][7];
+//extern const char        gSubMenu_BACKLIGHT[8][7];
 extern const char        gSubMenu_RX_TX[4][6];
 extern const char        gSubMenu_BAT_TXT[3][8];
 extern const char 		 gSubMenu_BATTYP[2][9];

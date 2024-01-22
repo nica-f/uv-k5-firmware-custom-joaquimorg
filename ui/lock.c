@@ -35,7 +35,7 @@ static void Render(void)
 	char         String[7];
 
 	memset(gStatusLine,  0, sizeof(gStatusLine));
-	UI_DisplayClear();
+	UI_displayClear();
 
 	UI_PrintString("LOCK", 0, 127, 1, 10);
 	for (i = 0; i < 6; i++)
@@ -44,7 +44,7 @@ static void Render(void)
 	UI_PrintString(String, 0, 127, 3, 12);
 
 	ST7565_BlitStatusLine();
-	ST7565_BlitFullScreen();
+	UI_displayUpdate();
 }
 
 void UI_DisplayLock(void)

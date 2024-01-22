@@ -1144,7 +1144,7 @@ static void RenderStill() {
 }
 
 static void Render() {
-  UI_DisplayClear();
+  UI_displayClear();
 
   switch (currentState) {
   case SPECTRUM:
@@ -1158,7 +1158,7 @@ static void Render() {
     break;
   }
 
-  ST7565_BlitFullScreen();
+  UI_displayUpdate();
 }
 
 bool HandleUserInput() {

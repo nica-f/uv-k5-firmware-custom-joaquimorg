@@ -276,7 +276,7 @@ void UI_DrawRectangleBuffer(uint8_t (*buffer)[128], int16_t x1, int16_t y1, int1
 
 void UI_DisplayPopup(const char *string)
 {
-	UI_DisplayClear();
+	UI_displayClear();
 
 	// for(uint8_t i = 1; i < 5; i++) {
 	// 	memset(gFrameBuffer[i]+8, 0x00, 111);

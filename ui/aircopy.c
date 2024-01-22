@@ -32,7 +32,7 @@ void UI_DisplayAircopy(void)
 	char String[16] = { 0 };
 	char *pPrintStr = { 0 };
 
-	UI_DisplayClear();
+	UI_displayClear();
 
 	if (gAircopyState == AIRCOPY_READY) {
 		pPrintStr = "AIR COPY(RDY)";
@@ -66,7 +66,7 @@ void UI_DisplayAircopy(void)
 	}
 	UI_PrintString(String, 2, 127, 4, 8);
 
-	ST7565_BlitFullScreen();
+	UI_displayUpdate();
 }
 
 #endif

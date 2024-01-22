@@ -79,6 +79,11 @@ enum BacklightOnRxTx_t {
 	BACKLIGHT_ON_TR_TXRX
 };
 
+extern const char* const gSubMenu_TXP[3];
+extern const char* const gSubMenu_W_N[3];
+extern const char* const gSubMenu_TOT[11];
+extern const char* const gSubMenu_BACKLIGHT[8];
+
 extern const uint8_t         fm_radio_countdown_500ms;
 extern const uint16_t        fm_play_countdown_scan_10ms;
 extern const uint16_t        fm_play_countdown_noscan_10ms;

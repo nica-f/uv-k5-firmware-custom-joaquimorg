@@ -19,7 +19,7 @@ void UI_DisplayMSG(void) {
 	static char String[37];
 
 	//memset(gFrameBuffer, 0, sizeof(gFrameBuffer));
-	UI_DisplayClear();
+	UI_displayClear();
 	memset(String, 0, sizeof(String));
 
 	//UI_PrintStringSmallBold("MESSENGER", 0, 127, 0);
@@ -82,7 +82,7 @@ void UI_DisplayMSG(void) {
 
 	GUI_DisplaySmallest(String, 20, 34, false, true);*/
 
-	ST7565_BlitFullScreen();
+	UI_displayUpdate();
 }
 
 #endif
