@@ -35,7 +35,7 @@ ENABLE_FASTER_CHANNEL_SCAN    ?= 1
 ENABLE_RSSI_BAR               ?= 1
 ENABLE_AUDIO_BAR              ?= 1
 ENABLE_COPY_CHAN_TO_VFO       ?= 0
-ENABLE_SPECTRUM               ?= 1
+ENABLE_SPECTRUM               ?= 0
 ENABLE_REDUCE_LOW_MID_TX_POWER?= 0
 ENABLE_BYP_RAW_DEMODULATORS   ?= 0
 ENABLE_BLMIN_TMP_OFF          ?= 0
@@ -64,7 +64,7 @@ ENABLE_MESSENGER_UART					?= 1
 ENABLE_PMR_MODE               ?= 0
 
 #### INTERNAL USE ####
-ENABLE_SCREEN_DUMP			  ?= 0
+ENABLE_SCREEN_DUMP			  ?= 1
 
 #------------------------------------------------------------------------------
 AUTHOR_STRING ?= JOAQUIM
@@ -107,8 +107,6 @@ else
 	K5PROG = utils/k5prog/k5prog -D -F -YYY -p /dev/ttyUSB3 -b
 endif
 
-CP = cp
-
 #------------------------------------------------------------------------------
 #ENABLE_AIRCOPY
 #ENABLE_PMR_MODE
@@ -125,6 +123,9 @@ BSP_HEADERS     := $(patsubst %.def,%.h,$(BSP_HEADERS))
 # Source files common to all targets
 ASM_SRC += \
 	start.S \
+
+#OLD \
+	font.c \
 
 C_SRC += \
 	external/printf/printf.c \
@@ -153,7 +154,6 @@ C_SRC += \
 	bitmaps.c \
 	board.c \
 	dcs.c \
-	font.c \
 	frequencies.c \
 	functions.c \
 	helper/battery.c \
@@ -173,6 +173,14 @@ C_SRC += \
 	ui/welcome.c \
 	version.c \
 	main.c \
+
+
+C_SRC += \
+	gui/ui.c \
+	gui/font_10.c \
+	gui/font_small.c \
+	gui/font_n_16.c \
+	gui/font_n_20.c \
 
 ifeq ($(ENABLE_UART),1)
 	C_SRC += driver/aes.c
@@ -233,6 +241,7 @@ endif
 IPATH += \
 	. \
 	ui/. \
+	gui/. \
 	helper/. \
 	app/. \
 	driver/. \

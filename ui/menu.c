@@ -499,7 +499,7 @@ void UI_DisplayMenu(void)
 	switch (UI_MENU_GetCurrentMenuId())
 	{
 		case MENU_SQL:
-			sprintf(String, "%d", gSubMenuSelection);
+			sprintf(String, "%d", (uint16_t)gSubMenuSelection);
 			break;
 
 		case MENU_MIC:
@@ -552,7 +552,7 @@ void UI_DisplayMenu(void)
 		case MENU_OFFSET:
 			if (!gIsInSubMenu || gInputBoxIndex == 0)
 			{
-				sprintf(String, "%3d.%05u", gSubMenuSelection / 100000, abs(gSubMenuSelection) % 100000);
+				sprintf(String, "%3d.%05u", (uint16_t)gSubMenuSelection / 100000, (uint16_t)abs(gSubMenuSelection) % 100000);
 				UI_PrintString(String, menu_item_x1, menu_item_x2, 1, 8);
 			}
 			else
@@ -598,7 +598,7 @@ void UI_DisplayMenu(void)
 
 		case MENU_ABR_MIN:
 		case MENU_ABR_MAX:
-			sprintf(String, "%d", gSubMenuSelection);
+			sprintf(String, "%d", (uint16_t)gSubMenuSelection);
 			if(gIsInSubMenu)
 				BACKLIGHT_SetBrightness(gSubMenuSelection);
 			else if(BACKLIGHT_GetBrightness() < 4)
@@ -607,7 +607,7 @@ void UI_DisplayMenu(void)
 		
 		#ifdef ENABLE_CONTRAST
 			case MENU_CONTRAST:				
-				sprintf(String, "%d", gSubMenuSelection);				
+				sprintf(String, "%d", (uint16_t)gSubMenuSelection);				
 				ST7565_SetContrast(gSubMenuSelection);
 				//else
 				//	ST7565_SetContrast(0);
@@ -664,7 +664,7 @@ void UI_DisplayMenu(void)
 			if (valid && !gAskForConfirmation)
 			{	// show the frequency so that the user knows the channels frequency
 				const uint32_t frequency = SETTINGS_FetchChannelFrequency(gSubMenuSelection);
-				sprintf(String, "%u.%05u", frequency / 100000, frequency % 100000);
+				sprintf(String, "%u.%05u", (uint16_t)frequency / 100000, (uint16_t)frequency % 100000);
 				UI_PrintString(String, menu_item_x1, menu_item_x2, 4, 8);
 			}
 
@@ -700,7 +700,7 @@ void UI_DisplayMenu(void)
 
 				if (!gAskForConfirmation)
 				{	// show the frequency so that the user knows the channels frequency
-					sprintf(String, "%u.%05u", frequency / 100000, frequency % 100000);
+					sprintf(String, "%u.%05u", (uint16_t)frequency / 100000, (uint16_t)frequency % 100000);
 					UI_PrintString(String, menu_item_x1, menu_item_x2, 4 + (gIsInSubMenu && edit_index >= 0), 8);
 				}
 			}
@@ -739,12 +739,12 @@ void UI_DisplayMenu(void)
 			if (gSubMenuSelection == 0)
 				strcpy(String, "OFF");
 			else
-				sprintf(String, "%d*100ms", gSubMenuSelection);
+				sprintf(String, "%d*100ms", (uint16_t)gSubMenuSelection);
 			break;
 
 		case MENU_S_LIST:
 			if (gSubMenuSelection < 2)
-				sprintf(String, "LIST%u", 1 + gSubMenuSelection);
+				sprintf(String, "LIST%u", (uint16_t)(1 + gSubMenuSelection));
 			else
 				strcpy(String, "ALL");
 			break;
@@ -778,7 +778,7 @@ void UI_DisplayMenu(void)
 			break;
 #endif
 		case MENU_D_PRE:
-			sprintf(String, "%d*10ms", gSubMenuSelection);
+			sprintf(String, "%d*10ms", (uint16_t)gSubMenuSelection);
 			break;
 
 		case MENU_PTT_ID:
@@ -833,8 +833,8 @@ void UI_DisplayMenu(void)
 					writeXtalFreqCal(gSubMenuSelection, false);
 
 					sprintf(String, "%d\n%u.%06u\nMHz",
-						gSubMenuSelection,
-						xtal_Hz / 1000000, xtal_Hz % 1000000);
+						(uint16_t)gSubMenuSelection,
+						(uint16_t)xtal_Hz / 1000000, (uint16_t)xtal_Hz % 1000000);
 				}
 				break;
 		#endif
@@ -842,7 +842,7 @@ void UI_DisplayMenu(void)
 		case MENU_BATCAL:
 		{
 			const uint16_t vol = (uint32_t)gBatteryVoltageAverage * gBatteryCalibration[3] / gSubMenuSelection;
-			sprintf(String, "%u.%02uV\n%u", vol / 100, vol % 100, gSubMenuSelection);
+			sprintf(String, "%u.%02uV\n%u", (uint16_t)vol / 100, (uint16_t)vol % 100, (uint16_t)gSubMenuSelection);
 			break;
 		}
 
@@ -969,7 +969,7 @@ void UI_DisplayMenu(void)
 	    || UI_MENU_GetCurrentMenuId() == MENU_D_LIST
 #endif
 	) {
-		sprintf(String, "%2d", gSubMenuSelection);
+		sprintf(String, "%2d", (uint16_t)gSubMenuSelection);
 		UI_PrintStringSmallNormal(String, 105, 0, 0);
 	}
 
