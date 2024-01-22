@@ -76,10 +76,6 @@ typedef enum {
 
 extern const uint16_t gStepFrequencyTable[];
 
-#ifdef ENABLE_NOAA
-	extern const uint32_t NoaaFrequencyTable[10];
-#endif
-
 #ifdef ENABLE_PMR_MODE
 	extern const uint32_t PMRFrequencyTable[16];
 #endif

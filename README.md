@@ -100,7 +100,6 @@ You'll find the options at the top of "Makefile" ('0' = disable, '1' = enable) .
 | ENABLE_UART | without this you can't configure radio via PC ! |
 | ENABLE_AIRCOPY | easier to just enter frequency with butts |
 | ENABLE_FMRADIO | WBFM VHF broadcast band receiver |
-| ENABLE_NOAA | everything NOAA (only of any use in the USA) |
 | ENABLE_VOICE | want to hear voices ? |
 | ENABLE_VOX | |
 | ENABLE_ALARM | TX alarms |

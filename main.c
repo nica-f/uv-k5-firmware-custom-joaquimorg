@@ -231,10 +231,6 @@ void Main(void)
 			AUDIO_PlaySingleVoice(0);
 		}
 #endif
-
-#ifdef ENABLE_NOAA
-		RADIO_ConfigureNOAA();
-#endif
 	}
 
 	while (true) {

@@ -62,9 +62,7 @@ const t_menu_item MenuList[] =
 	{"SList1", VOICE_ID_INVALID,                       MENU_SLIST1        },
 	{"SList2", VOICE_ID_INVALID,                       MENU_SLIST2        },
 	{"ScnRev", VOICE_ID_INVALID,                       MENU_SC_REV        },
-#ifdef ENABLE_NOAA
-	{"NOAA-S", VOICE_ID_INVALID,                       MENU_NOAA_S        },
-#endif
+
 	{"F1Shrt",    VOICE_ID_INVALID,                    MENU_F1SHRT        },
 	{"F1Long",    VOICE_ID_INVALID,                    MENU_F1LONG        },
 	{"F2Shrt",    VOICE_ID_INVALID,                    MENU_F2SHRT        },
@@ -641,9 +639,6 @@ void UI_DisplayMenu(void)
 		case MENU_D_DCD:
 #endif
 		case MENU_D_LIVE_DEC:
-		#ifdef ENABLE_NOAA
-			case MENU_NOAA_S:
-		#endif
 		case MENU_350TX:
 		case MENU_200TX:
 		case MENU_500TX:

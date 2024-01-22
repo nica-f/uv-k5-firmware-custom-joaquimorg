@@ -245,9 +245,6 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 		case MENU_D_DCD:
 #endif
 		case MENU_D_LIVE_DEC:
-		#ifdef ENABLE_NOAA
-			case MENU_NOAA_S:
-		#endif
 		case MENU_350TX:
 		case MENU_200TX:
 		case MENU_500TX:
@@ -717,13 +714,6 @@ void MENU_AcceptSetting(void)
 				break;
 		#endif
 
-		#ifdef ENABLE_NOAA
-			case MENU_NOAA_S:
-				gEeprom.NOAA_AUTO_SCAN = gSubMenuSelection;
-				gFlagReconfigureVfos   = true;
-				break;
-		#endif
-
 		case MENU_DEL_CH:
 			SETTINGS_UpdateChannel(gSubMenuSelection, NULL, false);
 			gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
@@ -1097,11 +1087,6 @@ void MENU_ShowCurrentSetting(void)
 			gSubMenuSelection = gSetting_AM_fix;
 			break;
 #endif
-		#ifdef ENABLE_NOAA
-			case MENU_NOAA_S:
-				gSubMenuSelection = gEeprom.NOAA_AUTO_SCAN;
-				break;
-		#endif
 
 		case MENU_DEL_CH:
 			#if 0
@@ -1567,12 +1552,7 @@ static void MENU_Key_STAR(const bool bKeyPressed, const bool bKeyHeld)
 	}
 
 	RADIO_SelectVfos();
-
-	#ifdef ENABLE_NOAA
-		if (!IS_NOAA_CHANNEL(gRxVfo->CHANNEL_SAVE) && gRxVfo->Modulation == MODULATION_FM)
-	#else
-		if (gRxVfo->Modulation ==  MODULATION_FM)
-	#endif
+	if (gRxVfo->Modulation ==  MODULATION_FM)
 	{
 		if ((UI_MENU_GetCurrentMenuId() == MENU_R_CTCS || UI_MENU_GetCurrentMenuId() == MENU_R_DCS) && gIsInSubMenu)
 		{	// scan CTCSS or DCS to find the tone/code of the incoming signal

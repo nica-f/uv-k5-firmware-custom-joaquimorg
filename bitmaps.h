@@ -34,10 +34,6 @@ extern const uint8_t BITMAP_TDR2[10];
 	extern const uint8_t BITMAP_VoicePrompt[9];
 #endif
 
-#ifdef ENABLE_NOAA
-	extern const uint8_t BITMAP_NOAA[11];
-#endif
-
 extern const uint8_t BITMAP_Antenna[5];
 
 extern const uint8_t BITMAP_VFO_Default[8];

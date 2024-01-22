@@ -107,9 +107,6 @@ enum
 #ifdef ENABLE_AM_FIX
 	MENU_AM_FIX,
 #endif
-#ifdef ENABLE_NOAA
-	MENU_NOAA_S,
-#endif
 	MENU_RESET,
 	MENU_F_LOCK,
 	MENU_200TX,

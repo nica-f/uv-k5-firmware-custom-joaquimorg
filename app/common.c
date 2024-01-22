@@ -43,12 +43,8 @@ void COMMON_SwitchVFOs()
 
 void COMMON_SwitchVFOMode()
 {
-#ifdef ENABLE_NOAA
-    if (gEeprom.VFO_OPEN && !IS_NOAA_CHANNEL(gTxVfo->CHANNEL_SAVE))
-#else
-    if (gEeprom.VFO_OPEN)
-#endif
-    {
+
+    if (gEeprom.VFO_OPEN) {
         if (IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE))
         {	// swap to frequency mode
             gEeprom.ScreenChannel[gEeprom.TX_VFO] = gEeprom.FreqChannel[gEeprom.TX_VFO];
