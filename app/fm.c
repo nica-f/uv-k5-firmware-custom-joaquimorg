@@ -270,9 +270,7 @@ static void Key_DIGITS(KEY_Code_t Key, uint8_t state)
 				}
 
 				gEeprom.FM_SelectedFrequency = (uint16_t)Frequency;
-#ifdef ENABLE_VOICE
-				gAnotherVoiceID = (VOICE_ID_t)Key;
-#endif
+
 				gEeprom.FM_FrequencyPlaying = gEeprom.FM_SelectedFrequency;
 				BK1080_SetFrequency(gEeprom.FM_FrequencyPlaying, gEeprom.FM_Band/*, gEeprom.FM_Space*/);
 				gRequestSaveFM = true;
@@ -287,9 +285,7 @@ static void Key_DIGITS(KEY_Code_t Key, uint8_t state)
 
 			if (State == STATE_MR_MODE) {
 				if (FM_CheckValidChannel(Channel)) {
-#ifdef ENABLE_VOICE
-					gAnotherVoiceID = (VOICE_ID_t)Key;
-#endif
+
 					gEeprom.FM_SelectedChannel = Channel;
 					gEeprom.FM_FrequencyPlaying = gFM_Channels[Channel];
 					BK1080_SetFrequency(gEeprom.FM_FrequencyPlaying, gEeprom.FM_Band/*, gEeprom.FM_Space*/);
@@ -298,9 +294,7 @@ static void Key_DIGITS(KEY_Code_t Key, uint8_t state)
 				}
 			}
 			else if (Channel < 20) {
-#ifdef ENABLE_VOICE
-				gAnotherVoiceID = (VOICE_ID_t)Key;
-#endif
+
 				gRequestDisplayScreen = DISPLAY_FM;
 				gInputBoxIndex = 0;
 				gFM_ChannelPosition = Channel;
@@ -311,9 +305,6 @@ static void Key_DIGITS(KEY_Code_t Key, uint8_t state)
 			return;
 		}
 
-#ifdef ENABLE_VOICE
-		gAnotherVoiceID = (VOICE_ID_t)Key;
-#endif
 	}
 	else
 		Key_FUNC(Key, state);
@@ -400,15 +391,9 @@ static void Key_EXIT(uint8_t state)
 			gInputBoxIndex = 0;
 		}
 
-#ifdef ENABLE_VOICE
-		gAnotherVoiceID = VOICE_ID_CANCEL;
-#endif
 	}
 	else {
 		FM_PlayAndUpdate();
-#ifdef ENABLE_VOICE
-		gAnotherVoiceID = VOICE_ID_SCANNING_STOP;
-#endif
 	}
 
 	gRequestDisplayScreen = DISPLAY_FM;

@@ -87,9 +87,6 @@ const t_menu_item MenuList[] =
 #endif		
 	{"BltTRX", VOICE_ID_INVALID,                       MENU_ABR_ON_TX_RX  },
 	{"Beep",   VOICE_ID_BEEP_PROMPT,                   MENU_BEEP          },
-#ifdef ENABLE_VOICE
-	{"Voice",  VOICE_ID_VOICE_PROMPT,                  MENU_VOICE         },
-#endif
 	{"Roger",  VOICE_ID_INVALID,                       MENU_ROGER         },
 	{"STE",    VOICE_ID_INVALID,                       MENU_STE           },
 	{"RP STE", VOICE_ID_INVALID,                       MENU_RP_STE        },
@@ -202,15 +199,6 @@ const char gSubMenu_RXMode[][17] =
 	"CROSS\nBAND", 		// TX on main, RX on secondary
 	"MAIN TX\nDUAL RX" 	// always TX on main, but RX on both
 };
-
-#ifdef ENABLE_VOICE
-	const char gSubMenu_VOICE[][4] =
-	{
-		"OFF",
-		"CHI",
-		"ENG"
-	};
-#endif
 
 const char gSubMenu_SC_REV[][8] =
 {
@@ -715,12 +703,6 @@ void UI_DisplayMenu(void)
 		case MENU_TOT:
 			strcpy(String, gSubMenu_TOT[gSubMenuSelection]);
 			break;
-
-		#ifdef ENABLE_VOICE
-			case MENU_VOICE:
-				strcpy(String, gSubMenu_VOICE[gSubMenuSelection]);
-				break;
-		#endif
 
 		case MENU_SC_REV:
 			strcpy(String, gSubMenu_SC_REV[gSubMenuSelection]);

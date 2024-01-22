@@ -209,24 +209,6 @@ void Main(void)
 
 		gUpdateStatus = true;
 
-#ifdef ENABLE_VOICE
-		{
-			uint8_t Channel;
-
-			AUDIO_SetVoiceID(0, VOICE_ID_WELCOME);
-
-			Channel = gEeprom.ScreenChannel[gEeprom.TX_VFO];
-			if (IS_MR_CHANNEL(Channel))
-			{
-				AUDIO_SetVoiceID(1, VOICE_ID_CHANNEL_MODE);
-				AUDIO_SetDigitVoice(2, Channel + 1);
-			}
-			else if (IS_FREQ_CHANNEL(Channel))
-				AUDIO_SetVoiceID(1, VOICE_ID_FREQUENCY_MODE);
-
-			AUDIO_PlaySingleVoice(0);
-		}
-#endif
 	}
 
 	while (true) {

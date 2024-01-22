@@ -195,7 +195,7 @@ static void processFKeyFunction(const KEY_Code_t Key, const bool beep)
 		case KEY_5:
 			if(beep) {
 
-#ifdef(ENABLE_SPECTRUM)
+#ifdef ENABLE_SPECTRUM
 				APP_RunSpectrum();
 				gRequestDisplayScreen = DISPLAY_MAIN;
 #endif
@@ -229,11 +229,6 @@ static void processFKeyFunction(const KEY_Code_t Key, const bool beep)
 			if (RADIO_CheckValidChannel(gEeprom.CHAN_1_CALL, false, 0)) {
 				gEeprom.MrChannel[Vfo]     = gEeprom.CHAN_1_CALL;
 				gEeprom.ScreenChannel[Vfo] = gEeprom.CHAN_1_CALL;
-#ifdef ENABLE_VOICE
-				AUDIO_SetVoiceID(0, VOICE_ID_CHANNEL_MODE);
-				AUDIO_SetDigitVoice(1, gEeprom.CHAN_1_CALL + 1);
-				gAnotherVoiceID        = (VOICE_ID_t)0xFE;
-#endif
 				gRequestSaveVFO            = true;
 				gVfoConfigureMode          = VFO_CONFIGURE_RELOAD;
 				break;
@@ -287,9 +282,6 @@ static void MAIN_Key_DIGITS(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		if (IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE)) { // user is entering channel number
 
 			if (gInputBoxIndex != 3) {
-				#ifdef ENABLE_VOICE
-					gAnotherVoiceID   = (VOICE_ID_t)Key;
-				#endif
 				gRequestDisplayScreen = DISPLAY_MAIN;
 				return;
 			}
@@ -303,10 +295,6 @@ static void MAIN_Key_DIGITS(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 				return;
 			}
 
-			#ifdef ENABLE_VOICE
-				gAnotherVoiceID        = (VOICE_ID_t)Key;
-			#endif
-
 			gEeprom.MrChannel[Vfo]     = (uint8_t)Channel;
 			gEeprom.ScreenChannel[Vfo] = (uint8_t)Channel;
 			gRequestSaveVFO            = true;
@@ -318,9 +306,6 @@ static void MAIN_Key_DIGITS(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		if (IS_FREQ_CHANNEL(gTxVfo->CHANNEL_SAVE))
 		{	// user is entering a frequency
 
-#ifdef ENABLE_VOICE
-			gAnotherVoiceID = (VOICE_ID_t)Key;
-#endif
 			bool isGigaF = gTxVfo->pRX->Frequency >= _1GHz_in_KHz;
 			if (gInputBoxIndex < 6 + isGigaF) {
 				return;
@@ -404,18 +389,11 @@ static void MAIN_Key_EXIT(bool bKeyPressed, bool bKeyHeld)
 
 				gKeyInputCountdown = key_input_timeout_500ms;
 
-#ifdef ENABLE_VOICE
-				if (gInputBoxIndex == 0)
-					gAnotherVoiceID = VOICE_ID_CANCEL;
-#endif
 			}
 			else {
 				gScanKeepResult = false;
 				CHFRSCANNER_Stop();
 
-#ifdef ENABLE_VOICE
-				gAnotherVoiceID = VOICE_ID_SCANNING_STOP;
-#endif
 			}
 
 			gRequestDisplayScreen = DISPLAY_MAIN;
@@ -488,9 +466,7 @@ static void MAIN_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 
 			gFlagRefreshSetting = true;
 			gRequestDisplayScreen = DISPLAY_MENU;
-			#ifdef ENABLE_VOICE
-				gAnotherVoiceID   = VOICE_ID_MENU;
-			#endif
+
 		}
 		else {
 			gRequestDisplayScreen = DISPLAY_MAIN;
@@ -571,10 +547,7 @@ static void MAIN_Key_UP_DOWN(bool bKeyPressed, bool bKeyHeld, int8_t Direction)
 			if (!bKeyHeld || IS_FREQ_CHANNEL(Channel))
 				return;
 			// if released long button press and not in freq mode
-#ifdef ENABLE_VOICE
-			AUDIO_SetDigitVoice(0, gTxVfo->CHANNEL_SAVE + 1); // say channel number
-			gAnotherVoiceID = (VOICE_ID_t)0xFE;
-#endif
+
 			return;
 		}
 	}
@@ -610,13 +583,6 @@ static void MAIN_Key_UP_DOWN(bool bKeyPressed, bool bKeyHeld, int8_t Direction)
 			return;
 		gEeprom.MrChannel[gEeprom.TX_VFO] = Next;
 		gEeprom.ScreenChannel[gEeprom.TX_VFO] = Next;
-
-		if (!bKeyHeld) {
-#ifdef ENABLE_VOICE
-			AUDIO_SetDigitVoice(0, Next + 1);
-			gAnotherVoiceID = (VOICE_ID_t)0xFE;
-#endif
-		}
 
 		gRequestSaveVFO   = true;
 		gVfoConfigureMode = VFO_CONFIGURE_RELOAD;

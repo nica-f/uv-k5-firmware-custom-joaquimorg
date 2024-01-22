@@ -54,9 +54,6 @@ static void SCANNER_Key_DIGITS(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 			gRequestDisplayScreen = DISPLAY_SCANNER;
 
 			if (gInputBoxIndex < 3) {
-#ifdef ENABLE_VOICE
-				gAnotherVoiceID = (VOICE_ID_t)Key;
-#endif
 				return;
 			}
 
@@ -64,9 +61,7 @@ static void SCANNER_Key_DIGITS(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 
 			uint16_t chan = ((gInputBox[0] * 100) + (gInputBox[1] * 10) + gInputBox[2]) - 1;
 			if (IS_MR_CHANNEL(chan)) {
-#ifdef ENABLE_VOICE
-				gAnotherVoiceID = (VOICE_ID_t)Key;
-#endif
+
 				gShowChPrefix = RADIO_CheckValidChannel(chan, false, 0);
 				gScanChannel  = (uint8_t)chan;
 				return;
@@ -99,9 +94,6 @@ static void SCANNER_Key_EXIT(bool bKeyPressed, bool bKeyHeld)
 
 			case SCAN_SAVE_CHANNEL:
 				gScannerSaveState     = SCAN_SAVE_NO_PROMPT;
-#ifdef ENABLE_VOICE
-				gAnotherVoiceID   = VOICE_ID_CANCEL;
-#endif
 				gRequestDisplayScreen = DISPLAY_SCANNER;
 				break;
 		}
@@ -160,9 +152,7 @@ static void SCANNER_Key_MENU(bool bKeyPressed, bool bKeyHeld)
 			}
 
 			gScanCssState         = SCAN_CSS_STATE_FOUND;
-#ifdef ENABLE_VOICE
-			gAnotherVoiceID   = VOICE_ID_MEMORY_CHANNEL;
-#endif
+
 			gRequestDisplayScreen = DISPLAY_SCANNER;
 			
 			gUpdateStatus = true;
@@ -210,9 +200,7 @@ static void SCANNER_Key_MENU(bool bKeyPressed, bool bKeyHeld)
 
 			gTxVfo->CHANNEL_SAVE = chan;
 			gEeprom.ScreenChannel[gEeprom.TX_VFO] = chan;
-#ifdef ENABLE_VOICE	
-			gAnotherVoiceID = VOICE_ID_CONFIRM;
-#endif
+
 			gRequestDisplayScreen = DISPLAY_SCANNER;
 			gRequestSaveChannel = 2;
 			gScannerSaveState = SCAN_SAVE_NO_PROMPT;
@@ -301,10 +289,6 @@ void SCANNER_Start(bool singleFreq)
 	gScanSingleFrequency = singleFreq;
 	gMonitor = false;
 
-#ifdef ENABLE_VOICE
-	gAnotherVoiceID = VOICE_ID_SCANNING_BEGIN;
-#endif
-
 	BK4819_StopScan();
 	RADIO_SelectVfos();
 
@@ -368,9 +352,7 @@ void SCANNER_Stop(void)
 		gUpdateStatus            = true;
 		gCssBackgroundScan 			 = false;
 		gScanUseCssResult = false;
-#ifdef ENABLE_VOICE
-		gAnotherVoiceID          = VOICE_ID_CANCEL;
-#endif
+
 		BK4819_StopScan();
 	}
 }

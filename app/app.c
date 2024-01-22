@@ -454,9 +454,6 @@ void APP_StartListening(FUNCTION_Type_t function)
 		(gEeprom.VOLUME_GAIN << 4) |     // AF Rx Gain-2
 		(gEeprom.DAC_GAIN    << 0));     // AF DAC Gain (after Gain-1 and Gain-2)
 
-#ifdef ENABLE_VOICE
-	if (gVoiceWriteIndex == 0)       // AM/FM RX mode will be set when the voice has finished
-#endif
 		RADIO_SetModulation(gRxVfo->Modulation);  // no need, set it now
 
 	FUNCTION_Select(function);
@@ -744,12 +741,6 @@ static void HandleVox(void)
 
 void APP_Update(void)
 {
-#ifdef ENABLE_VOICE
-	if (gFlagPlayQueuedVoice) {
-			AUDIO_PlayQueuedVoice();
-			gFlagPlayQueuedVoice = false;
-	}
-#endif
 
 	if (gCurrentFunction == FUNCTION_TRANSMIT && (gTxTimeoutReached || SerialConfigInProgress()))
 	{	// transmitter timed out or must de-key
@@ -842,11 +833,7 @@ void APP_Update(void)
 		gSchedulePowerSave = false;
 	}
 
-	if (gPowerSaveCountdownExpired && gCurrentFunction == FUNCTION_POWER_SAVE
-#ifdef ENABLE_VOICE
-		&& gVoiceWriteIndex == 0
-#endif
-	) {
+	if (gPowerSaveCountdownExpired && gCurrentFunction == FUNCTION_POWER_SAVE) {
 		static bool goToSleep;
 		// wake up, enable RX then go back to sleep
 		if (gRxIdleMode)
@@ -1816,15 +1803,6 @@ Skip:
 		RADIO_PrepareTX();
 		gFlagPrepareTX = false;
 	}
-
-#ifdef ENABLE_VOICE
-	if (gAnotherVoiceID != VOICE_ID_INVALID) {
-		if (gAnotherVoiceID < 76)
-			AUDIO_SetVoiceID(0, gAnotherVoiceID);
-		AUDIO_PlaySingleVoice(false);
-		gAnotherVoiceID = VOICE_ID_INVALID;
-	}
-#endif
 
 	GUI_SelectNextDisplay(gRequestDisplayScreen);
 	gRequestDisplayScreen = DISPLAY_INVALID;

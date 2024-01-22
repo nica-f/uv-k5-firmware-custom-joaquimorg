@@ -61,9 +61,6 @@ enum
 #endif	
 	MENU_TDR,
 	MENU_BEEP,
-#ifdef ENABLE_VOICE
-	MENU_VOICE,
-#endif
 	MENU_SC_REV,
 	MENU_AUTOLK,
 	MENU_S_ADD1,
@@ -138,9 +135,6 @@ extern const char        gSubMenu_SAVE[5][4];
 //extern const char        gSubMenu_TOT[11][7];
 extern const char		 gSubMenu_RXMode[4][17];
 
-#ifdef ENABLE_VOICE
-	extern const char    gSubMenu_VOICE[3][4];
-#endif
 extern const char        gSubMenu_SC_REV[3][8];
 extern const char		 gSubMenu_MDF[4][16];
 #ifdef ENABLE_ALARM

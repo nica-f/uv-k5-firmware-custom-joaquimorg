@@ -30,10 +30,6 @@ extern const uint8_t BITMAP_XB[12];
 extern const uint8_t BITMAP_TDR1[16];
 extern const uint8_t BITMAP_TDR2[10];
 
-#ifdef ENABLE_VOICE
-	extern const uint8_t BITMAP_VoicePrompt[9];
-#endif
-
 extern const uint8_t BITMAP_Antenna[5];
 
 extern const uint8_t BITMAP_VFO_Default[8];

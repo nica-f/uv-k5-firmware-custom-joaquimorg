@@ -72,11 +72,6 @@ void GENERIC_Key_F(bool bKeyPressed, bool bKeyHeld)
 			if (gWasFKeyPressed)
 				gKeyInputCountdown = key_input_timeout_500ms;
 
-			#ifdef ENABLE_VOICE
-				if (!gWasFKeyPressed)
-					gAnotherVoiceID = VOICE_ID_CANCEL;
-			#endif
-
 			gUpdateStatus = true;
 		}
 	}
@@ -151,9 +146,6 @@ void GENERIC_Key_PTT(bool bKeyPressed)
 	if (gFM_ScanState != FM_SCAN_OFF)
 	{	// FM radio is scanning .. stop
 		FM_PlayAndUpdate();
-		#ifdef ENABLE_VOICE
-			gAnotherVoiceID = VOICE_ID_SCANNING_STOP;
-		#endif
 		gRequestDisplayScreen = DISPLAY_FM;
 		goto cancel_tx;
 	}
