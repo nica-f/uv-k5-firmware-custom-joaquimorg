@@ -14,14 +14,15 @@
  *     limitations under the License.
  */
 
-#ifndef GUI_H
-#define GUI_H
+#ifndef G_GUI_H
+#define G_GUI_H
 
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
 
-void GUI_drawStatus(void);
+
+void GUI_drawBattery(void);
 
 //void        GUI_inputAppendKey(const KEY_Code_t key);
 uint8_t     GUI_inputGetSize();

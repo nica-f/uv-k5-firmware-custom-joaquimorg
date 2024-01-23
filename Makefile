@@ -114,6 +114,7 @@ ASM_SRC += \
 
 #OLD \
 	font.c \
+	bitmaps.c \
 
 C_SRC += \
 	external/printf/printf.c \
@@ -139,7 +140,6 @@ C_SRC += \
 	app/menu.c \
 	app/scanner.c \
 	audio.c \
-	bitmaps.c \
 	board.c \
 	dcs.c \
 	frequencies.c \

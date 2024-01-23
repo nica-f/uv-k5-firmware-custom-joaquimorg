@@ -36,29 +36,60 @@
 #include "ui/helper.h"
 #include "ui/ui.h"
 #include "ui/status.h"
+#include "gui/gui.h"
+
+
+#define STATUS_SPACE 2
 
 void UI_DisplayStatus()
 {
 	gUpdateStatus = false;
-	//memset(gFrameBuffer[0], 0, sizeof(gFrameBuffer[0]));
+	memset(gFrameBuffer[0], 0, sizeof(gFrameBuffer[0]));
 
-	//uint8_t     *line = gFrameBuffer[0];
-	//unsigned int x    = 0;
-	// **************
+	GUI_drawBattery();
+
+	switch (gSetting_battery_text) {
+		default:
+		case 0:
+			break;
+
+		case 1:	{	// voltage
+			const uint16_t voltage = (gBatteryVoltageAverage <= 999) ? gBatteryVoltageAverage : 999; // limit to 9.99V
+			UI_printf(&font_small, TEXT_ALIGN_LEFT, 18, 0, 4, true, false, "%u.%02uV", voltage / 100, voltage % 100);
+			break;
+		}
+
+		case 2: {	// percentage
+			const uint8_t gBatteryPercentage = BATTERY_VoltsToPercent(gBatteryVoltageAverage);
+			UI_printf(&font_small, TEXT_ALIGN_LEFT, 18, 0, 4, true, false, "% 3i%%", gBatteryPercentage);
+			break;
+		}
+	}
+
+	// USB-C charge indicator
+	if (gChargingWithTypeC) {
+		UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "\\");
+	}
 
 	// POWER-SAVE indicator
 	if (gCurrentFunction == FUNCTION_TRANSMIT) {
-
-		//memcpy(line + x, BITMAP_TX, sizeof(BITMAP_TX));
+		UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "\"");
 	}
 	else if (FUNCTION_IsRx()) {
-
-		//memcpy(line + x, BITMAP_RX, sizeof(BITMAP_RX));
+		UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "$");
 	}
 	else if (gCurrentFunction == FUNCTION_POWER_SAVE) {
-
-		//memcpy(line + x, BITMAP_POWERSAVE, sizeof(BITMAP_POWERSAVE));
+		UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "PS");
 	}
+
+	// KEY-LOCK indicator
+	if (gEeprom.KEY_LOCK) {
+		UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "]");		
+	}
+	else if (gWasFKeyPressed) {
+		UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "[");
+	}
+
 	//x += 8;
 	//unsigned int x1 = x;
 
@@ -136,66 +167,6 @@ void UI_DisplayStatus()
 	}
 	//x += sizeof(BITMAP_VOX) + 1;
 #endif
-
-	//x = MAX(x1, 61u);
-
-	// KEY-LOCK indicator
-	if (gEeprom.KEY_LOCK) {
-
-		//memcpy(line + x, BITMAP_KeyLock, sizeof(BITMAP_KeyLock));
-		//x += sizeof(BITMAP_KeyLock);
-		//x1 = x;
-	}
-	else if (gWasFKeyPressed) {
-
-		//memcpy(line + x, BITMAP_F_Key, sizeof(BITMAP_F_Key));
-		//x += sizeof(BITMAP_F_Key);
-		//x1 = x;
-	}
-
-	{	// battery voltage or percentage
-		//char         s[8] = "";
-		//unsigned int x2 = LCD_WIDTH - sizeof(BITMAP_BatteryLevel1) - 0;
-
-		if (gChargingWithTypeC) {
-
-			//x2 -= sizeof(BITMAP_USB_C);  // the radio is on charge
-		}
-
-		switch (gSetting_battery_text) {
-			default:
-			case 0:
-				break;
-
-			case 1:	{	// voltage
-				//const uint16_t voltage = (gBatteryVoltageAverage <= 999) ? gBatteryVoltageAverage : 999; // limit to 9.99V
-				//sprintf(s, "%u.%02uV", voltage / 100, voltage % 100);
-				break;
-			}
-
-			case 2:		// percentage
-				//sprintf(s, "%u%%", BATTERY_VoltsToPercent(gBatteryVoltageAverage));
-				break;
-		}
-
-		//unsigned int space_needed = (7 * strlen(s));
-		//if (x2 >= (x1 + space_needed))
-			//UI_PrintStringSmallBufferNormal(s, line + x2 - space_needed);
-	}
-
-	// move to right side of the screen
-	//x = LCD_WIDTH - sizeof(BITMAP_BatteryLevel1) - sizeof(BITMAP_USB_C);
-
-	// USB-C charge indicator
-	if (gChargingWithTypeC) {
-
-	}
-		//memcpy(line + x, BITMAP_USB_C, sizeof(BITMAP_USB_C));
-	//x += sizeof(BITMAP_USB_C);
-
-	// BATTERY LEVEL indicator
-	//UI_DrawBattery(line + x, gBatteryDisplayLevel, gLowBatteryBlink);
-
 
 	// **************
 

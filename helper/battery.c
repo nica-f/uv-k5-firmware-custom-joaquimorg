@@ -95,6 +95,7 @@ unsigned int BATTERY_VoltsToPercent(const unsigned int voltage_10mV)
 
 void BATTERY_GetReadings(const bool bDisplayBatteryLevel)
 {
+	(void) bDisplayBatteryLevel;
 	const uint8_t  PreviousBatteryLevel = gBatteryDisplayLevel;
 	const uint16_t Voltage              = (gBatteryVoltages[0] + gBatteryVoltages[1] + gBatteryVoltages[2] + gBatteryVoltages[3]) / 4;
 
@@ -154,8 +155,8 @@ void BATTERY_GetReadings(const bool bDisplayBatteryLevel)
 		{
 			gLowBattery = false;
 
-			if (bDisplayBatteryLevel)
-				UI_DisplayBattery(gBatteryDisplayLevel, gLowBatteryBlink);
+			/*if (bDisplayBatteryLevel)
+				UI_DisplayBattery(gBatteryDisplayLevel, gLowBatteryBlink);*/
 		}
 
 		if(!gLowBatteryConfirmed)
@@ -173,7 +174,7 @@ void BATTERY_TimeSlice500ms(void)
 
 	gLowBatteryBlink = ++lowBatteryCountdown & 1;
 
-	UI_DisplayBattery(0, gLowBatteryBlink);
+	//UI_DisplayBattery(0, gLowBatteryBlink);
 
 	if (gCurrentFunction == FUNCTION_TRANSMIT) {
 		return;

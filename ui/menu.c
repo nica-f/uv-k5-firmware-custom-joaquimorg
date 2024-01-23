@@ -418,8 +418,8 @@ void UI_DisplayMenu(void)
 		gFrameBuffer[i][(8 * menu_list_width) + 1] = 0xAA;
 
 	// draw the little sub-menu triangle marker
-	if (gIsInSubMenu)
-		memcpy(gFrameBuffer[0] + (8 * menu_list_width) + 1, BITMAP_CurrentIndicator, sizeof(BITMAP_CurrentIndicator));
+	/*if (gIsInSubMenu)
+		memcpy(gFrameBuffer[0] + (8 * menu_list_width) + 1, BITMAP_CurrentIndicator, sizeof(BITMAP_CurrentIndicator));*/
 
 	// draw the menu index number/count
 	sprintf(String, "%2u.%u", 1 + gMenuCursor, gMenuListCount);

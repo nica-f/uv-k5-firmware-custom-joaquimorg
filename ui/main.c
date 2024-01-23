@@ -33,6 +33,7 @@
 #include "radio.h"
 #include "settings.h"
 #include "gui/ui.h"
+#include "gui/gui.h"
 #include "ui/helper.h"
 #include "ui/inputbox.h"
 #include "ui/main.h"
@@ -78,9 +79,9 @@ void MainVFO_showRSSI(void) {
     const int16_t s0_dBm   = -gEeprom.S0_LEVEL;                  // S0 .. base level
 	const int16_t rssi_dBm =
 		BK4819_GetRSSI_dBm()
-/*#ifdef ENABLE_AM_FIX
+#ifdef ENABLE_AM_FIX
 		+ ((gSetting_AM_fix && gRxVfo->Modulation == MODULATION_AM) ? AM_fix_get_gain_diff() : 0)
-#endif*/
+#endif
 		+ dBmCorrTable[gRxVfo->Band];
 
     int s0_9 = gEeprom.S0_LEVEL - gEeprom.S9_LEVEL;
@@ -123,6 +124,31 @@ void MainVFO_showRSSI(void) {
 
 void UI_DisplayMain(void) {
 
+	const uint8_t popupW = 80;
+	const uint8_t popupH = 30;
+
+	uint8_t startX;
+    uint8_t startY;
+
+	//memset(gFrameBuffer[0],  0, sizeof(gFrameBuffer[0]));
+	UI_displayClear();
+
+	if(gLowBattery && !gLowBatteryConfirmed) {
+		GUI_showPopup(popupW, popupH, &startX, &startY);
+		UI_drawString(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 10, "LOW BATTERY", true, false);
+		UI_displayUpdate();
+		return;
+	}
+
+	if (gEeprom.KEY_LOCK && gKeypadLocked > 0) {
+		// tell user how to unlock the keyboard
+		GUI_showPopup(popupW, popupH, &startX, &startY);
+		UI_drawString(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 5, "Long press #", true, false);
+		UI_drawString(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 15, "to unlock", true, false);
+		UI_displayUpdate();
+		return;
+	}		
+
     char String[17] = { 0 };
     uint8_t vfoNumA;
     uint8_t vfoNumB;
@@ -143,9 +169,6 @@ void UI_DisplayMain(void) {
 
     uint32_t frequency;
     uint8_t  yPosVFO = 22;
-
-	// clear the screen
-	UI_displayClear();
 
     // VFO A
     UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO - 7, false, true, vfoNumA == 0 ? "A" : "B");
@@ -225,6 +248,14 @@ void UI_DisplayMain(void) {
         UI_printf(&font_small, TEXT_ALIGN_LEFT, 2, 20, yPosVFO + 2, true, false, "VFO");
     }
 
+	enum VfoState_t state = VfoState[vfoNumA];
+	if (state != VFO_STATE_NORMAL) {
+		if (state < ARRAY_SIZE(VfoStateStr)) {
+			GUI_showPopup(popupW, popupH, &startX, &startY);
+			UI_drawString(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 10, VfoStateStr[state], true, false);
+		}
+		//UI_PrintString(VfoStateStr[state], 31, 0, line, 8);
+	}
 
 	UI_displayUpdate();
 }

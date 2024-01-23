@@ -43,24 +43,7 @@ void GUI_drawBattery(void) {
 			gFrameBuffer[0][3 + i] = 0x21;
 		}
 	}
-
-	UI_printf(&font_small, TEXT_ALIGN_LEFT, 18, 0, 4, true, false, "% 3i%%", gBatteryPercentage);
 }
-
-void GUI_drawStatus(void) {
-	//const char txrxStatus = global_status.isTX ? '\"' : global_status.isRX ? '$' : 0x00;
-	//const char newMessage = global_status.newMessage ? '#' : 0x00;
-	memset(gFrameBuffer[0], 0x00, sizeof(gFrameBuffer[0]));	
-	GUI_drawBattery();
-	
-	UI_printf(&font_small, TEXT_ALIGN_LEFT, 38, 0, 4, true, false, "%u.%02uV", gBatteryVoltageAverage / 100, gBatteryVoltageAverage % 100);
-	//UI_printf(38, 0, 4, true, false, "%u.%02uV %s %c %c", gBatteryVoltageAverage / 100, gBatteryVoltageAverage % 100, global_status.statusMessage, txrxStatus, newMessage);
-	//UI_printf(&font_small, TEXT_ALIGN_LEFT, 38, 0, 4, true, false, "%s %c %c", global_status.statusMessage, txrxStatus, newMessage);
-
-	//UI_setFont(&bitmaps_8x8);
-	//UI_drawString(119, 0, 0, "!", true, false);
-}
-
 
 
 void GUI_inputAppendKey(const KEY_Code_t key) {
