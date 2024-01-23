@@ -43,6 +43,11 @@
 #include "ui/menu.h"
 #include "ui/ui.h"
 
+#ifdef ENABLE_UART
+	#include "driver/uart.h"
+#endif
+
+
 #ifndef ARRAY_SIZE
 	#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 #endif
@@ -1506,6 +1511,7 @@ static void MENU_Key_UP_DOWN(bool bKeyPressed, bool bKeyHeld, int8_t Direction)
 
 	if ( settingsSubMenuActive ) {
 		settingsCurrentSubMenu = NUMBER_AddWithWraparound(settingsCurrentSubMenu, -Direction, settingsSubmenuMin, settingsSubmenuSize - 1);
+		UART_printf("settingsCurrentSubMenu %i : %i : %i\r\n", settingsCurrentSubMenu, settingsSubmenuMin, settingsSubmenuSize - 1);
 	} else {
 		settingsCurrentMenu = NUMBER_AddWithWraparound(settingsCurrentMenu, -Direction, 0, gMenuListCount - 1);
 		settingsSubMenuTime = getTickCount();

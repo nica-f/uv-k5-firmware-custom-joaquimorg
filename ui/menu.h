@@ -172,8 +172,8 @@ extern int               edit_index;
 
 extern uint8_t 			settingsCurrentMenu;
 
-extern uint16_t 			settingsSubmenuMin;
-extern uint16_t 			settingsSubmenuSize;
+extern uint16_t 		settingsSubmenuMin;
+extern uint16_t 		settingsSubmenuSize;
 extern uint8_t 			settingsCurrentSubMenu;
 extern uint16_t 		settingsSubMenuTime;
 extern bool 			settingsShowSubMenu;

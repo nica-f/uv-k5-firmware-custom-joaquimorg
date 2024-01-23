@@ -534,7 +534,7 @@ void SettingsMenu_loadSubList() {
 
 		case MENU_STEP:
 			// 0 .. STEP_N_ELEM - 1;
-			settingsSubmenuSize = STEP_N_ELEM - 1;
+			settingsSubmenuSize = (STEP_N_ELEM - 1);
 			settingsCurrentSubMenu = FREQUENCY_GetSortedIdxFromStepIdx(gTxVfo->STEP_SETTING);
 			showValue = true;
 			break;
@@ -571,7 +571,7 @@ void SettingsMenu_loadSubList() {
 			showNumber = true;
 			break;
 
-#ifdef ENABLE_C
+#ifdef ENABLE_CONTRAST
 		case MENU_CONTRAST:
 			settingsCurrentSubMenu = gEeprom.LCD_CONTRAST;
 			settingsSubmenuSize = 63;
