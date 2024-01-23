@@ -96,7 +96,7 @@ void UI_DisplayStatus()
 #ifdef ENABLE_MESSENGER
 	if (hasNewMessage > 0) { // New Message indicator
 		if (hasNewMessage == 1) {
-
+			UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "#");
 		}
 			//memcpy(line + x, BITMAP_NEWMSG, sizeof(BITMAP_NEWMSG));
 		//x1 = x + sizeof(BITMAP_NEWMSG);
@@ -122,7 +122,7 @@ void UI_DisplayStatus()
 #endif
 	{ // SCAN indicator
 		if (gScanStateDir != SCAN_OFF || SCANNER_IsScanning()) {
-			/*char * s = "";
+			char * s = "";
 			if (IS_MR_CHANNEL(gNextMrChannel) && !SCANNER_IsScanning()) { // channel mode
 				switch(gEeprom.SCAN_LIST_DEFAULT) {
 					case 0: s = "1"; break;
@@ -132,8 +132,9 @@ void UI_DisplayStatus()
 			}
 			else {	// frequency mode
 				s = "S";
-			}*/
+			}
 
+			UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "%c", s);
 			//UI_PrintStringSmallBufferNormal(s, line + x + 1);
 			//x1 = x + 10;
 		}
@@ -144,7 +145,7 @@ void UI_DisplayStatus()
 		uint8_t dw = (gEeprom.DUAL_WATCH != DUAL_WATCH_OFF) + (gEeprom.CROSS_BAND_RX_TX != CROSS_BAND_OFF) * 2;
 		if(dw == 1 || dw == 3) { // DWR - dual watch + respond
 			if(gDualWatchActive) {
-
+				UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "DW");
 				//memcpy(line + x + (dw==1?0:2), BITMAP_TDR1, sizeof(BITMAP_TDR1) - (dw==1?0:5));
 			} else {
 
@@ -152,7 +153,7 @@ void UI_DisplayStatus()
 			}
 		}
 		else if(dw == 2) { // XB - crossband
-
+			UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "XB");
 			//memcpy(line + x + 2, BITMAP_XB, sizeof(BITMAP_XB));
 		}
 	}
@@ -162,6 +163,7 @@ void UI_DisplayStatus()
 	// VOX indicator
 	if (gEeprom.VOX_SWITCH) {
 
+		UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "VOX");
 		//memcpy(line + x, BITMAP_VOX, sizeof(BITMAP_VOX));
 		//x1 = x + sizeof(BITMAP_VOX) + 1;
 	}

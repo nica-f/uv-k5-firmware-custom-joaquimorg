@@ -38,6 +38,7 @@
 #include "ui/inputbox.h"
 #include "ui/main.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 
 center_line_t center_line = CENTER_LINE_NONE;
 

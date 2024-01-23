@@ -36,6 +36,14 @@
 	#define SWAP(a, b) ({ __typeof__ (a) _c = (a);  a = b; b = _c; })
 #endif
 
+#ifndef pdMS_TO_TICKS
+	#define configTICK_RATE_HZ (TickType_t)1000U
+	typedef uint16_t     TickType_t;
+    #define pdMS_TO_TICKS( xTimeInMs )    ( ( TickType_t ) ( ( ( TickType_t ) ( xTimeInMs ) * ( TickType_t ) configTICK_RATE_HZ ) / ( TickType_t ) 1000U ) )
+#endif
+
+extern uint32_t getTickCount(void);
+
 #define IS_MR_CHANNEL(x)       ((x) <= MR_CHANNEL_LAST)
 #define IS_FREQ_CHANNEL(x)     ((x) >= FREQ_CHANNEL_FIRST && (x) <= FREQ_CHANNEL_LAST)
 #define IS_VALID_CHANNEL(x)    ((x) < LAST_CHANNEL)
@@ -78,11 +86,6 @@ enum BacklightOnRxTx_t {
 	BACKLIGHT_ON_TR_RX,
 	BACKLIGHT_ON_TR_TXRX
 };
-
-extern const char* const gSubMenu_TXP[3];
-extern const char* const gSubMenu_W_N[3];
-extern const char* const gSubMenu_TOT[11];
-extern const char* const gSubMenu_BACKLIGHT[8];
 
 extern const uint8_t         fm_radio_countdown_500ms;
 extern const uint16_t        fm_play_countdown_scan_10ms;

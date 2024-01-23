@@ -1263,7 +1263,7 @@ void APP_TimeSlice500ms(void)
 
 	if (gBacklightCountdown_500ms > 0 && !gAskToSave && !gCssBackgroundScan
 		// don't turn off backlight if user is in backlight menu option
-		&& !(gScreenToDisplay == DISPLAY_MENU && (UI_MENU_GetCurrentMenuId() == MENU_ABR || UI_MENU_GetCurrentMenuId() == MENU_ABR_MAX))
+		&& !(gScreenToDisplay == DISPLAY_MENU /*&& (UI_MENU_GetCurrentMenuId() == MENU_ABR || UI_MENU_GetCurrentMenuId() == MENU_ABR_MAX)*/)
 		&& --gBacklightCountdown_500ms == 0
 		&& gEeprom.BACKLIGHT_TIME < (ARRAY_SIZE(gSubMenu_BACKLIGHT) - 1)
 	) {
@@ -1496,11 +1496,11 @@ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		}
 	}
 	else { // key pressed or held
-		const int m = UI_MENU_GetCurrentMenuId();
+		//const int m = UI_MENU_GetCurrentMenuId();
 		if 	(	//not when PTT and the backlight shouldn't turn on on TX
 				!(Key == KEY_PTT && !(gSetting_backlight_on_tx_rx & BACKLIGHT_ON_TR_TX))
 				// not in the backlight menu
-				&& !(gScreenToDisplay == DISPLAY_MENU && ( m == MENU_ABR || m == MENU_ABR_MAX || m == MENU_ABR_MIN))
+				&& !(gScreenToDisplay == DISPLAY_MENU /*&& ( m == MENU_ABR || m == MENU_ABR_MAX || m == MENU_ABR_MIN)*/)
 			)
 		{
 			BACKLIGHT_TurnOn();
@@ -1796,7 +1796,7 @@ Skip:
 		gFlagRefreshSetting = false;
 		gMenuCountdown      = menu_timeout_500ms;
 
-		MENU_ShowCurrentSetting();
+		//MENU_ShowCurrentSetting();
 	}
 
 	if (gFlagPrepareTX) {

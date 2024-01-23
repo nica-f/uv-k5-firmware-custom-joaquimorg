@@ -34,119 +34,156 @@
 #include "helper.h"
 #include "inputbox.h"
 #include "menu.h"
+#include "gui/ui.h"
+#include "gui/gui.h"
 #include "ui.h"
 
 const t_menu_item MenuList[] =
 {
-//   text,     voice ID,                               menu ID
-	{"Step",   VOICE_ID_FREQUENCY_STEP,                MENU_STEP          },
-	{"TxPwr",  VOICE_ID_POWER,                         MENU_TXP           }, // was "TXP"
-	{"RxDCS",  VOICE_ID_DCS,                           MENU_R_DCS         }, // was "R_DCS"
-	{"RxCTCS", VOICE_ID_CTCSS,                         MENU_R_CTCS        }, // was "R_CTCS"
-	{"TxDCS",  VOICE_ID_DCS,                           MENU_T_DCS         }, // was "T_DCS"
-	{"TxCTCS", VOICE_ID_CTCSS,                         MENU_T_CTCS        }, // was "T_CTCS"
-	{"TxODir", VOICE_ID_TX_OFFSET_FREQUENCY_DIRECTION, MENU_SFT_D         }, // was "SFT_D"
-	{"TxOffs", VOICE_ID_TX_OFFSET_FREQUENCY,           MENU_OFFSET        }, // was "OFFSET"
-	{"Bandwi", VOICE_ID_CHANNEL_BANDWIDTH,             MENU_W_N           },
-	{"Scramb", VOICE_ID_SCRAMBLER_ON,                  MENU_SCR           }, // was "SCR"
-	{"BusyCL", VOICE_ID_BUSY_LOCKOUT,                  MENU_BCL           }, // was "BCL"
-	{"Compnd", VOICE_ID_INVALID,                       MENU_COMPAND       },
-	{"Demodu", VOICE_ID_INVALID,                       MENU_AM            }, // was "AM"
-	{"ScAdd1", VOICE_ID_INVALID,                       MENU_S_ADD1        },
-	{"ScAdd2", VOICE_ID_INVALID,                       MENU_S_ADD2        },
-	{"ChSave", VOICE_ID_MEMORY_CHANNEL,                MENU_MEM_CH        }, // was "MEM-CH"
-	{"ChDele", VOICE_ID_DELETE_CHANNEL,                MENU_DEL_CH        }, // was "DEL-CH"
-	{"ChName", VOICE_ID_INVALID,                       MENU_MEM_NAME      },
+//   text,     menu ID
+	{"Step",   MENU_STEP          },
+	//{"TxPwr",  MENU_TXP           }, // was "TXP"
+	{"Rx DCS",  MENU_R_DCS         }, // was "R_DCS"
+	{"Rx CTCS", MENU_R_CTCS        }, // was "R_CTCS"
+	{"Tx DCS",  MENU_T_DCS         }, // was "T_DCS"
+	{"Tx CTCS", MENU_T_CTCS        }, // was "T_CTCS"
+	{"Tx ODir", MENU_SFT_D         }, // was "SFT_D"
+	{"Tx Offset", MENU_OFFSET        }, // was "OFFSET"
+	//{"Bandwi", MENU_W_N           },
+	{"Scrambler", MENU_SCR           }, // was "SCR"
+	{"Busy CL", MENU_BCL           }, // was "BCL"
+	{"Compand", MENU_COMPAND       },
+//	{"Demodu", MENU_AM            }, // was "AM"
+	{"Scan Add1", MENU_S_ADD1        },
+	{"Scan Add2", MENU_S_ADD2        },
+	{"Chan. Save", MENU_MEM_CH        }, // was "MEM-CH"
+	{"Chan. Dele", MENU_DEL_CH        }, // was "DEL-CH"
+	{"Chan. Name", MENU_MEM_NAME      },
 
-	{"SList",  VOICE_ID_INVALID,                       MENU_S_LIST        },
-	{"SList1", VOICE_ID_INVALID,                       MENU_SLIST1        },
-	{"SList2", VOICE_ID_INVALID,                       MENU_SLIST2        },
-	{"ScnRev", VOICE_ID_INVALID,                       MENU_SC_REV        },
+	{"Scan List",  MENU_S_LIST        },
+	{"Scan List1", MENU_SLIST1        },
+	{"Scan List2", MENU_SLIST2        },
+	{"Scan Rev", MENU_SC_REV        },
 
-	{"F1Shrt",    VOICE_ID_INVALID,                    MENU_F1SHRT        },
-	{"F1Long",    VOICE_ID_INVALID,                    MENU_F1LONG        },
-	{"F2Shrt",    VOICE_ID_INVALID,                    MENU_F2SHRT        },
-	{"F2Long",    VOICE_ID_INVALID,                    MENU_F2LONG        },
-	{"M Long",    VOICE_ID_INVALID,                    MENU_MLONG         },
+	{"F1 Short", MENU_F1SHRT        },
+	{"F1 Long", MENU_F1LONG        },
+	{"F2 Short", MENU_F2SHRT        },
+	{"F2 Long", MENU_F2LONG        },
+	{"M Long", MENU_MLONG         },
 
-	{"KeyLck", VOICE_ID_INVALID,                       MENU_AUTOLK        }, // was "AUTOLk"
-	{"TxTOut", VOICE_ID_TRANSMIT_OVER_TIME,            MENU_TOT           }, // was "TOT"
-	{"BatSav", VOICE_ID_SAVE_MODE,                     MENU_SAVE          }, // was "SAVE"
-	{"Mic",    VOICE_ID_INVALID,                       MENU_MIC           },
+	{"Key Lock", MENU_AUTOLK        }, // was "AUTOLk"
+	{"Tx TimeOut", MENU_TOT           }, // was "TOT"
+	{"Bat Save", MENU_SAVE          }, // was "SAVE"
+	{"Mic",    MENU_MIC           },
 #ifdef ENABLE_AUDIO_BAR
-	{"MicBar", VOICE_ID_INVALID,                       MENU_MIC_BAR       },
+	{"Mic Bar", MENU_MIC_BAR       },
 #endif
-	{"ChDisp", VOICE_ID_INVALID,                       MENU_MDF           }, // was "MDF"
-	{"POnMsg", VOICE_ID_INVALID,                       MENU_PONMSG        },
-	{"BatTxt", VOICE_ID_INVALID,                       MENU_BAT_TXT       },
-	{"BackLt", VOICE_ID_INVALID,                       MENU_ABR           }, // was "ABR"
-	{"BLMin",  VOICE_ID_INVALID,                       MENU_ABR_MIN       },
-	{"BLMax",  VOICE_ID_INVALID,                       MENU_ABR_MAX       },
-#ifdef ENABLE_CONTRAST
-	{"LCDCtr", VOICE_ID_INVALID,                       MENU_CONTRAST      },
-#endif		
-	{"BltTRX", VOICE_ID_INVALID,                       MENU_ABR_ON_TX_RX  },
-	{"Beep",   VOICE_ID_BEEP_PROMPT,                   MENU_BEEP          },
-	{"Roger",  VOICE_ID_INVALID,                       MENU_ROGER         },
-	{"STE",    VOICE_ID_INVALID,                       MENU_STE           },
-	{"RP STE", VOICE_ID_INVALID,                       MENU_RP_STE        },
-	{"1 Call", VOICE_ID_INVALID,                       MENU_1_CALL        },
+	//{"ChDisp", MENU_MDF           }, // was "MDF"
+	{"Pow. onMsg", MENU_PONMSG        },
+	{"Bat Txt", MENU_BAT_TXT       },
+	{"Back Lt", MENU_ABR           }, // was "ABR"
+	{"BL Min",  MENU_ABR_MIN       },
+	{"BL Max",  MENU_ABR_MAX       },
+#ifdef ENABLE_C
+	{"LCD Ctr", MENU_CONTRAST      },
+#endif
+	{"Blt TRX", MENU_ABR_ON_TX_RX  },
+	{"Beep",   MENU_BEEP          },
+	{"Roger",  MENU_ROGER         },
+	{"STE",    MENU_STE           },
+	{"RP STE", MENU_RP_STE        },
+	{"1 Call", MENU_1_CALL        },
 #ifdef ENABLE_ALARM
-	{"AlarmT", VOICE_ID_INVALID,                       MENU_AL_MOD        },
+	{"Alarm T", MENU_AL_MOD        },
 #endif
 #ifdef ENABLE_DTMF_CALLING
-	{"ANI ID", VOICE_ID_ANI_CODE,                      MENU_ANI_ID        },
+	{"ANI ID", MENU_ANI_ID        },
 #endif
-	{"UPCode", VOICE_ID_INVALID,                       MENU_UPCODE        },
-	{"DWCode", VOICE_ID_INVALID,                       MENU_DWCODE        },
-	{"PTT ID", VOICE_ID_INVALID,                       MENU_PTT_ID        },
-	{"D ST",   VOICE_ID_INVALID,                       MENU_D_ST          },
+	{"UP Code", MENU_UPCODE        },
+	{"DW Code", MENU_DWCODE        },
+	{"PTT ID", MENU_PTT_ID        },
+	{"D ST",   MENU_D_ST          },
 #ifdef ENABLE_DTMF_CALLING
-    {"D Resp", VOICE_ID_INVALID,                       MENU_D_RSP         },
-	{"D Hold", VOICE_ID_INVALID,                       MENU_D_HOLD        },
+    {"D Resp", MENU_D_RSP         },
+	{"D Hold", MENU_D_HOLD        },
 #endif
-	{"D Prel", VOICE_ID_INVALID,                       MENU_D_PRE         },
+	{"D Prel", MENU_D_PRE         },
 #ifdef ENABLE_DTMF_CALLING
-	{"D Decd", VOICE_ID_INVALID,                       MENU_D_DCD         },
-	{"D List", VOICE_ID_INVALID,                       MENU_D_LIST        },
+	{"D Decode", MENU_D_DCD         },
+	{"D List", MENU_D_LIST        },
 #endif
-	{"D Live", VOICE_ID_INVALID,                       MENU_D_LIVE_DEC    }, // live DTMF decoder
+	{"D Live", MENU_D_LIVE_DEC    }, // live DTMF decoder
 #ifdef ENABLE_AM_FIX
-	{"AM Fix", VOICE_ID_INVALID,                       MENU_AM_FIX        },
+	{"AM Fix", MENU_AM_FIX        },
 #endif
 #ifdef ENABLE_VOX
-	{"VOX",    VOICE_ID_VOX,                           MENU_VOX           },
+	{"VOX",    MENU_VOX           },
 #endif
-	{"BatVol", VOICE_ID_INVALID,                       MENU_VOL           }, // was "VOL"
-	{"RxMode", VOICE_ID_DUAL_STANDBY,                  MENU_TDR           },
-	{"Sql",    VOICE_ID_SQUELCH,                       MENU_SQL           },
+	{"Bat Vol", MENU_VOL           }, // was "VOL"
+	{"Rx Mode", MENU_TDR           },
+	{"SQL",    MENU_SQL           },
 
 	// hidden menu items from here on
 	// enabled if pressing both the PTT and upper side button at power-on
-	{"F Lock", VOICE_ID_INVALID,                       MENU_F_LOCK        },
-	{"Tx 200", VOICE_ID_INVALID,                       MENU_200TX         }, // was "200TX"
-	{"Tx 350", VOICE_ID_INVALID,                       MENU_350TX         }, // was "350TX"
-	{"Tx 500", VOICE_ID_INVALID,                       MENU_500TX         }, // was "500TX"
-	{"350 En", VOICE_ID_INVALID,                       MENU_350EN         }, // was "350EN"
-	{"ScraEn", VOICE_ID_INVALID,                       MENU_SCREN         }, // was "SCREN"
+	{"F Lock", MENU_F_LOCK        },
+	{"Tx 200", MENU_200TX         }, // was "200TX"
+	{"Tx 350", MENU_350TX         }, // was "350TX"
+	{"Tx 500", MENU_500TX         }, // was "500TX"
+	{"350 En", MENU_350EN         }, // was "350EN"
+	{"ScraEn", MENU_SCREN         }, // was "SCREN"
 #ifdef ENABLE_F_CAL_MENU
-	{"FrCali", VOICE_ID_INVALID,                       MENU_F_CALI        }, // reference xtal calibration
+	{"FrCali", MENU_F_CALI        }, // reference xtal calibration
 #endif
-	{"BatCal", VOICE_ID_INVALID,                       MENU_BATCAL        }, // battery voltage calibration
-	{"BatTyp", VOICE_ID_INVALID,                       MENU_BATTYP        }, // battery type 1600/2200mAh
-	{"Reset",  VOICE_ID_INITIALISATION,                MENU_RESET         }, // might be better to move this to the hidden menu items ?
+	{"BatCal", MENU_BATCAL        }, // battery voltage calibration
+	{"BatTyp", MENU_BATTYP        }, // battery type 1600/2200mAh
+	{"Reset",  MENU_RESET         }, // might be better to move this to the hidden menu items ?
 
-	{"",       VOICE_ID_INVALID,                       0xff               }  // end of list - DO NOT delete or move this this
+	{"",       0xff               }  // end of list - DO NOT delete or move this this
 };
+
 
 const uint8_t FIRST_HIDDEN_MENU_ITEM = MENU_F_LOCK;
 
-/*const char gSubMenu_TXP[][5] =
+const char gSubMenu_TXP[][5] =
 {
 	"LOW",
 	"MID",
 	"HIGH"
-};*/
+};
+
+const char gSubMenu_W_N[][6] =
+{
+	"25.0K",
+	"12.5K",
+	"6.25K"
+};
+
+const char gSubMenu_TOT[][8] =
+{
+	"30 sec",
+	"1 min",
+	"2 min",
+	"3 min",
+	"4 min",
+	"5 min",
+	"6 min",
+	"7 min",
+	"8 min",
+	"9 min",
+	"15 min"
+};
+
+const char gSubMenu_BACKLIGHT[][7] =
+{
+	"OFF",
+	"5 sec",
+	"10 sec",
+	"20 sec",
+	"1 min",
+	"2 min",
+	"4 min",
+	"ON"
+};
 
 const char gSubMenu_SFT_D[][4] =
 {
@@ -154,13 +191,6 @@ const char gSubMenu_SFT_D[][4] =
 	"+",
 	"-"
 };
-
-/*const char gSubMenu_W_N[][9] =
-{
-	"WIDE",
-	"NARROW",
-	"NARROWER"
-};*/
 
 const char gSubMenu_OFF_ON[][4] =
 {
@@ -177,27 +207,12 @@ const char gSubMenu_SAVE[][4] =
 	"1:4"
 };
 
-/*const char gSubMenu_TOT[][7] =
+const char gSubMenu_RXMode[][11] =
 {
-	"30 sec",
-	"1 min",
-	"2 min",
-	"3 min",
-	"4 min",
-	"5 min",
-	"6 min",
-	"7 min",
-	"8 min",
-	"9 min",
-	"15 min"
-};*/
-
-const char gSubMenu_RXMode[][17] =
-{
-	"MAIN\nONLY", 		// TX and RX on main only
-	"DUAL RX\nRESPOND", // Watch both and respond
-	"CROSS\nBAND", 		// TX on main, RX on secondary
-	"MAIN TX\nDUAL RX" 	// always TX on main, but RX on both
+	"MAIN RX TX", 		// TX and RX on main only
+	"DUAL RX TX", 		// Watch both and respond
+	"CROSS B.", 		// TX on main, RX on secondary
+	"TX MAIN" 			// always TX on main, but RX on both
 };
 
 const char gSubMenu_SC_REV[][8] =
@@ -207,13 +222,13 @@ const char gSubMenu_SC_REV[][8] =
 	"STOP"
 };
 
-const char gSubMenu_MDF[][16] =
+/*const char gSubMenu_MDF[][16] =
 {
 	"FREQ",
 	"CHANNEL\nNUMBER",
 	"NAME",
 	"NAME\n+\nFREQ"
-};
+};*/
 
 #ifdef ENABLE_ALARM
 	const char gSubMenu_AL_MOD[][5] =
@@ -226,20 +241,20 @@ const char gSubMenu_MDF[][16] =
 #ifdef ENABLE_DTMF_CALLING
 const char gSubMenu_D_RSP[][11] =
 {
-	"DO\nNOTHING",
+	"DO NOTHING",
 	"RING",
 	"REPLY",
 	"BOTH"
 };
 #endif
 
-const char gSubMenu_PTT_ID[][16] =
+const char gSubMenu_PTT_ID[][10] =
 {
 	"OFF",
 	"UP CODE",
 	"DOWN CODE",
-	"UP+DOWN\nCODE",
-	"APOLLO\nQUINDAR"
+	"U+D CODE",
+	"APOLLO"
 };
 
 const char gSubMenu_PONMSG[][8] =
@@ -280,18 +295,6 @@ const char gSubMenu_F_LOCK[][27] =
 	"DISABLE\nALL",
 	"UNLOCK\nALL",
 };
-
-/*const char gSubMenu_BACKLIGHT[][7] =
-{
-	"OFF",
-	"5 sec",
-	"10 sec",
-	"20 sec",
-	"1 min",
-	"2 min",
-	"4 min",
-	"ON"
-};*/
 
 const char gSubMenu_RX_TX[][6] =
 {
@@ -363,12 +366,6 @@ const uint8_t gSubMenu_SIDEFUNCTIONS_size = ARRAY_SIZE(gSubMenu_SIDEFUNCTIONS);
 
 bool    gIsInSubMenu;
 uint8_t gMenuCursor;
-int UI_MENU_GetCurrentMenuId() {
-	if(gMenuCursor < ARRAY_SIZE(MenuList))
-		return MenuList[gMenuCursor].menu_id;
-
-	return MenuList[ARRAY_SIZE(MenuList)-1].menu_id;
-}
 
 uint8_t UI_MENU_GetMenuIdx(uint8_t id)
 {
@@ -384,6 +381,386 @@ int32_t gSubMenuSelection;
 char    edit_original[17]; // a copy of the text before editing so that we can easily test for changes/difference
 char    edit[17];
 int     edit_index;
+
+#if 1
+
+#define SUB_MENU_X 68
+#define SETTINGS_TIMESHOW_SUB 60
+
+uint8_t settingsCurrentMenu = 0;
+uint8_t settingsCurrentSubMenu = 0;
+uint16_t settingsSubmenuMin = 0;
+uint16_t settingsSubmenuSize = 0;
+
+uint16_t settingsSubMenuTime = 0;
+bool settingsShowSubMenu = false;
+bool settingsSubMenuActive = false;
+bool needToSave = false;
+
+int UI_MENU_GetCurrentMenuId() {
+	if(settingsCurrentMenu < ARRAY_SIZE(MenuList))
+		return MenuList[settingsCurrentMenu].menu_id;
+
+	return MenuList[ARRAY_SIZE(MenuList)-1].menu_id;
+}
+
+void SettingsMenu_showList() {
+    uint8_t yPos = 15;
+    uint8_t menuSize = gMenuListCount - 2;
+	const uint8_t offset = Clamp(settingsCurrentMenu - 2, 0, menuSize - 3);
+
+    for (uint8_t i = 0; i < 5; i++) {
+		bool isFill = settingsCurrentMenu == i + offset ? true : false;
+
+        UI_printf(&font_small, TEXT_ALIGN_LEFT, 8, 0, yPos - 1, true, false, "%0.2i", (i + 1) + offset);
+
+        UI_printf(&font_10, TEXT_ALIGN_LEFT, 18, 0, yPos, !isFill, isFill,
+            "%s", MenuList[i + offset].name);
+        yPos += 11;
+    }
+
+    yPos = 10;
+    yPos += ((( (100 * settingsCurrentMenu) / (menuSize + 2) ) / 100.0) * 52);
+
+    UI_drawFastVLine(1, yPos - 1, 3, true);
+    UI_drawFastVLine(3, yPos - 1, 3, true);
+}
+
+/* ---------------------------------------------------------------------------------------------------- */
+// Sub List
+
+void SettingsMenu_showSubListCalc(uint8_t size, uint8_t *yPos, uint8_t *listCount, uint8_t *offset) {
+    if (size <= 2 ) {
+        if (size == 2 ) {
+            *yPos = *yPos + 6;
+        } else if (size == 1 ) {
+            *yPos = *yPos + 11;
+        }
+        *listCount = size + 1;
+    } else {
+		*offset = Clamp(settingsCurrentSubMenu - 2, 0, size - 3);
+    }
+}
+
+void SettingsMenu_showSubList(uint8_t size, uint8_t length, const char subList[size][length]) {
+	uint8_t yPos = 21;
+    uint8_t listCount = 4;
+	uint8_t offset = 0;
+	SettingsMenu_showSubListCalc(size - 1, &yPos, &listCount, &offset);
+    for (uint8_t i = 0; i < listCount; i++) {
+		bool isFill = settingsCurrentSubMenu == i + offset ? true : false;
+		UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, yPos, !isFill, isFill,
+			"%s", subList[i + offset]);
+        yPos += 11;
+    }
+}
+
+void SettingsMenu_showSubListValue(void) {
+	uint8_t yPos = 21;
+    uint8_t listCount = 4;
+	uint8_t offset = 0;
+	SettingsMenu_showSubListCalc(settingsSubmenuSize, &yPos, &listCount, &offset);
+    for (uint8_t i = 0; i < listCount; i++) {
+		bool isFill = settingsCurrentSubMenu == i + offset ? true : false;
+
+		if ( (i + offset == 0) && (MenuList[settingsCurrentMenu].menu_id != MENU_STEP) ) {
+			UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, yPos, !isFill, isFill, "OFF" );
+		} else {
+
+			switch (MenuList[settingsCurrentMenu].menu_id)
+			{
+				case MENU_STEP: {
+					uint16_t step = gStepFrequencyTable[FREQUENCY_GetStepIdxFromSortedIdx(i + offset)];
+					UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, yPos, !isFill, isFill, "%d.%02ukHz", step / 100, step % 100 );
+					break;
+				}
+
+				case MENU_R_DCS:
+				case MENU_T_DCS:
+					if (settingsCurrentSubMenu < 105) {
+						UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, yPos, !isFill, isFill, "D %03o N", DCS_Options[(i + offset) - 1]);
+					} else {
+						UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, yPos, !isFill, isFill, "D %03o I", DCS_Options[(i + offset) - 105]);
+					}
+				break;
+
+				case MENU_R_CTCS:
+				case MENU_T_CTCS:
+					UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, yPos, !isFill, isFill, "%u.%uHz", CTCSS_Options[(i + offset) - 1] / 10, CTCSS_Options[(i + offset) - 1] % 10);
+				break;
+
+				case MENU_MIC:
+					UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, yPos, !isFill, isFill, "+%u.%01u dB", gMicGain_dB2[(i + offset) - 1] / 2, gMicGain_dB2[(i + offset) - 1] % 2);
+				break;
+
+				default:
+            	break;
+			}
+		}
+        yPos += 11;
+    }
+}
+
+
+void SettingsMenu_showSubListNumber() {
+	uint8_t yPos = 21;
+    uint8_t listCount = 4;
+	uint8_t offset = 0;
+	SettingsMenu_showSubListCalc(settingsSubmenuSize, &yPos, &listCount, &offset);
+    for (uint8_t i = 0; i < listCount; i++) {
+		UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, yPos,
+			settingsCurrentSubMenu == i + offset ? false : true,
+			settingsCurrentSubMenu == i + offset ? true : false,
+			"%i", (i + offset));
+        yPos += 11;
+    }
+}
+
+void SettingsMenu_loadSubList() {
+
+	UI_fillRect(SUB_MENU_X - 2, 11, 61, 48, false);
+    if ( settingsSubMenuActive ) {
+    	UI_drawRoundRect(SUB_MENU_X - 2, 11, 61, 48, 4, true);
+	}
+    UI_drawRoundRect(SUB_MENU_X - 1, 12, 59, 46, 4, true);
+
+	settingsSubmenuMin = 0;
+	uint8_t arrayLength = 0;
+	bool showNumber = false;
+	bool showValue = false;
+
+	switch (MenuList[settingsCurrentMenu].menu_id)
+    {
+
+		case MENU_STEP:
+			// 0 .. STEP_N_ELEM - 1;
+			settingsSubmenuSize = STEP_N_ELEM - 1;
+			settingsCurrentSubMenu = FREQUENCY_GetSortedIdxFromStepIdx(gTxVfo->STEP_SETTING);
+			showValue = true;
+			break;
+
+		case MENU_ABR:
+			//gSubMenu_BACKLIGHT
+			settingsCurrentSubMenu = gEeprom.BACKLIGHT_TIME;
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_BACKLIGHT);
+			arrayLength = 7;
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_BACKLIGHT);
+			break;
+
+		case MENU_SQL:
+			settingsCurrentSubMenu = gEeprom.SQUELCH_LEVEL;
+			settingsSubmenuSize = 9;
+			showNumber = true;
+			break;
+
+		case MENU_ABR_MIN:
+			settingsCurrentSubMenu = gEeprom.BACKLIGHT_MIN;
+			settingsSubmenuSize = 9;
+			showNumber = true;
+			break;
+
+		case MENU_ABR_MAX:
+			settingsSubmenuSize = 10;
+			settingsCurrentSubMenu = gEeprom.BACKLIGHT_MAX;
+			showNumber = true;
+			break;
+
+		case MENU_RP_STE:
+			settingsCurrentSubMenu = gEeprom.REPEATER_TAIL_TONE_ELIMINATION;
+			settingsSubmenuSize = 10;
+			showNumber = true;
+			break;
+
+#ifdef ENABLE_C
+		case MENU_CONTRAST:
+			settingsCurrentSubMenu = gEeprom.LCD_CONTRAST;
+			settingsSubmenuSize = 63;
+			showNumber = true;
+			break;
+#endif
+
+		case MENU_BATCAL:
+			settingsSubmenuMin = 1600;
+			settingsSubmenuSize = 2200;
+			settingsCurrentSubMenu = gBatteryCalibration[3];
+			showNumber = true;
+			break;
+
+		case MENU_F_LOCK:
+			//gSubMenu_F_LOCK
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_F_LOCK);
+			arrayLength = 27;
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_F_LOCK);
+			break;
+
+		/*case MENU_TXP:
+			//gSubMenu_TXP
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_TXP);
+			break;*/
+
+		case MENU_PTT_ID:
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_PTT_ID);
+			arrayLength = 10;
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_PTT_ID);
+			break;
+
+		case MENU_SFT_D:
+			//gSubMenu_SFT_D
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_SFT_D);
+			arrayLength = 4;
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_SFT_D);
+			break;
+
+		case MENU_TDR:
+			//gSubMenu_RXMode
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_RXMode);
+			arrayLength = 11;
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_RXMode);
+			break;
+
+		case MENU_ROGER:
+			//gSubMenu_ROGER
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_ROGER);
+			arrayLength = 11;
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_ROGER);
+			break;
+
+		case MENU_R_DCS:
+		case MENU_T_DCS:
+			settingsSubmenuSize = ARRAY_SIZE(DCS_Options) * 2;
+			showValue = true;
+			break;
+
+		case MENU_R_CTCS:
+		case MENU_T_CTCS:
+			settingsSubmenuSize = ARRAY_SIZE(CTCSS_Options);
+			showValue = true;
+			break;
+
+		case MENU_MIC:
+			settingsSubmenuSize = ARRAY_SIZE(gMicGain_dB2);
+			settingsCurrentSubMenu = gEeprom.MIC_SENSITIVITY;
+			showValue = true;
+			break;
+
+		/*case MENU_W_N:
+			//gSubMenu_W_N
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_W_N);
+			break;*/
+
+		case MENU_RESET:
+			//gSubMenu_RESET
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_RESET);
+			arrayLength = 4;
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_RESET);
+			break;
+
+		case MENU_COMPAND:
+		case MENU_ABR_ON_TX_RX:
+			//gSubMenu_RX_TX
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_RX_TX);
+			arrayLength = 6;
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_RX_TX);
+			break;
+
+		case MENU_AM_FIX:
+		case MENU_MIC_BAR:
+		case MENU_BCL:
+		case MENU_BEEP:
+		case MENU_AUTOLK:
+		case MENU_STE:
+			//gSubMenu_OFF_ON
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_OFF_ON);
+			arrayLength = 4;
+        	SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_OFF_ON);
+			break;
+
+		/*case MENU_AM:
+			//gModulationStr
+        	SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gModulationStr);
+			break;*/
+
+		case MENU_TOT:
+			//gSubMenu_TOT
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_TOT);
+			arrayLength = 8;
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_TOT);
+			break;
+
+		case MENU_SAVE:
+			//gSubMenu_SAVE
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_SAVE);
+			arrayLength = 4;
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_SAVE);
+			break;
+
+		case MENU_BAT_TXT:
+			//gSubMenu_BAT_TXT
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_BAT_TXT);
+			arrayLength = 8;
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_BAT_TXT);
+			break;
+
+		case MENU_OFFSET:
+			break;
+
+		case MENU_VOL: {
+			const uint8_t gBatteryPercentage = BATTERY_VoltsToPercent(gBatteryVoltageAverage);
+			UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, 26, true, false,	"%u.%02uV", gBatteryVoltageAverage / 100, gBatteryVoltageAverage % 100);
+			UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, 37, true, false,	"%3i%%", gBatteryPercentage);
+			UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, 48, true, false,	"%dmA", gBatteryCurrent);
+			break;
+		}
+
+		case MENU_BATTYP:
+			// 0 .. 1;
+			//gSubMenu_BATTYP
+			settingsSubmenuSize = ARRAY_SIZE(gSubMenu_BATTYP);
+			arrayLength = 9;
+            SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_BATTYP);
+			break;
+
+
+        /*default:
+            break;*/
+    }
+	if (showValue) {
+		SettingsMenu_showSubListValue();
+	} else if (showNumber) {
+		SettingsMenu_showSubListNumber();
+	}
+}
+
+void UI_DisplayMenu(void) {
+	UI_displayClear();
+    UI_drawFastVLine(2, 9, 53, true);
+
+    SettingsMenu_showList();
+
+    if (settingsShowSubMenu) {
+        SettingsMenu_loadSubList();
+    } else {
+        if (getTickCount() - settingsSubMenuTime > pdMS_TO_TICKS(SETTINGS_TIMESHOW_SUB)) {
+			/*if( GUI_inputGetSize() == 1 ) {
+				const uint8_t inputValue = GUI_inputGetNumber();
+				if ( inputValue > 0) {
+					settingsCurrentMenu = inputValue - 1;
+					settingsShowSubMenu = false;
+					settingsSubMenuTime = getTickCount();
+				}
+			} else {*/
+				gMenuCountdown = menu_timeout_long_500ms;
+            	settingsShowSubMenu = true;
+            	settingsCurrentSubMenu = 0;
+				//SettingsMenu_loadSubListValues();
+			//}
+        }
+    }
+
+	UI_displayUpdate();
+	gUpdateDisplay = true;
+}
+#else
 
 void UI_DisplayMenu(void)
 {
@@ -589,11 +966,11 @@ void UI_DisplayMenu(void)
 				BACKLIGHT_SetBrightness(gSubMenuSelection);
 			else if(BACKLIGHT_GetBrightness() < 4)
 				BACKLIGHT_SetBrightness(4);
-			break;	
-		
+			break;
+
 		#ifdef ENABLE_CONTRAST
-			case MENU_CONTRAST:				
-				sprintf(String, "%d", (uint16_t)gSubMenuSelection);				
+			case MENU_CONTRAST:
+				sprintf(String, "%d", (uint16_t)gSubMenuSelection);
 				ST7565_SetContrast(gSubMenuSelection);
 				//else
 				//	ST7565_SetContrast(0);
@@ -961,3 +1338,5 @@ void UI_DisplayMenu(void)
 
 	UI_displayUpdate();
 }
+#endif
+

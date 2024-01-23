@@ -234,48 +234,6 @@ volatile uint8_t  boot_counter_10ms;
 uint8_t           gIsLocked = 0xFF;
 
 
-const char* const gSubMenu_TXP[] =
-{
-	"LOW",
-	"MID",
-	"HIGH"
-};
-
-const char* const gSubMenu_W_N[] =
-{
-	"25.0K",
-	"12.5K",
-	"6.25K"
-};
-
-const char* const gSubMenu_TOT[] =
-{
-	"30 sec",
-	"1 min",
-	"2 min",
-	"3 min",
-	"4 min",
-	"5 min",
-	"6 min",
-	"7 min",
-	"8 min",
-	"9 min",
-	"15 min"
-};
-
-const char* const gSubMenu_BACKLIGHT[] =
-{
-	"OFF",
-	"5 sec",
-	"10 sec",
-	"20 sec",
-	"1 min",
-	"2 min",
-	"4 min",
-	"ON"
-};
-
-
 inline void FUNCTION_NOP() { ; }
 
 
