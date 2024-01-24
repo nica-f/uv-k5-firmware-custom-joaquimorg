@@ -42,6 +42,7 @@
 #include "app/scanner.h"
 #ifdef ENABLE_UART
 	#include "app/uart.h"
+	#include "driver/uart.h"
 #endif
 #include "ARMCM0.h"
 #include "audio.h"
@@ -1241,8 +1242,11 @@ void APP_TimeSlice500ms(void)
 	}
 
 	if (gMenuCountdown > 0)
-		if (--gMenuCountdown == 0)
+		if (--gMenuCountdown == 0) {
 			exit_menu = (gScreenToDisplay == DISPLAY_MENU);	// exit menu mode
+			settingsShowSubMenu = false;
+			settingsSubMenuActive = false;
+		}
 
 #ifdef ENABLE_DTMF_CALLING
 	if (gDTMF_RX_timeout > 0)
@@ -1795,8 +1799,10 @@ Skip:
 	if (gFlagRefreshSetting) {
 		gFlagRefreshSetting = false;
 		gMenuCountdown      = menu_timeout_500ms;
-
-		//MENU_ShowCurrentSetting();
+		settingsShowSubMenu = false;
+		settingsSubMenuActive = false;
+		settingsSubMenuTime = getTickCount();
+		UI_DisplayMenu();
 	}
 
 	if (gFlagPrepareTX) {

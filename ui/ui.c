@@ -85,7 +85,7 @@ void GUI_SelectNextDisplay(GUI_DisplayType_t Display)
 		DTMF_clear_input_box();
 
 		gInputBoxIndex       = 0;
-		gIsInSubMenu         = false;
+		//gIsInSubMenu         = false;
 		gCssBackgroundScan   = false;
 		gScanStateDir        = SCAN_OFF;
 		#ifdef ENABLE_FMRADIO

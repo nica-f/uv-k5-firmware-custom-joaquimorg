@@ -36,6 +36,8 @@ void ACTION_SwitchDemodul(void);
 void ACTION_BlminTmpOff(void);
 #endif
 
+void ACTION_SwitchBandwidth(void);
+
 void ACTION_Handle(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 
 #endif

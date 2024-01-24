@@ -24,6 +24,10 @@
 	#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 #endif
 
+#ifndef ARRAY_SIZE_ELEMENT
+	#define ARRAY_SIZE_ELEMENT(x) (sizeof(x[0]))
+#endif
+
 #ifndef MAX
 	#define MAX(a, b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a > _b ? _a : _b; })
 #endif
@@ -320,6 +324,11 @@ extern volatile uint8_t      gVFOStateResumeCountdown_500ms;
 #endif
 extern uint8_t               gIsLocked;
 extern volatile uint8_t      boot_counter_10ms;
+
+
+extern bool              	gMainDisplayPopUp;
+extern uint8_t           	gMainPopUpType;
+
 
 int32_t NUMBER_AddWithWraparound(int32_t Base, int32_t Add, int32_t LowerLimit, int32_t UpperLimit);
 unsigned long StrToUL(const char * str);

@@ -125,7 +125,7 @@ void popupListCalc(uint8_t listSelected, uint8_t listSize, uint8_t *yPos, uint8_
     }
 }
 
-void popupShowList(uint8_t listSelected, uint8_t listSize, uint8_t x, uint8_t y, uint8_t w, const char* const subList[]) {
+void popupShowList(uint8_t listSelected, uint8_t listSize, uint8_t x, uint8_t y, uint8_t w, size_t num_cols, const char subList[][num_cols]) {
 	uint8_t yPos = y;
     uint8_t listCount = 3;
 	uint8_t offset = 0;

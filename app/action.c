@@ -213,6 +213,15 @@ void ACTION_SwitchDemodul(void)
 		gTxVfo->Modulation = MODULATION_FM;
 }
 
+void ACTION_SwitchBandwidth(void)
+{
+	gRequestSaveChannel = 1;
+
+	gTxVfo->CHANNEL_BANDWIDTH++;
+
+	if(gTxVfo->CHANNEL_BANDWIDTH == BANDWIDTH_UKNOWN)
+		gTxVfo->CHANNEL_BANDWIDTH = BANDWIDTH_WIDE;
+}
 
 void ACTION_Handle(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 {

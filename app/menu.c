@@ -94,10 +94,10 @@ void MENU_StartCssScan(void)
 void MENU_CssScanFound(void)
 {
 	if(gScanCssResultType == CODE_TYPE_DIGITAL || gScanCssResultType == CODE_TYPE_REVERSE_DIGITAL) {
-		gMenuCursor = UI_MENU_GetMenuIdx(MENU_R_DCS);
+		settingsCurrentMenu = UI_MENU_GetMenuIdx(MENU_R_DCS);
 	}
 	else if(gScanCssResultType == CODE_TYPE_CONTINUOUS_TONE) {
-		gMenuCursor = UI_MENU_GetMenuIdx(MENU_R_CTCS);
+		settingsCurrentMenu = UI_MENU_GetMenuIdx(MENU_R_CTCS);
 	}
 
 	MENU_ShowCurrentSetting();
@@ -114,7 +114,7 @@ void MENU_StopCssScan(void)
 	gUpdateStatus = true;
 }
 
-int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
+int MENU_GetLimits(uint8_t menu_id, uint16_t *pMin, uint16_t *pMax)
 {
 	*pMin = 0;
 	switch (menu_id)
@@ -128,7 +128,7 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			break;
 
 		case MENU_ABR:
-			*pMax = ARRAY_SIZE(gSubMenu_BACKLIGHT) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_BACKLIGHT);
 			break;
 
 		case MENU_ABR_MIN:
@@ -146,35 +146,35 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			break;	
 #endif
 		case MENU_F_LOCK:
-			*pMax = ARRAY_SIZE(gSubMenu_F_LOCK) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_F_LOCK);
 			break;
 
-		case MENU_MDF:
-			*pMax = ARRAY_SIZE(gSubMenu_MDF) - 1;
-			break;
+		/*case MENU_MDF:
+			*pMax = ARRAY_SIZE(gSubMenu_MDF);
+			break;*/
 
-		case MENU_TXP:
-			*pMax = ARRAY_SIZE(gSubMenu_TXP) - 1;
-			break;
+		/*case MENU_TXP:
+			*pMax = ARRAY_SIZE(gSubMenu_TXP);
+			break;*/
 
 		case MENU_SFT_D:
-			*pMax = ARRAY_SIZE(gSubMenu_SFT_D) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_SFT_D);
 			break;
 
 		case MENU_TDR:
-			*pMax = ARRAY_SIZE(gSubMenu_RXMode) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_RXMode);
 			break;
 
 		case MENU_SC_REV:
-			*pMax = ARRAY_SIZE(gSubMenu_SC_REV) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_SC_REV);
 			break;
 
 		case MENU_ROGER:
-			*pMax = ARRAY_SIZE(gSubMenu_ROGER) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_ROGER);
 			break;
 
 		case MENU_PONMSG:
-			*pMax = ARRAY_SIZE(gSubMenu_PONMSG) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_PONMSG);
 			break;
 
 		case MENU_R_DCS:
@@ -189,23 +189,23 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			break;
 
 		case MENU_W_N:
-			*pMax = ARRAY_SIZE(gSubMenu_W_N) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_W_N);
 			break;
 
 		#ifdef ENABLE_ALARM
 			case MENU_AL_MOD:
 
-				*pMax = ARRAY_SIZE(gSubMenu_AL_MOD) - 1;
+				*pMax = ARRAY_SIZE(gSubMenu_AL_MOD);
 				break;
 		#endif
 
 		case MENU_RESET:
-			*pMax = ARRAY_SIZE(gSubMenu_RESET) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_RESET);
 			break;
 
 		case MENU_COMPAND:
 		case MENU_ABR_ON_TX_RX:
-			*pMax = ARRAY_SIZE(gSubMenu_RX_TX) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_RX_TX);
 			break;
 		#ifdef ENABLE_AM_FIX
 			case MENU_AM_FIX:
@@ -229,19 +229,19 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 		case MENU_500TX:
 		case MENU_350EN:
 		case MENU_SCREN:
-			*pMax = ARRAY_SIZE(gSubMenu_OFF_ON) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_OFF_ON);
 			break;
 
 		case MENU_AM:
-			*pMax = ARRAY_SIZE(gModulationStr) - 1;
+			*pMax = ARRAY_SIZE(gModulationStr);
 			break;
 
 		case MENU_SCR:
-			*pMax = ARRAY_SIZE(gSubMenu_SCRAMBLER) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_SCRAMBLER);
 			break;
 
 		case MENU_TOT:
-			*pMax = ARRAY_SIZE(gSubMenu_TOT) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_TOT);
 			break;
 
 		#ifdef ENABLE_VOX
@@ -265,11 +265,11 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			break;
 
 		case MENU_SAVE:
-			*pMax = ARRAY_SIZE(gSubMenu_SAVE) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_SAVE);
 			break;
 
 		case MENU_MIC:
-			*pMax = 4;
+			*pMax = 6;
 			break;
 
 		case MENU_S_LIST:
@@ -278,15 +278,15 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 
 #ifdef ENABLE_DTMF_CALLING
 		case MENU_D_RSP:
-			*pMax = ARRAY_SIZE(gSubMenu_D_RSP) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_D_RSP);
 			break;
 #endif
 		case MENU_PTT_ID:
-			*pMax = ARRAY_SIZE(gSubMenu_PTT_ID) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_PTT_ID);
 			break;
 
 		case MENU_BAT_TXT:
-			*pMax = ARRAY_SIZE(gSubMenu_BAT_TXT) - 1;
+			*pMax = ARRAY_SIZE(gSubMenu_BAT_TXT);
 			break;
 
 #ifdef ENABLE_DTMF_CALLING
@@ -369,10 +369,10 @@ void MENU_AcceptSetting(void)
 			}
 			return;
 
-		case MENU_TXP:
+		/*case MENU_TXP:
 			gTxVfo->OUTPUT_POWER = settingsCurrentSubMenu;
 			gRequestSaveChannel = 1;
-			return;
+			return;*/
 
 		case MENU_T_DCS:
 			pConfig = &gTxVfo->freq_config_TX;
@@ -529,9 +529,9 @@ void MENU_AcceptSetting(void)
 			gEeprom.SCAN_RESUME_MODE = settingsCurrentSubMenu;
 			break;
 
-		case MENU_MDF:
+		/*case MENU_MDF:
 			gEeprom.CHANNEL_DISPLAY_MODE = settingsCurrentSubMenu;
-			break;
+			break;*/
 
 		case MENU_AUTOLK:
 			gEeprom.AUTO_KEYPAD_LOCK = settingsCurrentSubMenu;
@@ -777,6 +777,13 @@ static void MENU_ClampSelection(int8_t Direction)
 */
 void MENU_ShowCurrentSetting(void)
 {
+	if (!MENU_GetLimits(UI_MENU_GetCurrentMenuId(), &settingsSubmenuMin, &settingsSubmenuSize))
+	{
+		if (settingsCurrentSubMenu < settingsSubmenuMin) settingsCurrentSubMenu = settingsSubmenuMin;
+		else
+		if (settingsCurrentSubMenu > settingsSubmenuSize) settingsCurrentSubMenu = settingsSubmenuSize;
+	}
+
 	switch (UI_MENU_GetCurrentMenuId())
 	{
 		case MENU_SQL:
@@ -787,9 +794,9 @@ void MENU_ShowCurrentSetting(void)
 			settingsCurrentSubMenu = FREQUENCY_GetSortedIdxFromStepIdx(gTxVfo->STEP_SETTING);
 			break;
 
-		case MENU_TXP:
+		/*case MENU_TXP:
 			settingsCurrentSubMenu = gTxVfo->OUTPUT_POWER;
-			break;
+			break;*/
 
 		case MENU_RESET:
 			settingsCurrentSubMenu = 0;
@@ -924,9 +931,9 @@ void MENU_ShowCurrentSetting(void)
 			settingsCurrentSubMenu = gEeprom.SCAN_RESUME_MODE;
 			break;
 
-		case MENU_MDF:
+		/*case MENU_MDF:
 			settingsCurrentSubMenu = gEeprom.CHANNEL_DISPLAY_MODE;
-			break;
+			break;*/
 
 		case MENU_AUTOLK:
 			settingsCurrentSubMenu = gEeprom.AUTO_KEYPAD_LOCK;
@@ -1114,12 +1121,12 @@ void MENU_ShowCurrentSetting(void)
 			return;
 	}
 }
-/*
+
 static void MENU_Key_0_to_9(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 {
 	uint8_t  Offset;
-	int32_t  Min;
-	int32_t  Max;
+	uint16_t  Min;
+	uint16_t  Max;
 	uint16_t Value = 0;
 
 	if (bKeyHeld || !bKeyPressed)
@@ -1153,7 +1160,7 @@ static void MENU_Key_0_to_9(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 
 	gRequestDisplayScreen = DISPLAY_MENU;
 
-	if (!gIsInSubMenu)
+	if (!settingsSubMenuActive)
 	{
 		switch (gInputBoxIndex)
 		{
@@ -1164,7 +1171,7 @@ static void MENU_Key_0_to_9(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 
 				if (Value > 0 && Value <= gMenuListCount)
 				{
-					gMenuCursor         = Value - 1;
+					settingsCurrentMenu         = Value - 1;
 					gFlagRefreshSetting = true;
 					return;
 				}
@@ -1179,7 +1186,7 @@ static void MENU_Key_0_to_9(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 				Value = gInputBox[0];
 				if (Value > 0 && Value <= gMenuListCount)
 				{
-					gMenuCursor         = Value - 1;
+					settingsCurrentMenu         = Value - 1;
 					gFlagRefreshSetting = true;
 					return;
 				}
@@ -1222,7 +1229,7 @@ static void MENU_Key_0_to_9(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 
 		gInputBoxIndex = 0;
 
-		Value = ((gInputBox[0] * 100) + (gInputBox[1] * 10) + gInputBox[2]) - 1;
+		Value = ((gInputBox[0] * 100) + (gInputBox[1] * 10) + gInputBox[2]);
 
 		if (IS_MR_CHANNEL(Value))
 		{
@@ -1267,7 +1274,8 @@ static void MENU_Key_0_to_9(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 
 	gBeepToPlay = BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL;
 }
-*/
+
+
 static void MENU_Key_EXIT(bool bKeyPressed, bool bKeyHeld)
 {
 	if (bKeyHeld || !bKeyPressed)
@@ -1276,6 +1284,7 @@ static void MENU_Key_EXIT(bool bKeyPressed, bool bKeyHeld)
 	gBeepToPlay = BEEP_1KHZ_60MS_OPTIONAL;
 
 	if ( settingsSubMenuActive ) {	
+		settingsShowSubMenu = false;
 		settingsSubMenuActive = false;
 		gRequestDisplayScreen = DISPLAY_MENU;
 		return;
@@ -1287,12 +1296,12 @@ static void MENU_Key_EXIT(bool bKeyPressed, bool bKeyHeld)
 		   just in case we are exiting from one of them. */
 		BACKLIGHT_TurnOn();
 
-		/*if (gIsInSubMenu)
+		if (settingsSubMenuActive)
 		{
 			if (gInputBoxIndex == 0 || UI_MENU_GetCurrentMenuId() != MENU_OFFSET)
 			{
 				gAskForConfirmation = 0;
-				gIsInSubMenu        = false;
+				settingsSubMenuActive = false;
 				gInputBoxIndex      = 0;
 				gFlagRefreshSetting = true;
 
@@ -1304,7 +1313,7 @@ static void MENU_Key_EXIT(bool bKeyPressed, bool bKeyHeld)
 
 			gRequestDisplayScreen = DISPLAY_MENU;
 			return;
-		}*/
+		}
 
 		gRequestDisplayScreen = DISPLAY_MAIN;
 
@@ -1329,14 +1338,16 @@ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 
 	gBeepToPlay           = BEEP_1KHZ_60MS_OPTIONAL;
 	gRequestDisplayScreen = DISPLAY_MENU;
+	gUpdateDisplay = true;
 
 	if ( settingsSubMenuActive ) {
 		gFlagAcceptSetting = true;
-		settingsSubMenuActive = false;		
+		settingsSubMenuActive = false;
 	} else {
 		settingsSubMenuActive = true;
 		settingsShowSubMenu = true;
 		settingsCurrentSubMenu = 0;
+		MENU_ShowCurrentSetting();
 	}
 	/*
 	if (!gIsInSubMenu)
@@ -1511,12 +1522,13 @@ static void MENU_Key_UP_DOWN(bool bKeyPressed, bool bKeyHeld, int8_t Direction)
 
 	if ( settingsSubMenuActive ) {
 		settingsCurrentSubMenu = NUMBER_AddWithWraparound(settingsCurrentSubMenu, -Direction, settingsSubmenuMin, settingsSubmenuSize - 1);
-		UART_printf("settingsCurrentSubMenu %i : %i : %i\r\n", settingsCurrentSubMenu, settingsSubmenuMin, settingsSubmenuSize - 1);
 	} else {
 		settingsCurrentMenu = NUMBER_AddWithWraparound(settingsCurrentMenu, -Direction, 0, gMenuListCount - 1);
 		settingsSubMenuTime = getTickCount();
 		settingsShowSubMenu = false;
 	}
+	gRequestDisplayScreen = DISPLAY_MENU;
+	gUpdateDisplay = true;
 
 	/*uint8_t VFO;
 	uint8_t Channel;
@@ -1640,7 +1652,7 @@ void MENU_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		case KEY_7:
 		case KEY_8:
 		case KEY_9:
-			//MENU_Key_0_to_9(Key, bKeyPressed, bKeyHeld);
+			MENU_Key_0_to_9(Key, bKeyPressed, bKeyHeld);
 			break;
 		case KEY_MENU:
 			MENU_Key_MENU(bKeyPressed, bKeyHeld);

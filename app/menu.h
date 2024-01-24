@@ -25,7 +25,7 @@
 
 extern uint8_t gUnlockAllTxConfCnt;
 
-int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax);
+int MENU_GetLimits(uint8_t menu_id, uint16_t *pMin, uint16_t *pMax);
 void MENU_AcceptSetting(void);
 void MENU_ShowCurrentSetting(void);
 void MENU_StartCssScan(void);

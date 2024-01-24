@@ -66,6 +66,37 @@ const char *VfoStateStr[] = {
 
 #if 1
 
+void MainVFO_renderPopupFunction() {
+
+	if( gMainPopUpType == 0) return;
+
+    const uint8_t popupW = 68;
+	const uint8_t popupH = 42;
+
+    uint8_t startX;
+    uint8_t startY;
+
+	GUI_showPopup(popupW, popupH, &startX, &startY);
+
+    switch (gMainPopUpType)
+    {
+        case 1:            
+            UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, "VFO %s - TX POWER", gEeprom.TX_VFO == 0 ? "A" : "B");
+            popupShowList(gTxVfo->OUTPUT_POWER, ARRAY_SIZE(gSubMenu_TXP) - 1, startX, startY + 8, startX + popupW - 2, ARRAY_SIZE_ELEMENT(gSubMenu_TXP), gSubMenu_TXP);
+            break;
+        case 2:
+            UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, "VFO %s - BANDWIDTH", gEeprom.TX_VFO == 0 ? "A" : "B");
+            popupShowList(gTxVfo->CHANNEL_BANDWIDTH, ARRAY_SIZE(gSubMenu_W_N) - 1, startX, startY + 8, startX + popupW - 2, ARRAY_SIZE_ELEMENT(gSubMenu_W_N), gSubMenu_W_N);
+            break;
+        case 3:
+            UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, "VFO %s - MODULATION", gEeprom.TX_VFO == 0 ? "A" : "B");
+            popupShowList(gTxVfo->Modulation, MODULATION_UKNOWN - 1, startX, startY + 8, startX + popupW - 2, ARRAY_SIZE_ELEMENT(gModulationStr), gModulationStr);
+            break;
+        default:
+            break;
+    }
+}
+
 void MainVFO_showRSSI(void) {
 
     const uint8_t yPosVFO = 37;
@@ -123,10 +154,7 @@ void MainVFO_showRSSI(void) {
     //@@@@@@@@@&&&&&&&&&
 }
 
-void UI_DisplayMain(void) {
-
-	const uint8_t popupW = 80;
-	const uint8_t popupH = 30;
+void UI_DisplayMain(void) {	
 
 	uint8_t startX;
     uint8_t startY;
@@ -135,6 +163,8 @@ void UI_DisplayMain(void) {
 	UI_displayClear();
 
 	if(gLowBattery && !gLowBatteryConfirmed) {
+		const uint8_t popupW = 80;
+		const uint8_t popupH = 30;
 		GUI_showPopup(popupW, popupH, &startX, &startY);
 		UI_drawString(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 10, "LOW BATTERY", true, false);
 		UI_displayUpdate();
@@ -142,6 +172,8 @@ void UI_DisplayMain(void) {
 	}
 
 	if (gEeprom.KEY_LOCK && gKeypadLocked > 0) {
+		const uint8_t popupW = 80;
+		const uint8_t popupH = 30;
 		// tell user how to unlock the keyboard
 		GUI_showPopup(popupW, popupH, &startX, &startY);
 		UI_drawString(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 5, "Long press #", true, false);
@@ -172,7 +204,13 @@ void UI_DisplayMain(void) {
     uint8_t  yPosVFO = 22;
 
     // VFO A
-    UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO - 7, false, true, vfoNumA == 0 ? "A" : "B");
+	if(FUNCTION_IsRx()) {
+		UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO - 7, false, true, "%s %s", vfoNumA == 0 ? "A" : "B", gEeprom.RX_VFO == vfoNumA ? "$" : "");
+	} else if (gCurrentFunction == FUNCTION_TRANSMIT){
+		UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO - 7, false, true, "%s %s", vfoNumA == 0 ? "A" : "B", gEeprom.TX_VFO == vfoNumA ? "&" : "");
+	} else {
+    	UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO - 7, false, true, vfoNumA == 0 ? "A" : "B");
+	}
 
     // Frequency A
     frequency = vfoInfoA->pRX->Frequency;
@@ -222,7 +260,11 @@ void UI_DisplayMain(void) {
 
     yPosVFO = 61;
     // VFO B
-    UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO - 4, true, false, vfoNumA == 0 ? "B" : "A");
+	if(FUNCTION_IsRx()) {
+		UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO - 4, true, false, "%s %s", vfoNumB == 1 ? "B" : "A", gEeprom.RX_VFO == vfoNumB ? "$" : "");
+	} else {
+    	UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO - 4, true, false, vfoNumB == 1 ? "B" : "A");
+	}
 
     // Frequency B
     frequency = vfoInfoB->pRX->Frequency;
@@ -252,10 +294,19 @@ void UI_DisplayMain(void) {
 	enum VfoState_t state = VfoState[vfoNumA];
 	if (state != VFO_STATE_NORMAL) {
 		if (state < ARRAY_SIZE(VfoStateStr)) {
+			const uint8_t popupW = 80;
+			const uint8_t popupH = 30;
 			GUI_showPopup(popupW, popupH, &startX, &startY);
 			UI_drawString(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 10, VfoStateStr[state], true, false);
 		}
 		//UI_PrintString(VfoStateStr[state], 31, 0, line, 8);
+	}
+
+	if ( gMainDisplayPopUp && gMainPopUpType != 0 ) {
+		MainVFO_renderPopupFunction();
+
+		gMainDisplayPopUp = false;
+		//gUpdateDisplay = true;
 	}
 
 	UI_displayUpdate();

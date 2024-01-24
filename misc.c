@@ -233,6 +233,9 @@ volatile uint8_t  boot_counter_10ms;
 
 uint8_t           gIsLocked = 0xFF;
 
+bool              gMainDisplayPopUp = false;
+uint8_t           gMainPopUpType = 0;
+
 
 inline void FUNCTION_NOP() { ; }
 

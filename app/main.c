@@ -62,7 +62,7 @@ void toggle_chan_scanlist(void)
 #endif
 		return;
 	}
-	
+
 	if (gTxVfo->SCANLIST1_PARTICIPATION ^ gTxVfo->SCANLIST2_PARTICIPATION){
 		gTxVfo->SCANLIST2_PARTICIPATION = gTxVfo->SCANLIST1_PARTICIPATION;
 	} else {
@@ -83,14 +83,18 @@ static void processFKeyFunction(const KEY_Code_t Key, const bool beep)
 		gBeepToPlay = BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL;
 		return;
 	}
-	
+
 	gBeepToPlay = BEEP_1KHZ_60MS_OPTIONAL;
 
 	switch (Key) {
+
 		case KEY_0:
-			#ifdef ENABLE_FMRADIO
+			/*#ifdef ENABLE_FMRADIO
 				ACTION_FM();
-			#endif
+			#endif*/
+			ACTION_SwitchDemodul();
+			gMainDisplayPopUp = true;
+			gMainPopUpType = 3; //
 			break;
 
 		case KEY_1:
@@ -182,14 +186,18 @@ static void processFKeyFunction(const KEY_Code_t Key, const bool beep)
 		case KEY_4:
 			gWasFKeyPressed          = false;
 
-			gBackup_CROSS_BAND_RX_TX  = gEeprom.CROSS_BAND_RX_TX;
+			ACTION_SwitchBandwidth();
+			gMainDisplayPopUp = true;
+			gMainPopUpType = 2; //
+
+			/*gBackup_CROSS_BAND_RX_TX  = gEeprom.CROSS_BAND_RX_TX;
 			gEeprom.CROSS_BAND_RX_TX = CROSS_BAND_OFF;
-			gUpdateStatus            = true;		
+			gUpdateStatus            = true;
 			if (beep)
 				gBeepToPlay = BEEP_1KHZ_60MS_OPTIONAL;
 
 			SCANNER_Start(false);
-			gRequestDisplayScreen = DISPLAY_SCANNER;
+			gRequestDisplayScreen = DISPLAY_SCANNER;*/
 			break;
 
 		case KEY_5:
@@ -210,6 +218,8 @@ static void processFKeyFunction(const KEY_Code_t Key, const bool beep)
 
 		case KEY_6:
 			ACTION_Power();
+			gMainDisplayPopUp = true;
+			gMainPopUpType = 1; //
 			break;
 
 		case KEY_7:
@@ -449,12 +459,12 @@ static void MAIN_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 	{	// menu key released
 
 #ifdef ENABLE_MESSENGER
-		if (gWasFKeyPressed) {			
+		if (gWasFKeyPressed) {
 			hasNewMessage = 0;
 			gRequestDisplayScreen = DISPLAY_MSG;
 			return;
 		}
-#endif	
+#endif
 		const bool bFlag = !gInputBoxIndex;
 		gInputBoxIndex   = 0;
 
@@ -478,7 +488,7 @@ static void MAIN_Key_STAR(bool bKeyPressed, bool bKeyHeld)
 {
 	if (gCurrentFunction == FUNCTION_TRANSMIT)
 		return;
-	
+
 	if (gInputBoxIndex) {
 		if (!bKeyHeld && bKeyPressed)
 			gBeepToPlay = BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL;
@@ -487,7 +497,7 @@ static void MAIN_Key_STAR(bool bKeyPressed, bool bKeyHeld)
 
 	if (bKeyHeld && !gWasFKeyPressed){ // long press
 		if (!bKeyPressed) // released
-			return; 
+			return;
 
 		ACTION_Scan(false);// toggle scanning
 
@@ -498,15 +508,15 @@ static void MAIN_Key_STAR(bool bKeyPressed, bool bKeyHeld)
 	if (bKeyPressed) { // just pressed
 		return;
 	}
-	
+
 	// just released
-	
+
 	if (!gWasFKeyPressed) // pressed without the F-key
-	{	
-		if (gScanStateDir == SCAN_OFF 
+	{
+		if (gScanStateDir == SCAN_OFF
 #ifdef ENABLE_SCAN_RANGES
 			&& gScanRangeStart == 0
-#endif		
+#endif
 		)
 		{	// start entering a DTMF string
 			gBeepToPlay = BEEP_1KHZ_60MS_OPTIONAL;
@@ -530,7 +540,7 @@ static void MAIN_Key_STAR(bool bKeyPressed, bool bKeyHeld)
 		SCANNER_Start(true);
 		gRequestDisplayScreen = DISPLAY_SCANNER;
 	}
-	
+
 	gPttWasReleased = true;
 	gUpdateStatus   = true;
 }

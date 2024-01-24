@@ -79,7 +79,7 @@ void UI_DisplayStatus()
 		UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "$");
 	}
 	else if (gCurrentFunction == FUNCTION_POWER_SAVE) {
-		UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "PS");
+		UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "^");
 	}
 
 	// KEY-LOCK indicator
@@ -90,33 +90,21 @@ void UI_DisplayStatus()
 		UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "[");
 	}
 
-	//x += 8;
-	//unsigned int x1 = x;
-
 #ifdef ENABLE_MESSENGER
 	if (hasNewMessage > 0) { // New Message indicator
 		if (hasNewMessage == 1) {
 			UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "#");
 		}
-			//memcpy(line + x, BITMAP_NEWMSG, sizeof(BITMAP_NEWMSG));
-		//x1 = x + sizeof(BITMAP_NEWMSG);
 	}
-	//x += sizeof(BITMAP_NEWMSG);
 #endif
 
 #ifdef ENABLE_DTMF_CALLING
 	if (gSetting_KILLED) {
-
-		//memset(line + x, 0xFF, 10);
-		//x1 = x + 10;
 	}
 	else
 #endif
 #ifdef ENABLE_FMRADIO
 	if (gFmRadioMode) { // FM indicator
-
-		//memcpy(line + x, BITMAP_FM, sizeof(BITMAP_FM));
-		//x1 = x + sizeof(BITMAP_FM);
 	}
 	else
 #endif
@@ -133,13 +121,9 @@ void UI_DisplayStatus()
 			else {	// frequency mode
 				s = "S";
 			}
-
 			UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "%c", s);
-			//UI_PrintStringSmallBufferNormal(s, line + x + 1);
-			//x1 = x + 10;
 		}
 	}
-	//x += 10;  // font character width
 
 	if(!SCANNER_IsScanning()) {
 		uint8_t dw = (gEeprom.DUAL_WATCH != DUAL_WATCH_OFF) + (gEeprom.CROSS_BAND_RX_TX != CROSS_BAND_OFF) * 2;
@@ -148,7 +132,7 @@ void UI_DisplayStatus()
 				UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "DW");
 				//memcpy(line + x + (dw==1?0:2), BITMAP_TDR1, sizeof(BITMAP_TDR1) - (dw==1?0:5));
 			} else {
-
+				UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "><");
 				//memcpy(line + x + 3, BITMAP_TDR2, sizeof(BITMAP_TDR2));
 			}
 		}
@@ -157,17 +141,12 @@ void UI_DisplayStatus()
 			//memcpy(line + x + 2, BITMAP_XB, sizeof(BITMAP_XB));
 		}
 	}
-	//x += sizeof(BITMAP_TDR1) + 1;
 
 #ifdef ENABLE_VOX
 	// VOX indicator
 	if (gEeprom.VOX_SWITCH) {
-
 		UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + STATUS_SPACE, 0, 4, true, false, "VOX");
-		//memcpy(line + x, BITMAP_VOX, sizeof(BITMAP_VOX));
-		//x1 = x + sizeof(BITMAP_VOX) + 1;
 	}
-	//x += sizeof(BITMAP_VOX) + 1;
 #endif
 
 	// **************
