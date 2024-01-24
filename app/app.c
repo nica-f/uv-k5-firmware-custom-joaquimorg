@@ -18,6 +18,9 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include "am_fix.h"
 #include "app/action.h"
 
@@ -1018,6 +1021,7 @@ void APP_TimeSlice10ms(void)
 	}
 #endif
 
+/*
 #ifdef ENABLE_UART
 	if (UART_IsCommandAvailable()) {
 		__disable_irq();
@@ -1025,7 +1029,7 @@ void APP_TimeSlice10ms(void)
 		__enable_irq();
 	}
 #endif
-
+*/
 	if (gReducedService)
 		return;
 
@@ -1801,7 +1805,7 @@ Skip:
 		gMenuCountdown      = menu_timeout_500ms;
 		settingsShowSubMenu = false;
 		settingsSubMenuActive = false;
-		settingsSubMenuTime = getTickCount();
+		settingsSubMenuTime = xTaskGetTickCount();
 		UI_DisplayMenu();
 	}
 

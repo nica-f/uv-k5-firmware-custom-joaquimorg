@@ -15,8 +15,8 @@ ENABLE_DTMF_CALLING           ?= 0
 ENABLE_FLASHLIGHT             ?= 0
 
 # ---- CUSTOM MODS ----
-ENABLE_BIG_FREQ               ?= 1
-ENABLE_SMALL_BOLD             ?= 1
+ENABLE_BIG_FREQ               ?= 0
+ENABLE_SMALL_BOLD             ?= 0
 ENABLE_CUSTOM_MENU_LAYOUT     ?= 0
 ENABLE_KEEP_MEM_NAME          ?= 0
 ENABLE_WIDE_RX                ?= 1
@@ -53,10 +53,10 @@ ENABLE_LTO                    ?= 1
 #############################################################
 
 # --- joaquim.org
-ENABLE_MESSENGER              			?= 1
-ENABLE_MESSENGER_DELIVERY_NOTIFICATION	?= 1
-ENABLE_MESSENGER_NOTIFICATION			?= 1
-ENABLE_MESSENGER_UART					?= 1
+ENABLE_MESSENGER              			?= 0
+ENABLE_MESSENGER_DELIVERY_NOTIFICATION	?= 0
+ENABLE_MESSENGER_NOTIFICATION			?= 0
+ENABLE_MESSENGER_UART					?= 0
 
 #### INTERNAL USE ####
 ENABLE_SCREEN_DUMP			  ?= 1
@@ -70,6 +70,8 @@ BUILD := _build
 BIN := firmware
 
 LD_FILE := firmware.ld
+
+EXTERNAL_LIB := external
 
 #------------------------------------------------------------------------------
 # Tool Configure
@@ -111,6 +113,29 @@ BSP_HEADERS     := $(patsubst %.def,%.h,$(BSP_HEADERS))
 # Source files common to all targets
 ASM_SRC += \
 	start.S \
+
+# Include folders external libs
+IPATH += \
+	$(EXTERNAL_LIB)/. \
+	$(EXTERNAL_LIB)/printf/. \
+	$(EXTERNAL_LIB)/CMSIS_5/CMSIS/Core/Include/. \
+	$(EXTERNAL_LIB)/CMSIS_5/Device/ARM/ARMCM0/Include/. \
+
+CFLAGS += -DARMCM0
+
+# Source files FreeRTOS
+
+C_SRC += \
+	$(EXTERNAL_LIB)/FreeRTOS/list.c \
+	$(EXTERNAL_LIB)/FreeRTOS/queue.c \
+	$(EXTERNAL_LIB)/FreeRTOS/tasks.c \
+	$(EXTERNAL_LIB)/FreeRTOS/timers.c \
+	$(EXTERNAL_LIB)/FreeRTOS/portable/GCC/ARM_CM0/port.c \
+
+# Include folders external libs
+IPATH += \
+	$(EXTERNAL_LIB)/FreeRTOS/include/. \
+	$(EXTERNAL_LIB)/FreeRTOS/portable/GCC/ARM_CM0/. \
 
 #OLD \
 	font.c \
@@ -161,6 +186,7 @@ C_SRC += \
 	ui/welcome.c \
 	version.c \
 	main.c \
+	task_main.c \
 
 
 C_SRC += \

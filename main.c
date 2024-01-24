@@ -18,49 +18,79 @@
 #include <string.h>
 #include <stdio.h>     // NULL
 
-#ifdef ENABLE_MESSENGER
-	#include "app/messenger.h"
-#endif
-
-#ifdef ENABLE_AM_FIX
-	#include "am_fix.h"
-#endif
-
-#include "audio.h"
-#include "board.h"
-#include "misc.h"
-#include "radio.h"
-#include "settings.h"
-#include "version.h"
-
-#include "app/app.h"
-#include "app/dtmf.h"
-#include "bsp/dp32g030/gpio.h"
-#include "bsp/dp32g030/syscon.h"
-
-#include "driver/backlight.h"
-#include "driver/bk4819.h"
-#include "driver/gpio.h"
-#include "driver/system.h"
-#include "driver/systick.h"
 #ifdef ENABLE_UART
 	#include "driver/uart.h"
 #endif
 
-#include "helper/battery.h"
-#include "helper/boot.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
-#include "ui/lock.h"
-#include "ui/welcome.h"
-#include "ui/menu.h"
-void _putchar(__attribute__((unused)) char c)
-{
+#include "bsp/dp32g030/gpio.h"
+#include "bsp/dp32g030/syscon.h"
+#include "driver/systick.h"
 
+#include "board.h"
+#include "task_main.h"
+
+
+void _putchar(__attribute__((unused)) char c) {
 #ifdef ENABLE_UART
 	UART_Send((uint8_t *)&c, 1);
 #endif
+}
+
+void vAssertCalled( unsigned long ulLine, const char * const pcFileName ) {
+
+    taskENTER_CRITICAL();
+    {
+        #ifdef ENABLE_UART
+			UART_printf("[ASSERT ERROR] %s %s: line=%lu\r\n", __func__, pcFileName, ulLine);
+		#endif
+    }
+    taskEXIT_CRITICAL();
+}
+
+void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName ) {  	
+  	( void ) pxTask;
+
+	taskENTER_CRITICAL();
+    {
+        #ifdef ENABLE_UART
+			unsigned int stackWm = uxTaskGetStackHighWaterMark(pxTask);
+			UART_printf("[STACK ERROR] %s task=%s : %i\r\n", __func__, pcTaskName, stackWm);
+		#endif
+    }
+    taskEXIT_CRITICAL();
 
 }
+
+/*-----------------------------------------------------------*/
+
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
+                                    StackType_t **ppxIdleTaskStackBuffer,
+                                    uint32_t *pulIdleTaskStackSize ) {
+	static StaticTask_t xIdleTaskTCB;
+	static StackType_t uxIdleTaskStack[ configMINIMAL_STACK_SIZE ];
+
+    *ppxIdleTaskTCBBuffer = &xIdleTaskTCB;
+    *ppxIdleTaskStackBuffer = uxIdleTaskStack;
+    *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+}
+
+void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer,
+                                     StackType_t **ppxTimerTaskStackBuffer,
+                                     uint32_t *pulTimerTaskStackSize )
+{
+	static StaticTask_t xTimerTaskTCB;
+	static StackType_t uxTimerTaskStack[ configTIMER_TASK_STACK_DEPTH ];
+
+    *ppxTimerTaskTCBBuffer = &xTimerTaskTCB;
+    *ppxTimerTaskStackBuffer = uxTimerTaskStack;
+    *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
+}
+
+/*-----------------------------------------------------------*/
+
 
 void Main(void)
 {
@@ -78,149 +108,15 @@ void Main(void)
 
 
 	SYSTICK_Init();
-	BOARD_Init();
+	BOARD_PORTCON_Init();
+	BOARD_GPIO_Init();
+	
+	main_task_init();
 
-	boot_counter_10ms = 250;   // 2.5 sec
+	vTaskStartScheduler();
 
-#ifdef ENABLE_UART
-	UART_Init();
-	UART_Send(UART_Version, strlen(UART_Version));
-#endif
+    while(1) {
+		// oops, something went wrong
+  	}
 
-	// Not implementing authentic device checks
-
-	memset(gDTMF_String, '-', sizeof(gDTMF_String));
-	gDTMF_String[sizeof(gDTMF_String) - 1] = 0;
-
-	BK4819_Init();
-
-	BOARD_ADC_GetBatteryInfo(&gBatteryCurrentVoltage, &gBatteryCurrent);
-
-	SETTINGS_InitEEPROM();
-
-	#ifdef ENABLE_CONTRAST
-		ST7565_SetContrast(gEeprom.LCD_CONTRAST);
-	#endif
-
-	SETTINGS_WriteBuildOptions();
-	SETTINGS_LoadCalibration();
-
-	RADIO_ConfigureChannel(0, VFO_CONFIGURE_RELOAD);
-	RADIO_ConfigureChannel(1, VFO_CONFIGURE_RELOAD);
-
-	RADIO_SelectVfos();
-
-	RADIO_SetupRegisters(true);
-
-	for (unsigned int i = 0; i < ARRAY_SIZE(gBatteryVoltages); i++)
-		BOARD_ADC_GetBatteryInfo(&gBatteryVoltages[i], &gBatteryCurrent);
-
-	BATTERY_GetReadings(false);
-
-#ifdef ENABLE_MESSENGER
-	MSG_Init();
-#endif
-
-#ifdef ENABLE_AM_FIX
-	AM_fix_init();
-#endif
-
-	const BOOT_Mode_t  BootMode = BOOT_GetMode();
-
-	if (BootMode == BOOT_MODE_F_LOCK)
-	{
-		gF_LOCK = true;            // flag to say include the hidden menu items
-	}
-
-	// count the number of menu items
-	gMenuListCount = 0;
-	while (MenuList[gMenuListCount].name[0] != '\0') {
-		if(!gF_LOCK && MenuList[gMenuListCount].menu_id == FIRST_HIDDEN_MENU_ITEM)
-			break;
-
-		gMenuListCount++;
-	}
-
-	// wait for user to release all butts before moving on
-	if (!GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT) ||
-	     KEYBOARD_Poll() != KEY_INVALID || BootMode != BOOT_MODE_NORMAL
-	 		 
-	)
-	{	// keys are pressed
-		UI_DisplayReleaseKeys();
-		BACKLIGHT_TurnOn();
-
-		// 500ms
-		for (int i = 0; i < 50;)
-		{
-			i = (GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT) && KEYBOARD_Poll() == KEY_INVALID) ? i + 1 : 0;
-			SYSTEM_DelayMs(10);
-		}
-		gKeyReading0 = KEY_INVALID;
-		gKeyReading1 = KEY_INVALID;
-		gDebounceCounter = 0;
-	}
-
-	if (!gChargingWithTypeC && gBatteryDisplayLevel == 0)
-	{
-		FUNCTION_Select(FUNCTION_POWER_SAVE);
-
-		if (gEeprom.BACKLIGHT_TIME < (ARRAY_SIZE(gSubMenu_BACKLIGHT) - 1)) // backlight is not set to be always on
-			BACKLIGHT_TurnOff();	// turn the backlight OFF
-		else
-			BACKLIGHT_TurnOn();  	// turn the backlight ON
-
-		gReducedService = true;
-	}
-	else
-	{
-		UI_DisplayWelcome();
-
-		BACKLIGHT_TurnOn();
-
-		if (gEeprom.POWER_ON_DISPLAY_MODE != POWER_ON_DISPLAY_MODE_NONE)
-		{	// 2.55 second boot-up screen
-			while (boot_counter_10ms > 0)
-			{
-				if (KEYBOARD_Poll() != KEY_INVALID)
-				{	// halt boot beeps
-					boot_counter_10ms = 0;
-					break;
-				}
-#ifdef ENABLE_BOOT_BEEPS
-				if ((boot_counter_10ms % 25) == 0)
-					AUDIO_PlayBeep(BEEP_880HZ_40MS_OPTIONAL);
-#endif
-			}
-		}
-
-#ifdef ENABLE_PWRON_PASSWORD
-		if (gEeprom.POWER_ON_PASSWORD < 1000000)
-		{
-			bIsInLockScreen = true;
-			UI_DisplayLock();
-			bIsInLockScreen = false;
-		}
-#endif
-
-		BOOT_ProcessMode(BootMode);
-
-		GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_VOICE_0);
-
-		gUpdateStatus = true;
-
-	}
-
-	while (true) {
-		APP_Update();
-
-		if (gNextTimeslice) {
-
-			APP_TimeSlice10ms();
-
-			if (gNextTimeslice_500ms) {
-				APP_TimeSlice500ms();
-			}
-		}
-	}
 }

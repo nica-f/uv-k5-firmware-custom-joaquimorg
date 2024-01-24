@@ -15,6 +15,8 @@
  */
 
 #include <string.h>
+#include "FreeRTOS.h"
+#include "task.h"
 
 #if !defined(ENABLE_OVERLAY)
 	#include "ARMCM0.h"
@@ -1524,7 +1526,7 @@ static void MENU_Key_UP_DOWN(bool bKeyPressed, bool bKeyHeld, int8_t Direction)
 		settingsCurrentSubMenu = NUMBER_AddWithWraparound(settingsCurrentSubMenu, -Direction, settingsSubmenuMin, settingsSubmenuSize - 1);
 	} else {
 		settingsCurrentMenu = NUMBER_AddWithWraparound(settingsCurrentMenu, -Direction, 0, gMenuListCount - 1);
-		settingsSubMenuTime = getTickCount();
+		settingsSubMenuTime = xTaskGetTickCount();
 		settingsShowSubMenu = false;
 	}
 	gRequestDisplayScreen = DISPLAY_MENU;

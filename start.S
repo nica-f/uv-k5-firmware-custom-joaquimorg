@@ -20,6 +20,7 @@
 	.global Stack
 	.global HandlerReset
 	.global Main
+#	.global Systick
 
 	.global OVERLAY_Install
 	.global BOARD_FLASH_Init
@@ -27,6 +28,12 @@
 
 	.global SystickHandler
 	.weak SystickHandler
+
+	.global HandlerSVCall
+	.weak HandlerSVCall
+
+	.global HandlerPendSV
+	.weak HandlerPendSV	
 
 	.section .text.isr
 
@@ -136,10 +143,10 @@ HandlerHardFault:
 	b	.
 
 HandlerSVCall:
-	b	.
+	bx	lr
 
 HandlerPendSV:
-	b	.
+	bx	lr
 
 SystickHandler:
 	bx	lr
@@ -245,9 +252,5 @@ HandlerReset:
 	mov	sp, r0
 	bl	DATA_Init
 	bl	BSS_Init
-#if defined(ENABLE_OVERLAY)
-	bl	BOARD_FLASH_Init
-#endif
 	bl	Main
 	b 	.
-

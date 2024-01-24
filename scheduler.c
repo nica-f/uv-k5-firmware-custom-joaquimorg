@@ -44,14 +44,10 @@
 
 static volatile uint32_t gGlobalSysTickCounter;
 
-uint32_t getTickCount(void) {
-	return gGlobalSysTickCounter;
-}
-
-void SystickHandler(void);
+//void SystickHandler(void);
 
 // we come here every 10ms
-void SystickHandler(void)
+void SystickHandlerA(void)
 {
 	gGlobalSysTickCounter++;
 	

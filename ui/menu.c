@@ -16,6 +16,8 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include "FreeRTOS.h"
+#include "task.h"
 
 #include "../app/dtmf.h"
 #include "../app/menu.h"
@@ -385,7 +387,7 @@ int     edit_index;
 #if 1
 
 #define SUB_MENU_X 68
-#define SETTINGS_TIMESHOW_SUB 60
+#define SETTINGS_TIMESHOW_SUB 500
 
 uint8_t settingsCurrentMenu = 0;
 uint8_t settingsCurrentSubMenu = 0;
@@ -738,13 +740,13 @@ void UI_DisplayMenu(void) {
     if (settingsShowSubMenu) {
         SettingsMenu_subList();
     } else {
-        if (getTickCount() - settingsSubMenuTime > pdMS_TO_TICKS(SETTINGS_TIMESHOW_SUB)) {
+        if (xTaskGetTickCount() - settingsSubMenuTime > pdMS_TO_TICKS(SETTINGS_TIMESHOW_SUB)) {
 			/*if( GUI_inputGetSize() == 1 ) {
 				const uint8_t inputValue = GUI_inputGetNumber();
 				if ( inputValue > 0) {
 					settingsCurrentMenu = inputValue - 1;
 					settingsShowSubMenu = false;
-					settingsSubMenuTime = getTickCount();
+					settingsSubMenuTime =xTaskGetTickCount();
 				}
 			} else {*/
 				gMenuCountdown = menu_timeout_long_500ms;
