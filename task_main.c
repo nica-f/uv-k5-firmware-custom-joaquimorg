@@ -30,6 +30,7 @@
 #include "board.h"
 #include "misc.h"
 #include "radio.h"
+#include "app.h"
 #include "settings.h"
 #include "version.h"
 
@@ -73,25 +74,35 @@ StaticTimer_t hwStatusTimerBuffer500;
 
 extern void SystickHandlerA(void);
 
-void hw_timer_callback(TimerHandle_t xTimer) {
 
+void HandlerGPIOB1(void) {
+	UART_printf("HandlerGPIOB IRQ %b \r\n", GPIO_CheckBit(&GPIOB->DATA, GPIOB_PIN_SWD_CLK));
+}
+
+void hw_timer_callback(TimerHandle_t xTimer) {	
 
 #ifdef ENABLE_UART
-	taskENTER_CRITICAL();
+	//taskENTER_CRITICAL();
 	if (UART_IsCommandAvailable()) {
-		__disable_irq();
+		//__disable_irq();
 		UART_HandleCommand();
-		__enable_irq();
+		//__enable_irq();
 	}
-	taskEXIT_CRITICAL();
+	//taskEXIT_CRITICAL();
 #endif
 
     xTimerStart(xTimer, 0);
 }
 
+//bool flippp = false;
+
 void hw_timer_callback_500(TimerHandle_t xTimer) {
-	APP_TimeSlice500ms();	
-	//UART_printf("500ms \r\n");
+
+	//BK4819_ToggleGpioOut(2, flippp);
+	//UART_printf("GPIOB->DATA %b \r\n", GPIO_CheckBit(&GPIOB->DATA, GPIOB_PIN_SWD_CLK));
+	//flippp = !flippp;
+
+	APP_TimeSlice500ms();
     xTimerStart(xTimer, 0);
 }
 
@@ -109,7 +120,6 @@ void main_task(void* arg) {
 	boot_counter_10ms = 250;   // 2.5 sec
 
 	hwStatusTimer = xTimerCreateStatic("hwStatus", pdMS_TO_TICKS(50), pdFALSE, NULL, hw_timer_callback, &hwStatusTimerBuffer);
-	xTimerStart(hwStatusTimer, 0);
 
 	hwStatusTimer500 = xTimerCreateStatic("hwStatus500", pdMS_TO_TICKS(500), pdFALSE, NULL, hw_timer_callback_500, &hwStatusTimerBuffer500);
 
@@ -118,6 +128,7 @@ void main_task(void* arg) {
 	memset(gDTMF_String, '-', sizeof(gDTMF_String));
 	gDTMF_String[sizeof(gDTMF_String) - 1] = 0;
 
+	taskENTER_CRITICAL();
 	BK4819_Init();
 
 	BOARD_ADC_GetBatteryInfo(&gBatteryCurrentVoltage, &gBatteryCurrent);
@@ -128,7 +139,7 @@ void main_task(void* arg) {
 		ST7565_SetContrast(gEeprom.LCD_CONTRAST);
 	#endif
 
-	SETTINGS_WriteBuildOptions();
+	//SETTINGS_WriteBuildOptions();
 	SETTINGS_LoadCalibration();
 
 	RADIO_ConfigureChannel(0, VFO_CONFIGURE_RELOAD);
@@ -151,12 +162,12 @@ void main_task(void* arg) {
 	AM_fix_init();
 #endif
 
-	/*const BOOT_Mode_t  BootMode = BOOT_GetMode();
+	const BOOT_Mode_t  BootMode = BOOT_GetMode();
 
 	if (BootMode == BOOT_MODE_F_LOCK)
 	{
 		gF_LOCK = true;            // flag to say include the hidden menu items
-	}*/
+	}
 
 	// count the number of menu items
 	gMenuListCount = 0;
@@ -168,7 +179,7 @@ void main_task(void* arg) {
 	}
 
 	// wait for user to release all butts before moving on
-	/*if (!GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT) ||
+	if (!GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT) ||
 	     KEYBOARD_Poll() != KEY_INVALID || BootMode != BOOT_MODE_NORMAL
 	 		 
 	)
@@ -185,7 +196,7 @@ void main_task(void* arg) {
 		gKeyReading0 = KEY_INVALID;
 		gKeyReading1 = KEY_INVALID;
 		gDebounceCounter = 0;
-	}*/
+	}
 
 	/*if (!gChargingWithTypeC && gBatteryDisplayLevel == 0)
 	{
@@ -198,13 +209,13 @@ void main_task(void* arg) {
 
 		gReducedService = true;
 	}
-	else
-	{*/
+	else*/
+	{
 		UI_DisplayWelcome();
 
 		BACKLIGHT_TurnOn();
 
-		/*if (gEeprom.POWER_ON_DISPLAY_MODE != POWER_ON_DISPLAY_MODE_NONE)
+		if (gEeprom.POWER_ON_DISPLAY_MODE != POWER_ON_DISPLAY_MODE_NONE)
 		{	// 2.55 second boot-up screen
 			while (boot_counter_10ms > 0)
 			{
@@ -218,7 +229,7 @@ void main_task(void* arg) {
 					AUDIO_PlayBeep(BEEP_880HZ_40MS_OPTIONAL);
 #endif
 			}
-		}*/
+		}
 /*
 #ifdef ENABLE_PWRON_PASSWORD
 		if (gEeprom.POWER_ON_PASSWORD < 1000000)
@@ -229,20 +240,27 @@ void main_task(void* arg) {
 		}
 #endif
 */
-		//BOOT_ProcessMode(BootMode);
+		BOOT_ProcessMode(BootMode);
 
 		GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_VOICE_0);
 
 		gUpdateStatus = true;
 
-	//}
+	}
+
+	taskEXIT_CRITICAL();
 
 	xTimerStart(hwStatusTimer500, 0);
-	UART_printf("Ready... \r\n");
+	xTimerStart(hwStatusTimer, 0);
+	//UART_printf("Ready... \r\n");
 	while (true) {
 		SystickHandlerA();
 		APP_TimeSlice10ms();
-		APP_Update();		
+		if (gCurrentFunction != FUNCTION_POWER_SAVE || !gRxIdleMode) {	
+			CheckRadioInterrupts();
+		}
+		APP_Update();
+		vTaskDelay(pdMS_TO_TICKS(5));
 	}
 }
 

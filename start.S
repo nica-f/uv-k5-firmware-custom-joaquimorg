@@ -35,6 +35,9 @@
 	.global HandlerPendSV
 	.weak HandlerPendSV	
 
+	.global HandlerGPIOB1
+	.weak HandlerGPIOB1
+
 	.section .text.isr
 
 Stack:
@@ -230,7 +233,7 @@ HandlerGPIOB0:
 	b	.
 
 HandlerGPIOB1:
-	b	.
+	bx	lr
 
 HandlerGPIOC0:
 	b	.

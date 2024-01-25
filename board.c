@@ -16,6 +16,9 @@
 
 #include <string.h>
 
+#include "ARMCM0.h"
+#include "bsp/dp32g030/irq.h"
+
 #ifdef ENABLE_FMRADIO
 	#include "app/fm.h"
 #endif
@@ -88,9 +91,15 @@ void BOARD_GPIO_Init(void)
 		// ST7565 + SWD IO
 		| GPIO_DIR_11_BITS_OUTPUT
 		// B14 = SWD_CLK assumed INPUT by default
+		//| GPIO_DIR_14_MASK // INPUT
 		// BK1080
 		| GPIO_DIR_15_BITS_OUTPUT
 		;
+
+	GPIOB->DIR &= ~(0		
+		| GPIO_DIR_14_MASK // INPUT
+		);
+
 	GPIOC->DIR |= 0
 		// BK4819 SCN
 		| GPIO_DIR_0_BITS_OUTPUT
@@ -187,6 +196,8 @@ void BOARD_PORTCON_Init(void)
 		| PORTCON_PORTB_SEL1_B14_MASK
 		// BK1080
 		| PORTCON_PORTB_SEL1_B15_MASK
+
+		| PORTCON_PORTB_SEL1_B14_MASK
 		);
 	PORTCON_PORTB_SEL1 |= 0
 		// SPI0 CLK, wasn't cleared in previous step / relying on default value!
@@ -313,7 +324,7 @@ void BOARD_PORTCON_Init(void)
 	// PORT B pin configuration
 
 	PORTCON_PORTB_IE |= 0
-		| PORTCON_PORTB_IE_B14_BITS_ENABLE
+		| PORTCON_PORTB_IE_B14_MASK
 		;
 	PORTCON_PORTB_IE &= ~(0
 		// Back light
@@ -373,6 +384,10 @@ void BOARD_PORTCON_Init(void)
 	PORTCON_PORTB_OD |= 0
 		// SWD CLK
 		| PORTCON_PORTB_OD_B14_BITS_ENABLE
+		;
+
+	PORTCON_PORTB_PU |= 0
+		| PORTCON_PORTB_PU_B14_BITS_ENABLE
 		;
 
 	// PORT C pin configuration
@@ -452,6 +467,8 @@ void BOARD_PORTCON_Init(void)
 		// PTT button
 		| PORTCON_PORTC_OD_C5_BITS_ENABLE
 		;
+
+	NVIC_EnableIRQ((IRQn_Type)DP32_GPIOB1_IRQn);
 }
 
 void BOARD_ADC_Init(void)

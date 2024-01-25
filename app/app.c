@@ -511,10 +511,12 @@ static void DualwatchAlternate(void)
 	gDualWatchCountdown_10ms = dual_watch_count_toggle_10ms;
 }
 
-static void CheckRadioInterrupts(void)
+void CheckRadioInterrupts(void)
 {
 	if (SCANNER_IsScanning())
 		return;
+
+	//UART_printf("BK4819_REG_0C %b \r\n", BK4819_ReadRegister(BK4819_REG_0C));
 
 	while (BK4819_ReadRegister(BK4819_REG_0C) & 1u) { // BK chip interrupt request
 		// clear interrupts
@@ -541,9 +543,11 @@ static void CheckRadioInterrupts(void)
 				uint16_t fskTxFinied : 1;
 			};
 			uint16_t __raw;
-		} interrupts;
+		} interrupts;		
 
 		interrupts.__raw = BK4819_ReadRegister(BK4819_REG_02);
+
+		//UART_printf("interrupts %b \r\n", interrupts);
 
 		// 0 = no phase shift
 		// 1 = 120deg phase shift
@@ -636,11 +640,13 @@ static void CheckRadioInterrupts(void)
 		if (interrupts.sqlLost) {
 			g_SquelchLost = true;
 			BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, true);
+			//UART_printf("sqlLost \r\n");
 		}
 
 		if (interrupts.sqlFound) {
 			g_SquelchLost = false;
 			BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, false);
+			//UART_printf("sqlFound \r\n");
 		}
 
 #ifdef ENABLE_AIRCOPY
@@ -1033,8 +1039,8 @@ void APP_TimeSlice10ms(void)
 	if (gReducedService)
 		return;
 
-	if (gCurrentFunction != FUNCTION_POWER_SAVE || !gRxIdleMode)
-		CheckRadioInterrupts();
+	/*if (gCurrentFunction != FUNCTION_POWER_SAVE || !gRxIdleMode)
+		CheckRadioInterrupts();*/
 
 	if (gCurrentFunction == FUNCTION_TRANSMIT)
 	{	// transmitting

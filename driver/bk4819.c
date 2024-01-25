@@ -118,10 +118,15 @@ void BK4819_Init(void)
 	BK4819_WriteRegister(BK4819_REG_1F, 0x5454);
 	BK4819_WriteRegister(BK4819_REG_3E, 0xA037);
 
-	gBK4819_GpioOutState = 0x9000;
+	//gBK4819_GpioOutState = 0x9000; // 1001 0000 0000 0000
 
-	BK4819_WriteRegister(BK4819_REG_33, 0x9000);
+	gBK4819_GpioOutState = 0x8000; // 1000 0000 0000 0000 - enable GPIO2 try to use to set interrupt on MCU
+
+	BK4819_WriteRegister(BK4819_REG_33, gBK4819_GpioOutState);
 	BK4819_WriteRegister(BK4819_REG_3F, 0);
+
+	BK4819_WriteRegister(BK4819_REG_34, 0x00);
+	BK4819_WriteRegister(BK4819_REG_35, 0x01); // SET GPIO02 for Interrupt -> MCU PB14 (GPIOB_PIN_SWD_CLK)
 }
 
 static uint16_t BK4819_ReadU16(void)
