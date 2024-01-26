@@ -18,16 +18,17 @@
 #include <string.h>
 #include <stdio.h>     // NULL
 
-#ifdef ENABLE_UART
-	#include "driver/uart.h"
-#endif
-
+#include "ARMCM0.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
 #include "bsp/dp32g030/gpio.h"
 #include "bsp/dp32g030/syscon.h"
 #include "driver/systick.h"
+
+#ifdef ENABLE_UART
+	#include "driver/uart.h"
+#endif
 
 #include "board.h"
 #include "task_main.h"
@@ -112,6 +113,13 @@ void Main(void)
 	BOARD_GPIO_Init();
 	
 	main_task_init();
+
+#if(__ARM_ARCH_7A__ == 0U)
+    /* Service Call interrupt might be configured before kernel start      */
+    /* and when its priority is lower or equal to BASEPRI, svc instruction */
+    /* causes a Hard Fault.                                                */
+    NVIC_SetPriority(SVCall_IRQn, 0U);
+#endif
 
 	vTaskStartScheduler();
 
