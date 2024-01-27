@@ -72,9 +72,8 @@ void SETTINGS_InitEEPROM(void)
 
 	gEeprom.TAIL_TONE_ELIMINATION = (Data[6] >> 7) & 1;
 
-#ifdef ENABLE_CONTRAST
 	gEeprom.LCD_CONTRAST		  = Data[6] & 0x7F;
-#endif
+
 
 	// 0E80..0E87
 	EEPROM_ReadBuffer(0x0E80, Data, 8);
@@ -491,11 +490,8 @@ void SETTINGS_SaveSettings(void)
 	//State[6] = gEeprom.TAIL_TONE_ELIMINATION;
 	State[7] = gEeprom.VFO_OPEN;
 
-#ifdef ENABLE_CONTRAST
 	State[6] = (gEeprom.LCD_CONTRAST & 0x7F) | (gEeprom.TAIL_TONE_ELIMINATION << 7);
-#else
-	State[6] = (gEeprom.TAIL_TONE_ELIMINATION << 7);
-#endif
+
 
 	EEPROM_WriteBuffer(0x0E78, State);
 

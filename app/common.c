@@ -30,8 +30,8 @@ void COMMON_SwitchVFOs()
     if (gEeprom.DUAL_WATCH != DUAL_WATCH_OFF)
         gEeprom.DUAL_WATCH = gEeprom.TX_VFO + 1;
 
-    gRequestSaveSettings  = 1;
-    gFlagReconfigureVfos  = true;
+    //gRequestSaveSettings  = 1;
+    //gFlagReconfigureVfos  = true;
     gScheduleDualWatch = true;
 
     gRequestDisplayScreen = DISPLAY_MAIN;
@@ -44,8 +44,8 @@ void COMMON_SwitchVFOMode()
         if (IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE))
         {	// swap to frequency mode
             gEeprom.ScreenChannel[gEeprom.TX_VFO] = gEeprom.FreqChannel[gEeprom.TX_VFO];
-            gRequestSaveVFO            = true;
-            gVfoConfigureMode          = VFO_CONFIGURE_RELOAD;
+            //gRequestSaveVFO            = true;
+            //gVfoConfigureMode          = VFO_CONFIGURE_RELOAD;
             return;
         }
 
@@ -53,8 +53,8 @@ void COMMON_SwitchVFOMode()
         if (Channel != 0xFF)
         {	// swap to channel mode
             gEeprom.ScreenChannel[gEeprom.TX_VFO] = Channel;
-            gRequestSaveVFO     = true;
-            gVfoConfigureMode   = VFO_CONFIGURE_RELOAD;
+            //gRequestSaveVFO     = true;
+            //gVfoConfigureMode   = VFO_CONFIGURE_RELOAD;
             return;
         }
     }

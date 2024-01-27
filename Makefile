@@ -140,6 +140,7 @@ IPATH += \
 #OLD \
 	font.c \
 	bitmaps.c \
+	ui/main.c \
 
 C_SRC += \
 	external/printf/printf.c \
@@ -178,7 +179,6 @@ C_SRC += \
 	ui/battery.c \
 	ui/helper.c \
 	ui/inputbox.c \
-	ui/main.c \
 	ui/menu.c \
 	ui/scanner.c \
 	ui/status.c \
@@ -186,7 +186,11 @@ C_SRC += \
 	ui/welcome.c \
 	version.c \
 	main.c \
+
+C_SRC += \
+	vfo.c \
 	task_main.c \
+	applications_task.c \
 
 
 C_SRC += \
@@ -253,6 +257,7 @@ IPATH += \
 	gui/. \
 	helper/. \
 	app/. \
+	apps/. \
 	driver/. \
 	bsp/dp32g030/. \
 	external/printf/. \
@@ -316,9 +321,6 @@ ifeq ($(ENABLE_F_CAL_MENU),1)
 endif
 ifeq ($(ENABLE_CTCSS_TAIL_PHASE_SHIFT),1)
 	CFLAGS  += -DENABLE_CTCSS_TAIL_PHASE_SHIFT
-endif
-ifeq ($(ENABLE_CONTRAST),1)
-	CFLAGS  += -DENABLE_CONTRAST
 endif
 ifeq ($(ENABLE_BOOT_BEEPS),1)
 	CFLAGS  += -DENABLE_BOOT_BEEPS

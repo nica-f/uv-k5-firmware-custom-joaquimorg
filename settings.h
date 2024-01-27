@@ -152,9 +152,7 @@ typedef struct {
 	bool                  VOX_SWITCH;
 	uint8_t               VOX_LEVEL;
 	bool                  BEEP_CONTROL;
-	#ifdef ENABLE_CONTRAST
-		uint8_t    		  LCD_CONTRAST;
-	#endif
+	uint8_t    		  LCD_CONTRAST;
 	uint8_t               CHANNEL_DISPLAY_MODE;
 	bool                  TAIL_TONE_ELIMINATION;
 	bool                  VFO_OPEN;

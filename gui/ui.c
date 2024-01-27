@@ -33,17 +33,17 @@ void UI_displayClear(void) {
 }
 
 void UI_displayUpdate(void) {
-	//if ( UI_updateDisplay ) {		
+	if ( UI_updateDisplay ) {		
 		ST7565_BlitFullScreen(false);
 		UI_updateDisplay = false;
-	//}
+	}
 }
 
 void UI_statusUpdate(void) {
-	//if ( UI_updateStatus ) {		
+	if ( UI_updateStatus ) {		
 		ST7565_BlitFullScreen(true);
 		UI_updateStatus = false;
-	//}
+	}
 }
 
 /**************************************************************************/

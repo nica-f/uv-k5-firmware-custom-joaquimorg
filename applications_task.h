@@ -15,9 +15,18 @@
  */
 
 #include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+
 #include "task_messages.h"
+#include "apps.h"
 
-void main_task_init(void);
+void applications_task_init(void);
 
-void main_push_message_value(MAIN_MSG_t msg, uint32_t value);
-void main_push_message(MAIN_MSG_t msg);
+void app_push_message_value(APP_MSG_t msg, uint32_t value);
+void app_push_message(APP_MSG_t msg);
+
+void load_application(APPS_t application);
+void application_showPopup(APPS_Popup_t popup, bool autoClose);
+void application_closePopup(void);
+

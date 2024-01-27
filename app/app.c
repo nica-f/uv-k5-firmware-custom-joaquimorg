@@ -79,17 +79,20 @@
 #include "ui/status.h"
 #include "ui/ui.h"
 
+#include "task_main.h"
+
 #ifdef ENABLE_MESSENGER_NOTIFICATION
 bool gPlayMSGRing = false;
 uint8_t gPlayMSGRingCount = 0;
 #endif
 
+/*
 static bool flagSaveVfo;
 static bool flagSaveSettings;
 static bool flagSaveChannel;
 
 static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
-
+*/
 
 void (*ProcessKeysFunctions[])(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) = {
 	[DISPLAY_MAIN] = &MAIN_ProcessKeys,
@@ -641,12 +644,14 @@ void CheckRadioInterrupts(void)
 			g_SquelchLost = true;
 			BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, true);
 			//UART_printf("sqlLost \r\n");
+			main_push_message(RADIO_SQUELCH_LOST);
 		}
 
 		if (interrupts.sqlFound) {
 			g_SquelchLost = false;
 			BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, false);
 			//UART_printf("sqlFound \r\n");
+			main_push_message(RADIO_SQUELCH_FOUND);
 		}
 
 #ifdef ENABLE_AIRCOPY
@@ -762,7 +767,7 @@ void APP_Update(void)
 
 		RADIO_SetVfoState(VFO_STATE_TIMEOUT);
 
-		GUI_DisplayScreen();
+		//GUI_DisplayScreen();
 	}
 
 	if (gReducedService)
@@ -893,7 +898,7 @@ void APP_Update(void)
 		gPowerSaveCountdownExpired = false;
 	}
 }
-
+/*
 // called every 10ms
 static void CheckKeys(void)
 {
@@ -1006,6 +1011,7 @@ static void CheckKeys(void)
 	}
 }
 
+*/
 void APP_TimeSlice10ms(void)
 {
 	gNextTimeslice = false;
@@ -1042,22 +1048,23 @@ void APP_TimeSlice10ms(void)
 	/*if (gCurrentFunction != FUNCTION_POWER_SAVE || !gRxIdleMode)
 		CheckRadioInterrupts();*/
 
+
 	if (gCurrentFunction == FUNCTION_TRANSMIT)
 	{	// transmitting
-#ifdef ENABLE_AUDIO_BAR
-		/*if (gSetting_mic_bar && (gFlashLightBlinkCounter % (150 / 10)) == 0) // once every 150ms
-			UI_DisplayAudioBar();*/
-#endif
+/*#ifdef ENABLE_AUDIO_BAR
+		if (gSetting_mic_bar && (gFlashLightBlinkCounter % (150 / 10)) == 0) // once every 150ms
+			UI_DisplayAudioBar();
+#endif*/
 	}
 
-	if (gUpdateDisplay)
+	/*if (gUpdateDisplay)
 	{
 		gUpdateDisplay = false;
 		GUI_DisplayScreen();
 	}
 
 	if (gUpdateStatus)
-		UI_DisplayStatus();
+		UI_DisplayStatus();*/
 
 	// Skipping authentic device checks
 
@@ -1111,13 +1118,13 @@ void APP_TimeSlice10ms(void)
 						BK4819_Enable_AfDac_DiscMode_TxDsp();
 						BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, false);
 
-						GUI_DisplayScreen();
+						//GUI_DisplayScreen();
 					}
 					else
 					{
 						gAlarmState = ALARM_STATE_TXALARM;
 
-						GUI_DisplayScreen();
+						//GUI_DisplayScreen();
 
 						BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, true);
 						RADIO_SetTxParameters();
@@ -1152,18 +1159,18 @@ void APP_TimeSlice10ms(void)
 #endif
 
 
-	SCANNER_TimeSlice10ms();
+	//SCANNER_TimeSlice10ms();
 
 #ifdef ENABLE_AIRCOPY
 	if (gScreenToDisplay == DISPLAY_AIRCOPY && gAircopyState == AIRCOPY_TRANSFER && gAirCopyIsSendMode == 1)
 	{
 		if (!AIRCOPY_SendMessage()) {
-			GUI_DisplayScreen();
+			//GUI_DisplayScreen();
 		}
 	}
 #endif
 
-	CheckKeys();
+	//CheckKeys();
 }
 
 void cancelUserInputModes(void)
@@ -1406,9 +1413,9 @@ void APP_TimeSlice500ms(void)
 #endif
 	}
 
-	BATTERY_TimeSlice500ms();
-	SCANNER_TimeSlice500ms();
-	UI_MAIN_TimeSlice500ms();
+	//BATTERY_TimeSlice500ms();
+	//SCANNER_TimeSlice500ms();
+	//UI_MAIN_TimeSlice500ms();
 
 #ifdef ENABLE_DTMF_CALLING
 	if (gCurrentFunction != FUNCTION_TRANSMIT) {
@@ -1464,9 +1471,13 @@ static void ALARM_Off(void)
 		gRequestDisplayScreen = DISPLAY_MAIN;
 }
 #endif
-
+/*
 static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 {
+	(void)Key;
+	(void)bKeyPressed;
+	(void)bKeyHeld;
+	
 	if (Key == KEY_EXIT && !BACKLIGHT_IsOn() && gEeprom.BACKLIGHT_TIME > 0)
 	{	// just turn the light on for now so the user can see what's what
 		BACKLIGHT_TurnOn();
@@ -1499,7 +1510,7 @@ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 			gFlagSaveFM = false;
 		}
 #endif
-
+		
 		if (flagSaveChannel) {
 			SETTINGS_SaveChannel(gTxVfo->CHANNEL_SAVE, gEeprom.TX_VFO, gTxVfo, flagSaveChannel);
 			flagSaveChannel = false;
@@ -1510,11 +1521,11 @@ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		}
 	}
 	else { // key pressed or held
-		//const int m = UI_MENU_GetCurrentMenuId();
+		const int m = UI_MENU_GetCurrentMenuId();
 		if 	(	//not when PTT and the backlight shouldn't turn on on TX
 				!(Key == KEY_PTT && !(gSetting_backlight_on_tx_rx & BACKLIGHT_ON_TR_TX))
 				// not in the backlight menu
-				&& !(gScreenToDisplay == DISPLAY_MENU /*&& ( m == MENU_ABR || m == MENU_ABR_MAX || m == MENU_ABR_MIN)*/)
+				&& !(gScreenToDisplay == DISPLAY_MENU && ( m == MENU_ABR || m == MENU_ABR_MAX || m == MENU_ABR_MIN))
 			)
 		{
 			BACKLIGHT_TurnOn();
@@ -1536,6 +1547,7 @@ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 #ifdef ENABLE_SCAN_RANGES
 			gScanRangeStart = 0;
 #endif
+
 		}
 
 		if (gScreenToDisplay == DISPLAY_MENU)       // 1of11
@@ -1553,6 +1565,7 @@ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 			}
 		}
 #endif
+
 	}
 
 	bool lowBatPopup = gLowBattery && !gLowBatteryConfirmed &&  gScreenToDisplay == DISPLAY_MAIN;
@@ -1824,4 +1837,6 @@ Skip:
 	gRequestDisplayScreen = DISPLAY_INVALID;
 
 	gUpdateDisplay = true;
+	
 }
+*/

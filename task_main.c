@@ -41,6 +41,7 @@
 
 #include "driver/backlight.h"
 #include "driver/bk4819.h"
+#include "driver/st7565.h"
 #include "driver/gpio.h"
 #include "driver/system.h"
 #include "driver/systick.h"
@@ -53,16 +54,26 @@
 #include "helper/battery.h"
 #include "helper/boot.h"
 
+#include "ui/status.h"
+#include "ui/ui.h"
+
 #include "ui/lock.h"
 #include "ui/welcome.h"
 #include "ui/menu.h"
+
+#include "task_main.h"
+#include "vfo.h"
+#include "common.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "timers.h"
 
-StackType_t main_task_stack[configMINIMAL_STACK_SIZE + 500];
+#include "task_messages.h"
+#include "applications_task.h"
+
+StackType_t main_task_stack[configMINIMAL_STACK_SIZE + 100];
 StaticTask_t main_task_buffer;
 
 TimerHandle_t hwStatusTimer;
@@ -71,73 +82,27 @@ StaticTimer_t hwStatusTimerBuffer;
 TimerHandle_t hwStatusTimer500;
 StaticTimer_t hwStatusTimerBuffer500;
 
+#define QUEUE_LENGTH    20
+#define ITEM_SIZE       sizeof( MAIN_Messages_t )
+static StaticQueue_t mainTasksQueue;
+QueueHandle_t mainTasksMsgQueue;
+uint8_t mainQueueStorageArea[ QUEUE_LENGTH * ITEM_SIZE ];
 
 extern void SystickHandlerA(void);
 
+void main_push_message(MAIN_MSG_t msg);
 
-void HandlerGPIOB1(void) {
-	UART_printf("HandlerGPIOB IRQ %b \r\n", GPIO_CheckBit(&GPIOB->DATA, GPIOB_PIN_SWD_CLK));
-}
+/* --------------------------------------------------------------------------------------------------------- */
 
-void hw_timer_callback(TimerHandle_t xTimer) {	
+void init_radio(void) {
 
-#ifdef ENABLE_UART
-	//taskENTER_CRITICAL();
-	if (UART_IsCommandAvailable()) {
-		//__disable_irq();
-		UART_HandleCommand();
-		//__enable_irq();
-	}
-	//taskEXIT_CRITICAL();
-#endif
-
-    xTimerStart(xTimer, 0);
-}
-
-//bool flippp = false;
-
-void hw_timer_callback_500(TimerHandle_t xTimer) {
-
-	//BK4819_ToggleGpioOut(2, flippp);
-	//UART_printf("GPIOB->DATA %b \r\n", GPIO_CheckBit(&GPIOB->DATA, GPIOB_PIN_SWD_CLK));
-	//flippp = !flippp;
-
-	APP_TimeSlice500ms();
-    xTimerStart(xTimer, 0);
-}
-
-
-void main_task(void* arg) {
-	(void)arg;
-
-	BOARD_Init();
-
-#ifdef ENABLE_UART
-	UART_Init();
-	UART_Send(UART_Version, strlen(UART_Version));
-#endif
-
-	boot_counter_10ms = 250;   // 2.5 sec
-
-	hwStatusTimer = xTimerCreateStatic("hwStatus", pdMS_TO_TICKS(50), pdFALSE, NULL, hw_timer_callback, &hwStatusTimerBuffer);
-
-	hwStatusTimer500 = xTimerCreateStatic("hwStatus500", pdMS_TO_TICKS(500), pdFALSE, NULL, hw_timer_callback_500, &hwStatusTimerBuffer500);
-
-	// Not implementing authentic device checks
-
-	memset(gDTMF_String, '-', sizeof(gDTMF_String));
-	gDTMF_String[sizeof(gDTMF_String) - 1] = 0;
-
-	taskENTER_CRITICAL();
 	BK4819_Init();
 
 	BOARD_ADC_GetBatteryInfo(&gBatteryCurrentVoltage, &gBatteryCurrent);
 
 	SETTINGS_InitEEPROM();
 
-	#ifdef ENABLE_CONTRAST
-		ST7565_SetContrast(gEeprom.LCD_CONTRAST);
-	#endif
+	ST7565_SetContrast(gEeprom.LCD_CONTRAST);
 
 	//SETTINGS_WriteBuildOptions();
 	SETTINGS_LoadCalibration();
@@ -162,109 +127,187 @@ void main_task(void* arg) {
 	AM_fix_init();
 #endif
 
-	const BOOT_Mode_t  BootMode = BOOT_GetMode();
 
-	if (BootMode == BOOT_MODE_F_LOCK)
-	{
-		gF_LOCK = true;            // flag to say include the hidden menu items
-	}
-
-	// count the number of menu items
+	/*// count the number of menu items
 	gMenuListCount = 0;
 	while (MenuList[gMenuListCount].name[0] != '\0') {
 		if(!gF_LOCK && MenuList[gMenuListCount].menu_id == FIRST_HIDDEN_MENU_ITEM)
 			break;
 
 		gMenuListCount++;
+	}*/
+
+	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_VOICE_0);
+
+	gUpdateStatus = true;
+
+}
+
+
+/* --------------------------------------------------------------------------------------------------------- */
+
+
+void HandlerGPIOB1(void) {
+	UART_printf("HandlerGPIOB IRQ %b \r\n", GPIO_CheckBit(&GPIOB->DATA, GPIOB_PIN_SWD_CLK));
+}
+
+void hw_timer_callback(TimerHandle_t xTimer) {	
+
+#ifdef ENABLE_UART
+	//taskENTER_CRITICAL();
+	if (UART_IsCommandAvailable()) {
+		UART_HandleCommand();
 	}
-
-	// wait for user to release all butts before moving on
-	if (!GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT) ||
-	     KEYBOARD_Poll() != KEY_INVALID || BootMode != BOOT_MODE_NORMAL
-	 		 
-	)
-	{	// keys are pressed
-		UI_DisplayReleaseKeys();
-		BACKLIGHT_TurnOn();
-
-		// 500ms
-		for (int i = 0; i < 50;)
-		{
-			i = (GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT) && KEYBOARD_Poll() == KEY_INVALID) ? i + 1 : 0;
-			SYSTEM_DelayMs(10);
-		}
-		gKeyReading0 = KEY_INVALID;
-		gKeyReading1 = KEY_INVALID;
-		gDebounceCounter = 0;
-	}
-
-	/*if (!gChargingWithTypeC && gBatteryDisplayLevel == 0)
-	{
-		FUNCTION_Select(FUNCTION_POWER_SAVE);
-
-		if (gEeprom.BACKLIGHT_TIME < (ARRAY_SIZE(gSubMenu_BACKLIGHT) - 1)) // backlight is not set to be always on
-			BACKLIGHT_TurnOff();	// turn the backlight OFF
-		else
-			BACKLIGHT_TurnOn();  	// turn the backlight ON
-
-		gReducedService = true;
-	}
-	else*/
-	{
-		UI_DisplayWelcome();
-
-		BACKLIGHT_TurnOn();
-
-		if (gEeprom.POWER_ON_DISPLAY_MODE != POWER_ON_DISPLAY_MODE_NONE)
-		{	// 2.55 second boot-up screen
-			while (boot_counter_10ms > 0)
-			{
-				if (KEYBOARD_Poll() != KEY_INVALID)
-				{	// halt boot beeps
-					boot_counter_10ms = 0;
-					break;
-				}
-#ifdef ENABLE_BOOT_BEEPS
-				if ((boot_counter_10ms % 25) == 0)
-					AUDIO_PlayBeep(BEEP_880HZ_40MS_OPTIONAL);
+	//taskEXIT_CRITICAL();
 #endif
-			}
-		}
-/*
-#ifdef ENABLE_PWRON_PASSWORD
-		if (gEeprom.POWER_ON_PASSWORD < 1000000)
-		{
-			bIsInLockScreen = true;
-			UI_DisplayLock();
-			bIsInLockScreen = false;
-		}
-#endif
-*/
-		BOOT_ProcessMode(BootMode);
 
-		GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_VOICE_0);
-
-		gUpdateStatus = true;
-
+	if (GPIO_CheckBit(&GPIOB->DATA, GPIOB_PIN_SWD_CLK)) {
+		CheckRadioInterrupts();
 	}
+	SystickHandlerA();
+	APP_TimeSlice10ms();
+	
+    xTimerStart(xTimer, 0);
+}
 
-	taskEXIT_CRITICAL();
+//bool flippp = false;
+
+void hw_timer_callback_500(TimerHandle_t xTimer) {
+
+	//BK4819_ToggleGpioOut(2, flippp);
+	//UART_printf("GPIOB->DATA %b \r\n", GPIO_CheckBit(&GPIOB->DATA, GPIOB_PIN_SWD_CLK));
+	//flippp = !flippp;
+
+	//UART_printf("500ms \r\n");
+
+	//APP_TimeSlice500ms();
+    xTimerStart(xTimer, 0);
+}
+
+
+void main_task(void* arg) {
+	(void)arg;
+
+	BOARD_Init();
+
+#ifdef ENABLE_UART
+	UART_Init();
+	UART_Send(UART_Version, strlen(UART_Version));
+#endif
+
+	init_radio();	
+
+	mainTasksMsgQueue = xQueueCreateStatic(QUEUE_LENGTH, ITEM_SIZE, mainQueueStorageArea, &mainTasksQueue);
+
+	main_push_message(MAIN_MSG_INIT);
+
+	hwStatusTimer = xTimerCreateStatic("hwStatus", pdMS_TO_TICKS(20), pdFALSE, NULL, hw_timer_callback, &hwStatusTimerBuffer);
+	hwStatusTimer500 = xTimerCreateStatic("hwStatus500", pdMS_TO_TICKS(500), pdFALSE, NULL, hw_timer_callback_500, &hwStatusTimerBuffer500);
+	
+	BACKLIGHT_TurnOn();
+
+	applications_task_init();
 
 	xTimerStart(hwStatusTimer500, 0);
 	xTimerStart(hwStatusTimer, 0);
 	//UART_printf("Ready... \r\n");
 	while (true) {
-		SystickHandlerA();
-		APP_TimeSlice10ms();
-		if (gCurrentFunction != FUNCTION_POWER_SAVE || !gRxIdleMode) {	
-			CheckRadioInterrupts();
+		MAIN_Messages_t msg;
+    	if (xQueueReceive(mainTasksMsgQueue, &msg, 20)) {
+			switch(msg.message) {
+				case MAIN_MSG_INIT:
+					UART_printf("MSG INIT \r\n");
+					break;
+				case MAIN_MSG_IDLE:
+					break;
+				
+				case MAIN_MSG_PLAY_BEEP:
+					if ( msg.payload != 0 ) {
+						AUDIO_PlayBeep(msg.payload);
+					}					
+					break;
+
+				/* -------------------------------------------------------- */
+
+				case RADIO_SQUELCH_LOST:
+					gCurrentFunction = FUNCTION_INCOMING;
+                    app_push_message(APP_MSG_RX);					
+                    break;
+                
+				case RADIO_SQUELCH_FOUND:
+					gCurrentFunction = FUNCTION_FOREGROUND;
+                    app_push_message(APP_MSG_IDLE);
+                    break;
+
+				case RADIO_VFO_UP:
+					VFO_Up_Down(1);
+					break;
+
+				case RADIO_VFO_DOWN:
+					VFO_Up_Down(-1);
+					break;
+
+				case RADIO_VFO_SWITCH:
+					COMMON_SwitchVFOs();
+					main_push_message(RADIO_SAVE_VFO);
+					main_push_message(RADIO_RECONFIGURE_VFO);
+					break;
+
+				case RADIO_VFO_SWITCH_MODE:
+                	COMMON_SwitchVFOMode();
+					main_push_message(RADIO_SAVE_SETTINGS);
+					main_push_message(RADIO_VFO_CONFIGURE_RELOAD);
+					break;
+
+				case RADIO_SAVE_VFO:
+					SETTINGS_SaveVfoIndices();
+                    break;
+				
+				case RADIO_VFO_CONFIGURE_RELOAD:
+                    RADIO_ConfigureChannel(0, VFO_CONFIGURE_RELOAD);
+	                RADIO_ConfigureChannel(1, VFO_CONFIGURE_RELOAD);
+                    break;
+
+				case RADIO_RECONFIGURE_VFO:
+                    RADIO_SelectVfos();
+                    RADIO_SetupRegisters(true);                    
+                    break;
+
+                case RADIO_VFO_CONFIGURE:
+					RADIO_ConfigureChannel(gEeprom.TX_VFO, VFO_CONFIGURE);
+                    break;
+
+				case RADIO_SAVE_CHANNEL:
+					SETTINGS_SaveChannel(gTxVfo->CHANNEL_SAVE, gEeprom.TX_VFO, gTxVfo, 1);
+					break;
+
+				case RADIO_SAVE_SETTINGS:
+					SETTINGS_SaveSettings();
+                    break;
+				
+			}
 		}
+		//APP_Update();
+		/*
+		//SystickHandlerA();
+		//APP_TimeSlice10ms();
 		APP_Update();
 		vTaskDelay(pdMS_TO_TICKS(5));
+		*/
 	}
 }
 
 
+void main_push_message_value(MAIN_MSG_t msg, uint32_t value) {	
+	MAIN_Messages_t mainMSG = { msg, value };
+    BaseType_t xHigherPriorityTaskWoken;
+    xHigherPriorityTaskWoken = pdFALSE;
+    xQueueSendToBackFromISR(mainTasksMsgQueue, (void *)&mainMSG, &xHigherPriorityTaskWoken);
+}
+
+void main_push_message(MAIN_MSG_t msg) {
+	main_push_message_value(msg, 0);
+}
 
 void main_task_init(void) {
 
@@ -273,7 +316,7 @@ void main_task_init(void) {
 		"MAIN",
 		ARRAY_SIZE(main_task_stack),
 		NULL,
-		tskIDLE_PRIORITY,
+		1 + tskIDLE_PRIORITY,
 		main_task_stack,
 		&main_task_buffer
 	);

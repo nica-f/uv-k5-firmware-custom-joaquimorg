@@ -141,12 +141,12 @@ int MENU_GetLimits(uint8_t menu_id, uint16_t *pMin, uint16_t *pMax)
 			*pMin = 1;
 			*pMax = 10;
 			break;
-#ifdef ENABLE_CONTRAST	
+
 		case MENU_CONTRAST:
 			*pMin = 1;
 			*pMax = 63;
 			break;	
-#endif
+
 		case MENU_F_LOCK:
 			*pMax = ARRAY_SIZE(gSubMenu_F_LOCK);
 			break;
@@ -501,12 +501,12 @@ void MENU_AcceptSetting(void)
 			gEeprom.BACKLIGHT_MAX = settingsCurrentSubMenu;
 			gEeprom.BACKLIGHT_MIN = MIN(settingsCurrentSubMenu - 1, gEeprom.BACKLIGHT_MIN);
 			break;			
-#ifdef ENABLE_CONTRAST
+
 		case MENU_CONTRAST:
 			gEeprom.LCD_CONTRAST = settingsCurrentSubMenu;
 			ST7565_SetContrast(gEeprom.LCD_CONTRAST);
 			break;
-#endif
+
 		case MENU_ABR_ON_TX_RX:
 			gSetting_backlight_on_tx_rx = settingsCurrentSubMenu;
 			break;
@@ -908,11 +908,11 @@ void MENU_ShowCurrentSetting(void)
 		case MENU_ABR_MAX:
 			settingsCurrentSubMenu = gEeprom.BACKLIGHT_MAX;
 			break;
-#ifdef ENABLE_CONTRAST
+
 		case MENU_CONTRAST:
 			settingsCurrentSubMenu = gEeprom.LCD_CONTRAST;
 			break;		
-#endif
+
 		case MENU_ABR_ON_TX_RX:
 			settingsCurrentSubMenu = gSetting_backlight_on_tx_rx;
 			break;

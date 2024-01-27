@@ -25,9 +25,8 @@
 #include "driver/system.h"
 #include "misc.h"
 
-#ifdef ENABLE_CONTRAST
-	uint8_t contrast = 31;  // 0 ~ 63
-#endif
+
+uint8_t contrast = 31;  // 0 ~ 63
 
 uint8_t gFrameBuffer[FRAME_LINES][LCD_WIDTH];
 
@@ -205,11 +204,7 @@ void ST7565_Init(void)
 
 	SYSTEM_DelayMs(40);
 
-	#ifdef ENABLE_CONTRAST
-		ST7565_WriteByte(contrast);  // brightness 0 ~ 63
-	#else
-		ST7565_WriteByte(31);        // brightness 0 ~ 63
-	#endif
+	ST7565_WriteByte(contrast);  // brightness 0 ~ 63
 	
 	ST7565_WriteByte(ST7565_CMD_SET_START_LINE | 0);   // line 0
 	ST7565_WriteByte(ST7565_CMD_DISPLAY_ON_OFF | 1);   // D=1
@@ -258,14 +253,13 @@ void ST7565_WriteByte(uint8_t Value)
 	SPI0->WDR = Value;
 }
 
-#ifdef ENABLE_CONTRAST
-	void ST7565_SetContrast(const uint8_t value)
-	{
-		contrast = (value > 45) ? 45 : (value < 26) ? 26 : value;
-	}
 
-	uint8_t ST7565_GetContrast(void)
-	{
-		return contrast;
-	}
-#endif
+void ST7565_SetContrast(const uint8_t value)
+{
+	contrast = (value > 45) ? 45 : (value < 26) ? 26 : value;
+}
+
+uint8_t ST7565_GetContrast(void)
+{
+	return contrast;
+}

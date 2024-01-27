@@ -261,9 +261,9 @@ void UI_DisplayMain(void) {
     yPosVFO = 61;
     // VFO B
 	if(FUNCTION_IsRx()) {
-		UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO - 4, true, false, "%s %s", vfoNumB == 1 ? "B" : "A", gEeprom.RX_VFO == vfoNumB ? "$" : "");
+		UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO - 8, true, false, "%s %s", vfoNumB == 1 ? "B" : "A", gEeprom.RX_VFO == vfoNumB ? "$" : "");
 	} else {
-    	UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO - 4, true, false, vfoNumB == 1 ? "B" : "A");
+    	UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO - 8, true, false, vfoNumB == 1 ? "B" : "A");
 	}
 
     // Frequency B

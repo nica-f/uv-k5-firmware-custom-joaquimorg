@@ -466,7 +466,7 @@ void SettingsMenu_showSubValue(void) {
 				UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, yPos + 6, true, false, "%3d.%05u", (uint16_t)settingsCurrentSubMenu / 100000, (uint16_t)abs(settingsCurrentSubMenu) % 100000);
 			} else {
 				const char * ascii = INPUTBOX_GetAscii();
-				UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, yPos + 6, true, false, "%.3s.%.3s",ascii, ascii + 3);						
+				UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, yPos + 6, true, false, "%.3s.%.3s",ascii, ascii + 3);
 			}
 
 			UI_printf(&font_10, TEXT_ALIGN_CENTER, SUB_MENU_X, 125, yPos + 27, true, false, "Mhz");
@@ -550,12 +550,12 @@ void SettingsMenu_subList() {
 	uint8_t arrayLength = 0;
 	bool showNumber = false;
 	bool showValue = false;
-	
+
 	switch (UI_MENU_GetCurrentMenuId())
     {
 
 		case MENU_ABR:
-			//gSubMenu_BACKLIGHT			
+			//gSubMenu_BACKLIGHT
 			arrayLength = 7;
             SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_BACKLIGHT);
 			break;
@@ -566,14 +566,12 @@ void SettingsMenu_subList() {
             SettingsMenu_showSubList(settingsSubmenuSize, arrayLength, gSubMenu_SCRAMBLER);
 			break;
 
-		case MENU_SQL:			
-		case MENU_ABR_MIN:			
+		case MENU_SQL:
+		case MENU_ABR_MIN:
 		case MENU_ABR_MAX:
-		case MENU_RP_STE:			
-#ifdef ENABLE_CONTRAST
+		case MENU_RP_STE:
 		case MENU_CONTRAST:
-#endif
-		case MENU_BATCAL:		
+		case MENU_BATCAL:
 			showNumber = true;
 			break;
 
@@ -685,7 +683,7 @@ void SettingsMenu_subList() {
 			//TODO:
 			SettingsMenu_showSubValue();
 			break;
-		
+
 		case MENU_S_LIST:
 			//TODO:
 			break;
@@ -968,15 +966,13 @@ void UI_DisplayMenu(void)
 				BACKLIGHT_SetBrightness(4);
 			break;
 
-		#ifdef ENABLE_CONTRAST
-			case MENU_CONTRAST:
-				sprintf(String, "%d", (uint16_t)gSubMenuSelection);
-				ST7565_SetContrast(gSubMenuSelection);
-				//else
-				//	ST7565_SetContrast(0);
-				//g_update_display = true;
-				break;
-		#endif
+		case MENU_CONTRAST:
+			sprintf(String, "%d", (uint16_t)gSubMenuSelection);
+			ST7565_SetContrast(gSubMenuSelection);
+			//else
+			//	ST7565_SetContrast(0);
+			//g_update_display = true;
+			break;
 
 		case MENU_AM:
 			strcpy(String, gModulationStr[gSubMenuSelection]);

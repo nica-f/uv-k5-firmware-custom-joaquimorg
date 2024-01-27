@@ -45,12 +45,30 @@ enum KEY_Code_e {
 };
 typedef enum KEY_Code_e KEY_Code_t;
 
+// Define the key states
+enum KEY_State_e {
+  KEY_RELEASED = 0,
+  KEY_PRESSED,
+  KEY_PRESSED_WITH_F,
+  KEY_LONG_PRESSED,
+  KEY_LONG_PRESSED_CONT
+};
+
+typedef enum KEY_State_e KEY_State_t;
+
 extern KEY_Code_t gKeyReading0;
 extern KEY_Code_t gKeyReading1;
 extern uint16_t   gDebounceCounter;
 extern bool       gWasFKeyPressed;
 
 KEY_Code_t KEYBOARD_Poll(void);
+
+// Define the callback function type
+typedef void (*key_callback_t)(KEY_Code_t key, KEY_State_t state);
+
+void keyboard_init(key_callback_t cb);
+void keyboard_task();
+
 
 #endif
 

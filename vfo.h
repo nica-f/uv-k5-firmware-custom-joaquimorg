@@ -14,10 +14,5 @@
  *     limitations under the License.
  */
 
-#include "FreeRTOS.h"
-#include "task_messages.h"
+void VFO_Up_Down(int8_t Direction);
 
-void main_task_init(void);
-
-void main_push_message_value(MAIN_MSG_t msg, uint32_t value);
-void main_push_message(MAIN_MSG_t msg);

@@ -15,6 +15,9 @@
  *     limitations under the License.
  */
 
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include "bsp/dp32g030/gpio.h"
 #include "driver/gpio.h"
 #include "driver/keyboard.h"
@@ -27,6 +30,7 @@ KEY_Code_t gKeyReading1     = KEY_INVALID;
 uint16_t   gDebounceCounter = 0;
 bool       gWasFKeyPressed  = false;
 
+#if 0
 static const struct {
 
 	// Using a 16 bit pre-calculated shift and invert is cheaper
@@ -105,8 +109,8 @@ KEY_Code_t KEYBOARD_Poll(void)
 	for (unsigned int j = 0; j < ARRAY_SIZE(keyboard); j++)
 	{
 		uint16_t reg;
-		unsigned int i;
-		unsigned int k;
+		//unsigned int i;
+		//unsigned int k;
 
 		// Set all high
 		GPIOA->DATA |=  1u << GPIOA_PIN_KEYBOARD_4 |
@@ -118,16 +122,18 @@ KEY_Code_t KEYBOARD_Poll(void)
 		GPIOA->DATA &= keyboard[j].set_to_zero_mask;
 
 		// Read all 4 GPIO pins at once .. with de-noise, max of 8 sample loops
-		for (i = 0, k = 0, reg = 0; i < 3 && k < 8; i++, k++) {
+		/*for (i = 0, k = 0, reg = 0; i < 3 && k < 8; i++, k++) {
 			SYSTICK_DelayUs(1);
 			uint16_t reg2 = GPIOA->DATA;
 			i *= reg == reg2;
 			reg = reg2;
-		}
+		}*/
+		
+		reg = GPIOA->DATA;
 
-		if (i < 3)
+		/*if (i < 3)
 			break;	// noise is too bad
-
+		*/
 		for (unsigned int i = 0; i < ARRAY_SIZE(keyboard[j].pins); i++)
 		{
 			const uint16_t mask = 1u << keyboard[j].pins[i].pin;
@@ -152,3 +158,229 @@ KEY_Code_t KEYBOARD_Poll(void)
 
 	return Key;
 }
+
+#else
+
+// Define the number of rows and columns of the matrix keyboard
+#define ROWS 5
+#define COLS 4
+
+static const struct {
+
+	// Using a 16 bit pre-calculated shift and invert is cheaper
+	// than using 8 bit and doing shift and invert in code.
+	uint16_t set_to_zero_mask;
+
+	// We are very fortunate.
+	// The key and pin defines fit together in a single u8, making this very efficient
+	struct {
+		KEY_Code_t key : 5;
+		uint8_t    pin : 3; // Pin 6 is highest
+	} pins[4];
+
+} keyboard[] = {
+
+{	// First row
+		.set_to_zero_mask = ~(1u << GPIOA_PIN_KEYBOARD_4) & 0xffff,
+		.pins = {
+			{ .key = KEY_MENU,  .pin = GPIOA_PIN_KEYBOARD_0},
+			{ .key = KEY_1,     .pin = GPIOA_PIN_KEYBOARD_1},
+			{ .key = KEY_4,     .pin = GPIOA_PIN_KEYBOARD_2},
+			{ .key = KEY_7,     .pin = GPIOA_PIN_KEYBOARD_3}
+		}
+	},
+	{	// Second row
+		.set_to_zero_mask = ~(1u << GPIOA_PIN_KEYBOARD_5) & 0xffff,
+		.pins = {
+			{ .key = KEY_UP,    .pin = GPIOA_PIN_KEYBOARD_0},
+			{ .key = KEY_2 ,    .pin = GPIOA_PIN_KEYBOARD_1},
+			{ .key = KEY_5 ,    .pin = GPIOA_PIN_KEYBOARD_2},
+			{ .key = KEY_8 ,    .pin = GPIOA_PIN_KEYBOARD_3}
+		}
+	},
+	{	// Third row
+		.set_to_zero_mask = ~(1u << GPIOA_PIN_KEYBOARD_6) & 0xffff,
+		.pins = {
+			{ .key = KEY_DOWN,  .pin = GPIOA_PIN_KEYBOARD_0},
+			{ .key = KEY_3   ,  .pin = GPIOA_PIN_KEYBOARD_1},
+			{ .key = KEY_6   ,  .pin = GPIOA_PIN_KEYBOARD_2},
+			{ .key = KEY_9   ,  .pin = GPIOA_PIN_KEYBOARD_3}
+		}
+	},
+	{	// Fourth row
+		.set_to_zero_mask = ~(1u << GPIOA_PIN_KEYBOARD_7) & 0xffff,
+		.pins = {
+			{ .key = KEY_EXIT,  .pin = GPIOA_PIN_KEYBOARD_0},
+			{ .key = KEY_STAR,  .pin = GPIOA_PIN_KEYBOARD_1},
+			{ .key = KEY_0   ,  .pin = GPIOA_PIN_KEYBOARD_2},
+			{ .key = KEY_F   ,  .pin = GPIOA_PIN_KEYBOARD_3}
+		}
+	},
+	{	// FN Row
+		// Set to zero to handle special case of nothing pulled down
+		.set_to_zero_mask = 0xffff,
+		.pins = {
+			{ .key = KEY_SIDE1,   .pin = GPIOA_PIN_KEYBOARD_0},			
+			{ .key = KEY_SIDE2,   .pin = GPIOA_PIN_KEYBOARD_1},
+			{ .key = KEY_INVALID, .pin = GPIOA_PIN_KEYBOARD_2},
+			{ .key = KEY_PTT,     .pin = GPIOA_PIN_KEYBOARD_3}
+		}
+	},
+};
+
+KEY_Code_t KEYBOARD_Poll(void) {	
+	return KEY_INVALID;
+}
+
+// Declare local variables to store the current and previous key states
+bool key_state[ROWS][COLS] = {0};
+KEY_State_t prev_key_state[ROWS][COLS] = {0};
+
+//TickType_t debounce_timer[ROWS][COLS] = {0};
+TickType_t long_press_timer[ROWS][COLS] = {0};
+
+// Define the long press time in milliseconds
+#define LONG_PRESS_TIME 500
+
+static bool isFkeyPressed = false;
+
+// Declare a global variable to store the callback function pointer
+static key_callback_t key_callback = NULL;
+
+// Initialize the matrix keyboard
+void keyboard_init(key_callback_t cb) {
+	// Check if the callback function pointer is valid
+	if (cb == NULL) {
+		return;
+	}
+
+	// Store the callback function pointer in the global variable
+	key_callback = cb;
+
+}
+
+
+// Scan the matrix keyboard and detect key events
+void keyboard_task() {
+
+	// Declare local variables to store the current tick count and elapsed time
+	TickType_t current_tick = 0;
+	TickType_t elapsed_time = 0;
+	uint16_t regH, regL;
+
+	// KEY_PTT
+	key_state[ROWS - 1][3] = !GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT);
+
+	// Set high for FN Keys
+	GPIOA->DATA |=  1u << GPIOA_PIN_KEYBOARD_4 |
+					1u << GPIOA_PIN_KEYBOARD_5 |
+					1u << GPIOA_PIN_KEYBOARD_6 |
+					1u << GPIOA_PIN_KEYBOARD_7;
+
+	GPIOA->DATA &= keyboard[ROWS - 1].set_to_zero_mask;
+	SYSTICK_DelayUs(1);
+	regL = GPIOA->DATA;
+	for (uint8_t j = 0; j < 2; j++) {
+		const uint16_t mask = 1u << keyboard[ROWS - 1].pins[j].pin;
+		key_state[ROWS - 1][j] = (bool)!(regL & mask);
+	}
+
+	// Scan each row and column of the matrix keyboard
+    for (uint8_t i = 0; i < (ROWS - 1); i++) {
+
+		// Set all high
+		GPIOA->DATA |=  1u << GPIOA_PIN_KEYBOARD_4 |
+						1u << GPIOA_PIN_KEYBOARD_5 |
+						1u << GPIOA_PIN_KEYBOARD_6 |
+						1u << GPIOA_PIN_KEYBOARD_7;
+
+		SYSTICK_DelayUs(1);
+		regH = GPIOA->DATA;
+		SYSTICK_DelayUs(1);
+		// Clear the pin we are selecting
+		GPIOA->DATA &= keyboard[i].set_to_zero_mask;
+		SYSTICK_DelayUs(1);
+		regL = GPIOA->DATA;
+
+		for (uint8_t j = 0; j < COLS; j++) {
+			const uint16_t mask = 1u << keyboard[i].pins[j].pin;
+			if((regH & mask)) {
+				key_state[i][j] = (bool)!(regL & mask);
+			}
+		}
+
+	}
+
+	// Create I2C stop condition since we might have toggled I2C pins
+	// This leaves GPIOA_PIN_KEYBOARD_4 and GPIOA_PIN_KEYBOARD_5 high
+	I2C_Stop();
+
+	// Reset VOICE pins
+	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_6);
+	GPIO_SetBit(  &GPIOA->DATA, GPIOA_PIN_KEYBOARD_7);
+
+
+	//vTaskDelay(pdMS_TO_TICKS(DEBOUNCE_TIME));
+
+	// Scan each row and column of the matrix keyboard
+    for (uint8_t i = 0; i < ROWS; i++) {
+
+      	for (uint8_t j = 0; j < COLS; j++) {
+
+			// Get the current tick count
+			current_tick = xTaskGetTickCount();
+
+			// Check if the key is pressed				
+			if (key_state[i][j]) {
+				
+				// Check if the key was previously released
+				if (prev_key_state[i][j] == KEY_RELEASED) {
+					// Call the callback function with the key pressed state
+					if(isFkeyPressed) {
+						key_callback(keyboard[i].pins[j].key, KEY_PRESSED_WITH_F);
+						isFkeyPressed = false;
+					} else {
+						key_callback(keyboard[i].pins[j].key, KEY_PRESSED);
+					}
+
+					if ( keyboard[i].pins[j].key == KEY_F ) {
+						isFkeyPressed = true;
+					}
+
+					// Start the long press timer
+					long_press_timer[i][j] = current_tick;
+					prev_key_state[i][j] = KEY_PRESSED;
+
+				} else if (prev_key_state[i][j] == KEY_PRESSED) {
+					// Check if the long press time has elapsed
+					elapsed_time = current_tick - long_press_timer[i][j];
+					if (elapsed_time >= pdMS_TO_TICKS(LONG_PRESS_TIME)) {
+						// Stop the long press timer
+						long_press_timer[i][j] = 0;
+						prev_key_state[i][j] = KEY_LONG_PRESSED;
+					}
+				} else if (prev_key_state[i][j] == KEY_LONG_PRESSED || prev_key_state[i][j] == KEY_LONG_PRESSED_CONT) {
+					// Call the callback function with the key long pressed state
+					key_callback(keyboard[i].pins[j].key, prev_key_state[i][j]);
+					prev_key_state[i][j] = KEY_LONG_PRESSED_CONT;
+				}
+			}
+			else {
+				// Check if the key was previously pressed
+				if (prev_key_state[i][j] != KEY_RELEASED) {
+					// Call the callback function with the key released state
+					key_callback(keyboard[i].pins[j].key, KEY_RELEASED);
+
+					// Stop the long press timer
+					long_press_timer[i][j] = 0;
+					prev_key_state[i][j] = KEY_RELEASED;
+				}
+			}
+
+		}
+	}
+
+}
+
+
+#endif

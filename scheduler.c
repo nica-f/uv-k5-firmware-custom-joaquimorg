@@ -93,5 +93,5 @@ void SystickHandlerA(void)
 	DECREMENT(gVoxStopCountdown_10ms);
 #endif
 
-	DECREMENT(boot_counter_10ms);
+	//DECREMENT(boot_counter_10ms);
 }

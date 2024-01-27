@@ -147,14 +147,6 @@ typedef struct {
 	uint32_t Timestamp;
 } CMD_052F_t;
 
-#ifdef ENABLE_SCREEN_DUMP
-	typedef struct {
-		Header_t Header;
-		uint32_t Timestamp;
-	} CMD_0803_t; // request screen memory
-#endif
-
-
 static const uint8_t Obfuscation[16] =
 {
 	0x16, 0x6C, 0x14, 0xE6, 0x2E, 0x91, 0x0D, 0x40, 0x21, 0x35, 0xD5, 0x40, 0x13, 0x03, 0xE9, 0x80
