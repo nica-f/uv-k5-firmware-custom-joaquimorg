@@ -64,8 +64,9 @@ ENABLE_MESSENGER_UART					?= 1
 ENABLE_PMR_MODE               ?= 0
 
 
-#### INTERNAL USE ####
-ENABLE_SCREEN_DUMP			  ?= 0
+#### Display and Keypad remote Control ####
+# https://home.joaquim.org/display-explorer/
+ENABLE_REMOTE_CONTROL			  ?= 1
 
 #------------------------------------------------------------------------------
 AUTHOR_STRING ?= JOAQUIM
@@ -246,8 +247,8 @@ IPATH += \
 CFLAGS += -DPRINTF_INCLUDE_CONFIG_H
 CFLAGS += -DAUTHOR_STRING=\"$(AUTHOR_STRING)\" -DVERSION_STRING=\"$(VERSION_STRING)\"
 
-ifeq ($(ENABLE_SCREEN_DUMP),1)
-	CFLAGS += -DENABLE_SCREEN_DUMP
+ifeq ($(ENABLE_REMOTE_CONTROL),1)
+	CFLAGS += -DENABLE_REMOTE_CONTROL
 endif
 ifeq ($(ENABLE_PMR_MODE),1)
 	CFLAGS  += -DENABLE_PMR_MODE
@@ -383,7 +384,7 @@ ifeq ($(ENABLE_CUSTOM_MENU_LAYOUT),1)
 endif
 ifeq ($(ENABLE_UART), 0)
 	ENABLE_MESSENGER_UART := 0
-	ENABLE_SCREEN_DUMP := 0
+	ENABLE_REMOTE_CONTROL := 0
 endif
 ifeq ($(ENABLE_MESSENGER),1)
 	CFLAGS  += -DENABLE_MESSENGER

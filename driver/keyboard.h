@@ -36,16 +36,16 @@ enum KEY_Code_e {
 	KEY_UP,     // B
 	KEY_DOWN,   // C
 	KEY_EXIT,   // D
-	KEY_STAR,   // *
-	KEY_F,      // #
-	KEY_PTT,    //
-	KEY_SIDE2,  //
-	KEY_SIDE1,  //
-	KEY_INVALID //
+	KEY_STAR,   // * E
+	KEY_F,      // # F
+	KEY_PTT,    //	 10
+	KEY_SIDE2,  //	 11	
+	KEY_SIDE1,  // 	 12
+	KEY_INVALID //	 13
 };
 typedef enum KEY_Code_e KEY_Code_t;
 
-#ifdef ENABLE_SCREEN_DUMP
+#ifdef ENABLE_REMOTE_CONTROL
 	extern KEY_Code_t gSimulateKey;
 	extern KEY_Code_t gSimulateHold;
 	extern uint8_t gDebounceDefeat;

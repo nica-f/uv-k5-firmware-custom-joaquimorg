@@ -46,7 +46,7 @@
 	#include "sram-overlay.h"
 #endif
 
-#ifdef ENABLE_SCREEN_DUMP
+#ifdef ENABLE_REMOTE_CONTROL
 	#include "driver/keyboard.h"
 	#include "driver/st7565.h"
 #endif
@@ -149,7 +149,7 @@ typedef struct {
 } CMD_052F_t;
 
 
-#ifdef ENABLE_SCREEN_DUMP
+#ifdef ENABLE_REMOTE_CONTROL
 typedef struct {
 	Header_t Header;
 	uint8_t Key;
@@ -452,7 +452,7 @@ static void CMD_052F(const uint8_t *pBuffer)
 	SendVersion();
 }
 
-#ifdef ENABLE_SCREEN_DUMP
+#ifdef ENABLE_REMOTE_CONTROL
 static void CMD_0A03() // dumps the LCD screen memory to the PC. Not used in the Dock, is just for debug purposes
 {
 	const uint16_t screenDumpIdByte = 0xEFAB;
@@ -474,6 +474,11 @@ static void CMD_0A01(const uint8_t *pBuffer) // smulate a key press
 			gPttCounter = 40;
 	}
 	gSimulateHold = click ? KEY_INVALID : key;
+
+	/*const uint16_t screenDumpIdByte = 0xA1AB;
+	UART_Send(&screenDumpIdByte, 2);	
+	UART_Send(&key, 1);
+	UART_Send(&click, 1);*/
 }
 #endif
 
@@ -691,7 +696,7 @@ void UART_HandleCommand(void)
 			break;
 #endif
 
-#ifdef ENABLE_SCREEN_DUMP
+#ifdef ENABLE_REMOTE_CONTROL
 
 		case 0x0A01: // simulate key press
 			CMD_0A01(UART_Command.Buffer);

@@ -22,7 +22,7 @@
 #include "driver/i2c.h"
 #include "misc.h"
 
-#ifdef ENABLE_SCREEN_DUMP
+#ifdef ENABLE_REMOTE_CONTROL
 	KEY_Code_t gSimulateKey     = KEY_INVALID;
 	KEY_Code_t gSimulateHold     = KEY_INVALID;
 	uint8_t gDebounceDefeat = 0;
@@ -101,15 +101,16 @@ static const struct {
 
 KEY_Code_t KEYBOARD_Poll(void)
 {
-	#ifdef ENABLE_SCREEN_DUMP
+	#ifdef ENABLE_REMOTE_CONTROL
 		if(gSimulateKey != KEY_INVALID)
 		{
 			const KEY_Code_t temp = gSimulateKey;
 			if(gDebounceDefeat++ >= 5)
 				gSimulateKey = KEY_INVALID;
+			
 			return temp;		
 		}
-		if(gSimulateHold != KEY_INVALID)
+		/*if(gSimulateHold != KEY_INVALID)
 		{
 			if(gSimulateHold == KEY_PTT)
 			{
@@ -119,7 +120,7 @@ KEY_Code_t KEYBOARD_Poll(void)
 					gPttCounter--;
 			}
 			return gSimulateHold;
-		}
+		}*/
 	#endif
 	
 	KEY_Code_t Key = KEY_INVALID;
