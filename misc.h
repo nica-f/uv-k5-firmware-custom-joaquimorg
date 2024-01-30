@@ -325,6 +325,11 @@ extern uint8_t           	gMainPopUpType;
 int32_t NUMBER_AddWithWraparound(int32_t Base, int32_t Add, int32_t LowerLimit, int32_t UpperLimit);
 unsigned long StrToUL(const char * str);
 
+extern const char* const gSubMenu_TXP[3];
+extern const char* const gSubMenu_W_N[3];
+extern const char* const gSubMenu_TOT[11];
+extern const char* const gSubMenu_BACKLIGHT[8];
+
 void FUNCTION_NOP();
 
 inline bool SerialConfigInProgress() { return gSerialConfigCountDown_500ms != 0; }

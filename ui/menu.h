@@ -14,8 +14,10 @@
  *     limitations under the License.
  */
 
-#ifndef UI_MENU_H
-#define UI_MENU_H
+//#ifndef UI_MENU_H
+//#define UI_MENU_H
+
+#ifdef OLD_MENU
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -181,3 +183,5 @@ int UI_MENU_GetCurrentMenuId();
 uint8_t UI_MENU_GetMenuIdx(uint8_t id);
 
 #endif
+
+//#endif

@@ -439,7 +439,7 @@ static void CMD_052F(const uint8_t *pBuffer)
 
 
 #ifdef ENABLE_SCREEN_DUMP
-static void CMD_0803() // dumps the LCD screen memory to the PC. Not used in the Dock, is just for debug purposes
+static void CMD_0A03() // dumps the LCD screen memory to the PC. Not used in the Dock, is just for debug purposes
 {
 	const uint16_t screenDumpIdByte = 0xEFAB;
 	UART_Send(&screenDumpIdByte, 2);
@@ -662,8 +662,8 @@ void UART_HandleCommand(void)
 			break;
 #endif
 #ifdef ENABLE_SCREEN_DUMP
-		case 0x0803: // screen dump
-			CMD_0803();
+		case 0x0A03: // screen dump
+			CMD_0A03();
 			break;
 #endif
 

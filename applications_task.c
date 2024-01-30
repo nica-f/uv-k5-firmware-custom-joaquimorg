@@ -42,7 +42,7 @@
 #include "apps/apps.h"
 #include "apps/welcome.h"
 #include "apps/main_vfo.h"
-//#include "apps/settings_menu.h"
+#include "apps/settings_menu.h"
 
 #define QUEUE_LENGTH    10
 #define ITEM_SIZE       sizeof( APP_Messages_t )
@@ -162,7 +162,7 @@ void app_task(void* arg) {
                             currentAppPopup = APP_POPUP_NONE;
                             xTimerReset( idleTimer, 0 );
                         } else {
-                            //sys_push_message(MAIN_MSG_BKLIGHT_OFF);
+                            main_push_message(MAIN_MSG_BKLIGHT_OFF);
                         }
                     }
                     break;
@@ -175,7 +175,7 @@ void app_task(void* arg) {
                     break;
 
 				case APP_MSG_WAKEUP:
-					//sys_push_message(MAIN_MSG_BKLIGHT_ON);
+					main_push_message(MAIN_MSG_BKLIGHT_ON);
 					break;
 
                 case APP_MSG_IDLE:
@@ -186,7 +186,7 @@ void app_task(void* arg) {
                     //global_status.isRX = true;
                     xTimerReset( idleTimer, 0 );
 					if ( !BACKLIGHT_IsOn() ) {
-						//sys_push_message(MAIN_MSG_BKLIGHT_ON);
+						main_push_message(MAIN_MSG_BKLIGHT_ON);
 					}
                     break;
 
@@ -240,7 +240,7 @@ void load_application(APPS_t application) {
         break;
     case APP_MENU:
         //strcpy(global_status.statusMessage, "MENU\0");
-        //change_application(&APPMainMenu);
+        change_application(&APPMainMenu);
         break;
 
     default:

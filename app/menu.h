@@ -14,6 +14,8 @@
  *     limitations under the License.
  */
 
+#ifdef OLD_MENU
+
 #ifndef APP_MENU_H
 #define APP_MENU_H
 
@@ -33,6 +35,8 @@ void MENU_CssScanFound(void);
 void MENU_StopCssScan(void);
 
 void MENU_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
+
+#endif
 
 #endif
 

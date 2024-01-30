@@ -49,8 +49,8 @@ bool              gAskToDelete;
 
 
 void (*UI_DisplayFunctions[])(void) = {
-	[DISPLAY_MAIN] = &UI_DisplayMain,
-	[DISPLAY_MENU] = &UI_DisplayMenu,
+	//[DISPLAY_MAIN] = &UI_DisplayMain,
+	//[DISPLAY_MENU] = &UI_DisplayMenu,
 	[DISPLAY_SCANNER] = &UI_DisplayScanner,
 
 #ifdef ENABLE_FMRADIO
@@ -70,9 +70,9 @@ static_assert(ARRAY_SIZE(UI_DisplayFunctions) == DISPLAY_N_ELEM);
 
 void GUI_DisplayScreen(void)
 {
-	if (gScreenToDisplay != DISPLAY_INVALID) {
+	/*if (gScreenToDisplay != DISPLAY_INVALID) {
 		UI_DisplayFunctions[gScreenToDisplay]();
-	}
+	}*/
 }
 
 void GUI_SelectNextDisplay(GUI_DisplayType_t Display)

@@ -151,7 +151,7 @@ void HandlerGPIOB1(void) {
 	UART_printf("HandlerGPIOB IRQ %b \r\n", GPIO_CheckBit(&GPIOB->DATA, GPIOB_PIN_SWD_CLK));
 }
 
-void hw_timer_callback(TimerHandle_t xTimer) {	
+void hw_timer_callback(TimerHandle_t xTimer) {
 
 #ifdef ENABLE_UART
 	//taskENTER_CRITICAL();
@@ -166,7 +166,7 @@ void hw_timer_callback(TimerHandle_t xTimer) {
 	}
 	SystickHandlerA();
 	APP_TimeSlice10ms();
-	
+
     xTimerStart(xTimer, 0);
 }
 
@@ -195,20 +195,20 @@ void main_task(void* arg) {
 	UART_Send(UART_Version, strlen(UART_Version));
 #endif
 
-	init_radio();	
+	init_radio();
 
 	mainTasksMsgQueue = xQueueCreateStatic(QUEUE_LENGTH, ITEM_SIZE, mainQueueStorageArea, &mainTasksQueue);
 
 	main_push_message(MAIN_MSG_INIT);
 
 	hwStatusTimer = xTimerCreateStatic("hwStatus", pdMS_TO_TICKS(20), pdFALSE, NULL, hw_timer_callback, &hwStatusTimerBuffer);
-	hwStatusTimer500 = xTimerCreateStatic("hwStatus500", pdMS_TO_TICKS(500), pdFALSE, NULL, hw_timer_callback_500, &hwStatusTimerBuffer500);
-	
+	//hwStatusTimer500 = xTimerCreateStatic("hwStatus500", pdMS_TO_TICKS(500), pdFALSE, NULL, hw_timer_callback_500, &hwStatusTimerBuffer500);
+
 	BACKLIGHT_TurnOn();
 
 	applications_task_init();
 
-	xTimerStart(hwStatusTimer500, 0);
+	//xTimerStart(hwStatusTimer500, 0);
 	xTimerStart(hwStatusTimer, 0);
 	//UART_printf("Ready... \r\n");
 	while (true) {
@@ -220,23 +220,33 @@ void main_task(void* arg) {
 					break;
 				case MAIN_MSG_IDLE:
 					break;
-				
+
+				case MAIN_MSG_BKLIGHT_ON:
+					BACKLIGHT_TurnOn();
+					break;
+
+				case MAIN_MSG_BKLIGHT_OFF:
+					BACKLIGHT_TurnOff();
+					break;
+
 				case MAIN_MSG_PLAY_BEEP:
 					if ( msg.payload != 0 ) {
 						AUDIO_PlayBeep(msg.payload);
-					}					
+					}
 					break;
 
 				/* -------------------------------------------------------- */
 
 				case RADIO_SQUELCH_LOST:
 					gCurrentFunction = FUNCTION_INCOMING;
-                    app_push_message(APP_MSG_RX);					
+                    app_push_message(APP_MSG_RX);
+					APP_Function(gCurrentFunction);
                     break;
-                
+
 				case RADIO_SQUELCH_FOUND:
-					gCurrentFunction = FUNCTION_FOREGROUND;
+					gCurrentFunction = FUNCTION_RECEIVE;
                     app_push_message(APP_MSG_IDLE);
+					APP_Function(gCurrentFunction);
                     break;
 
 				case RADIO_VFO_UP:
@@ -262,7 +272,7 @@ void main_task(void* arg) {
 				case RADIO_SAVE_VFO:
 					SETTINGS_SaveVfoIndices();
                     break;
-				
+
 				case RADIO_VFO_CONFIGURE_RELOAD:
                     RADIO_ConfigureChannel(0, VFO_CONFIGURE_RELOAD);
 	                RADIO_ConfigureChannel(1, VFO_CONFIGURE_RELOAD);
@@ -270,7 +280,7 @@ void main_task(void* arg) {
 
 				case RADIO_RECONFIGURE_VFO:
                     RADIO_SelectVfos();
-                    RADIO_SetupRegisters(true);                    
+                    RADIO_SetupRegisters(true);
                     break;
 
                 case RADIO_VFO_CONFIGURE:
@@ -284,7 +294,7 @@ void main_task(void* arg) {
 				case RADIO_SAVE_SETTINGS:
 					SETTINGS_SaveSettings();
                     break;
-				
+
 			}
 		}
 		//APP_Update();
@@ -298,7 +308,7 @@ void main_task(void* arg) {
 }
 
 
-void main_push_message_value(MAIN_MSG_t msg, uint32_t value) {	
+void main_push_message_value(MAIN_MSG_t msg, uint32_t value) {
 	MAIN_Messages_t mainMSG = { msg, value };
     BaseType_t xHigherPriorityTaskWoken;
     xHigherPriorityTaskWoken = pdFALSE;

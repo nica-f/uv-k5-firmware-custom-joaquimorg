@@ -95,8 +95,8 @@ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 */
 
 void (*ProcessKeysFunctions[])(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) = {
-	[DISPLAY_MAIN] = &MAIN_ProcessKeys,
-	[DISPLAY_MENU] = &MENU_ProcessKeys,
+	//[DISPLAY_MAIN] = &MAIN_ProcessKeys,
+	//[DISPLAY_MENU] = &MENU_ProcessKeys,
 	[DISPLAY_SCANNER] = &SCANNER_ProcessKeys,
 
 #ifdef ENABLE_FMRADIO
@@ -410,6 +410,10 @@ static_assert(ARRAY_SIZE(HandleFunction_fn_table) == FUNCTION_N_ELEM);
 static void HandleFunction(void)
 {
 	HandleFunction_fn_table[gCurrentFunction]();
+}
+
+void APP_Function(FUNCTION_Type_t function) {
+	HandleFunction_fn_table[function]();
 }
 
 void APP_StartListening(FUNCTION_Type_t function)
@@ -1261,8 +1265,8 @@ void APP_TimeSlice500ms(void)
 	if (gMenuCountdown > 0)
 		if (--gMenuCountdown == 0) {
 			exit_menu = (gScreenToDisplay == DISPLAY_MENU);	// exit menu mode
-			settingsShowSubMenu = false;
-			settingsSubMenuActive = false;
+			//settingsShowSubMenu = false;
+			//settingsSubMenuActive = false;
 		}
 
 #ifdef ENABLE_DTMF_CALLING
@@ -1286,7 +1290,7 @@ void APP_TimeSlice500ms(void)
 		// don't turn off backlight if user is in backlight menu option
 		&& !(gScreenToDisplay == DISPLAY_MENU /*&& (UI_MENU_GetCurrentMenuId() == MENU_ABR || UI_MENU_GetCurrentMenuId() == MENU_ABR_MAX)*/)
 		&& --gBacklightCountdown_500ms == 0
-		&& gEeprom.BACKLIGHT_TIME < (ARRAY_SIZE(gSubMenu_BACKLIGHT) - 1)
+		//&& gEeprom.BACKLIGHT_TIME < (ARRAY_SIZE(gSubMenu_BACKLIGHT) - 1)
 	) {
 		BACKLIGHT_TurnOff();
 	}

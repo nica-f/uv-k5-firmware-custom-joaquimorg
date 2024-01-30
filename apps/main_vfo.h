@@ -318,19 +318,22 @@ bool MainVFO_renderPopupFunction(APPS_Popup_t popup) {
             GUI_showPopup(popupW, popupH, &startX, &startY);
             UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, "VFO %s - TX POWER", gEeprom.TX_VFO == 0 ? "A" : "B");
             popupListSize = ARRAY_SIZE(gSubMenu_TXP) - 1;
-            popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, ARRAY_SIZE_ELEMENT(gSubMenu_TXP), gSubMenu_TXP);
+            //popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, ARRAY_SIZE_ELEMENT(gSubMenu_TXP), gSubMenu_TXP);
+            popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, gSubMenu_TXP);
             break;
         case APP_POPUP_W_N:
             GUI_showPopup(popupW, popupH, &startX, &startY);
             UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, "VFO %s - BANDWIDTH", gEeprom.TX_VFO == 0 ? "A" : "B");
             popupListSize = ARRAY_SIZE(gSubMenu_W_N) - 1;
-            popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, ARRAY_SIZE_ELEMENT(gSubMenu_W_N), gSubMenu_W_N);
+            //popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, ARRAY_SIZE_ELEMENT(gSubMenu_W_N), gSubMenu_W_N);
+            popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, gSubMenu_W_N);
             break;
         case APP_POPUP_AM:
             GUI_showPopup(popupW, popupH, &startX, &startY);
             UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, "VFO %s - MODULATION", gEeprom.TX_VFO == 0 ? "A" : "B");
             popupListSize = MODULATION_UKNOWN - 1;
-            popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, ARRAY_SIZE_ELEMENT(gModulationStr), gModulationStr);
+            //popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, ARRAY_SIZE_ELEMENT(gModulationStr), gModulationStr);
+            popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, gModulationStr);
             break;
         default:
             break;

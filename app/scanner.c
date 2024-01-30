@@ -458,8 +458,8 @@ void SCANNER_TimeSlice10ms(void)
 
 			if(gCssBackgroundScan) {
 				gCssBackgroundScan = false;
-				if(gScanUseCssResult)
-					MENU_CssScanFound();
+				/*if(gScanUseCssResult)
+					MENU_CssScanFound();*/
 			}
 			else
 				GUI_SelectNextDisplay(DISPLAY_SCANNER);

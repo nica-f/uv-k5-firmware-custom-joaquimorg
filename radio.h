@@ -70,7 +70,8 @@ typedef enum {
 	MODULATION_UKNOWN
 } ModulationMode_t;
 
-extern const char gModulationStr[MODULATION_UKNOWN][4];
+//extern const char gModulationStr[MODULATION_UKNOWN][4];
+extern const char* const gModulationStr[];
 
 typedef struct
 {

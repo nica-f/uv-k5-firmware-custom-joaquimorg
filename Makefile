@@ -141,6 +141,8 @@ IPATH += \
 	font.c \
 	bitmaps.c \
 	ui/main.c \
+	ui/menu.c \
+	app/menu.c \
 
 C_SRC += \
 	external/printf/printf.c \
@@ -163,7 +165,6 @@ C_SRC += \
 	app/dtmf.c \
 	app/generic.c \
 	app/main.c \
-	app/menu.c \
 	app/scanner.c \
 	audio.c \
 	board.c \
@@ -179,7 +180,6 @@ C_SRC += \
 	ui/battery.c \
 	ui/helper.c \
 	ui/inputbox.c \
-	ui/menu.c \
 	ui/scanner.c \
 	ui/status.c \
 	ui/ui.c \

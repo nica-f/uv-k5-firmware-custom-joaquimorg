@@ -25,7 +25,7 @@
 #include "driver/eeprom.h"
 #include "misc.h"
 #include "settings.h"
-#include "ui/menu.h"
+//#include "ui/menu.h"
 
 static const uint32_t gDefaultFrequencyTable[] =
 {

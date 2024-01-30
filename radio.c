@@ -46,14 +46,14 @@ VFO_Info_t    *gCurrentVfo;
 DCS_CodeType_t gCurrentCodeType;
 VfoState_t     VfoState[2];
 
-const char gModulationStr[MODULATION_UKNOWN][4] = {
-	[MODULATION_FM]="FM",
-	[MODULATION_AM]="AM",
-	[MODULATION_USB]="USB",
+const char* const gModulationStr[] = {
+	"FM",
+	"AM",
+	"USB",
 
 #ifdef ENABLE_BYP_RAW_DEMODULATORS
-	[MODULATION_BYP]="BYP",
-	[MODULATION_RAW]="RAW"
+	"BYP",
+	"RAW"
 #endif
 };
 
@@ -222,8 +222,8 @@ void RADIO_ConfigureChannel(const unsigned int VFO, const unsigned int configure
 		pVfo->StepFrequency = gStepFrequencyTable[tmp];
 
 		tmp = data[7];
-		if (tmp > (ARRAY_SIZE(gSubMenu_SCRAMBLER) - 1))
-			tmp = 0;
+		/*if (tmp > (ARRAY_SIZE(gSubMenu_SCRAMBLER) - 1))
+			tmp = 0;*/
 		pVfo->SCRAMBLING_TYPE = tmp;
 
 		pVfo->freq_config_RX.CodeType = (data[2] >> 0) & 0x0F;
@@ -920,8 +920,8 @@ void RADIO_PrepareTX(void)
 	{
 		if (gEeprom.TX_TIMEOUT_TIMER == 0)
 			gTxTimerCountdown_500ms = 60;   // 30 sec
-		else if (gEeprom.TX_TIMEOUT_TIMER < (ARRAY_SIZE(gSubMenu_TOT) - 1))
-			gTxTimerCountdown_500ms = 120 * gEeprom.TX_TIMEOUT_TIMER;  // minutes
+		/*else if (gEeprom.TX_TIMEOUT_TIMER < (ARRAY_SIZE(gSubMenu_TOT) - 1))
+			gTxTimerCountdown_500ms = 120 * gEeprom.TX_TIMEOUT_TIMER;  // minutes*/
 		else
 			gTxTimerCountdown_500ms = 120 * 15;  // 15 minutes
 	}

@@ -118,7 +118,7 @@ void BATTERY_GetReadings(const bool bDisplayBatteryLevel)
 	}
 
 
-	if ((gScreenToDisplay == DISPLAY_MENU) && UI_MENU_GetCurrentMenuId() == MENU_VOL)
+	if ((gScreenToDisplay == DISPLAY_MENU) /*&& UI_MENU_GetCurrentMenuId() == MENU_VOL*/)
 		gUpdateDisplay = true;
 
 	if (gBatteryCurrent < 501)
@@ -184,7 +184,7 @@ void BATTERY_TimeSlice500ms(void)
 
 	if (lowBatteryCountdown < lowBatteryPeriod) {
 		if (lowBatteryCountdown == lowBatteryPeriod-1 && !gChargingWithTypeC && !gLowBatteryConfirmed) {
-			AUDIO_PlayBeep(BEEP_500HZ_60MS_DOUBLE_BEEP);
+			//AUDIO_PlayBeep(BEEP_500HZ_60MS_DOUBLE_BEEP);
 		}
 		return;
 	}
@@ -197,7 +197,7 @@ void BATTERY_TimeSlice500ms(void)
 
 	// not on charge
 	if (!gLowBatteryConfirmed) {
-		AUDIO_PlayBeep(BEEP_500HZ_60MS_DOUBLE_BEEP);
+		//AUDIO_PlayBeep(BEEP_500HZ_60MS_DOUBLE_BEEP);
 	}
 
 	if (gBatteryDisplayLevel != 0) {
@@ -210,7 +210,7 @@ void BATTERY_TimeSlice500ms(void)
 
 	ST7565_HardwareReset();
 
-	if (gEeprom.BACKLIGHT_TIME < (ARRAY_SIZE(gSubMenu_BACKLIGHT) - 1)) {
+	/*if (gEeprom.BACKLIGHT_TIME < (ARRAY_SIZE(gSubMenu_BACKLIGHT) - 1)) {
 		BACKLIGHT_TurnOff();
-	}
+	}*/
 }

@@ -20,10 +20,11 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include "driver/keyboard.h"
 
 void GUI_drawBattery(void);
 
-//void        GUI_inputAppendKey(const KEY_Code_t key);
+void        GUI_inputAppendKey(const KEY_Code_t key);
 uint8_t     GUI_inputGetSize();
 uint32_t    GUI_inputGetNumber();
 
@@ -32,7 +33,8 @@ void        GUI_showPopup(uint8_t popupW, uint8_t popupH, uint8_t *startX, uint8
 int Clamp(int v, int min, int max);
 
 void popupListCalc(uint8_t listSelected, uint8_t listSize, uint8_t *yPos, uint8_t *listCount, uint8_t *offset);
-void popupShowList(uint8_t listSelected, uint8_t listSize, uint8_t x, uint8_t y, uint8_t w, size_t num_cols, const char subList[][num_cols]);
+//void popupShowList(uint8_t listSelected, uint8_t listSize, uint8_t x, uint8_t y, uint8_t w, size_t num_cols, const char subList[][num_cols]);
+void popupShowList(uint8_t listSelected, uint8_t listSize, uint8_t x, uint8_t y, uint8_t w, const char* const subList[]);
 
 
 #endif

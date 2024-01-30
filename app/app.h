@@ -36,4 +36,6 @@ void     APP_TimeSlice10ms(void);
 void     APP_TimeSlice500ms(void);
 void CheckRadioInterrupts(void);
 
+void APP_Function(FUNCTION_Type_t function);
+
 #endif
