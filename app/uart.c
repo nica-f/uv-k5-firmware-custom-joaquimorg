@@ -453,13 +453,19 @@ static void CMD_052F(const uint8_t *pBuffer)
 }
 
 #ifdef ENABLE_REMOTE_CONTROL
-static void CMD_0A03() // dumps the LCD screen memory to the PC. Not used in the Dock, is just for debug purposes
-{
-	const uint16_t screenDumpIdByte = 0xEFAB;
+
+void sendScreeBuffer(void) {
+	const uint16_t screenDumpIdByte = 0xEDAB;
 	UART_Send(&screenDumpIdByte, 2);
-	UART_Send(gStatusLine, 128);
 	UART_Send(gFrameBuffer, 896);
 }
+
+void sendStatusBuffer(void) {
+	const uint16_t screenDumpIdByte = 0xEEAB;
+	UART_Send(&screenDumpIdByte, 2);
+	UART_Send(gStatusLine, 128);
+}
+
 
 static void CMD_0A01(const uint8_t *pBuffer) // smulate a key press
 {
@@ -702,7 +708,8 @@ void UART_HandleCommand(void)
 			CMD_0A01(UART_Command.Buffer);
 			break;			
 		case 0x0A03: // screen dump
-			CMD_0A03();
+			sendStatusBuffer();
+			sendScreeBuffer();
 			break;
 #endif
 

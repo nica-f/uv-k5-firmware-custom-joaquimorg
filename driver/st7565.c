@@ -25,6 +25,10 @@
 #include "driver/system.h"
 #include "misc.h"
 
+#ifdef ENABLE_REMOTE_CONTROL
+#include "app/uart.h"
+#endif
+
 #ifdef ENABLE_CONTRAST
 	uint8_t contrast = 31;  // 0 ~ 63
 #endif
@@ -58,6 +62,9 @@ void ST7565_BlitFullScreen(void)
 		DrawLine(0, line+1, gFrameBuffer[line], LCD_WIDTH);
 	}
 	SPI_ToggleMasterMode(&SPI0->CR, true);
+#ifdef ENABLE_REMOTE_CONTROL	
+	sendScreeBuffer();
+#endif	
 }
 
 void ST7565_BlitLine(unsigned line)
@@ -74,6 +81,9 @@ void ST7565_BlitStatusLine(void)
 	ST7565_WriteByte(0x40);    // start line ?
 	DrawLine(0, 0, gStatusLine, LCD_WIDTH);
 	SPI_ToggleMasterMode(&SPI0->CR, true);
+#ifdef ENABLE_REMOTE_CONTROL	
+	sendStatusBuffer();
+#endif	
 }
 
 void ST7565_FillScreen(uint8_t value)
