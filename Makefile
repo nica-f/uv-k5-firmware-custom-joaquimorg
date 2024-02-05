@@ -59,17 +59,17 @@ ENABLE_MESSENGER_NOTIFICATION			?= 1
 ENABLE_MESSENGER_UART					?= 1
 
 # Work in progress
-ENABLE_PMR_MODE               ?= 0
+ENABLE_PMR_MODE               			?= 0
 
 
 #### Display and Keypad remote Control ####
 # https://home.joaquim.org/display-explorer/
-ENABLE_REMOTE_CONTROL			  ?= 1
+ENABLE_REMOTE_CONTROL			  		?= 1
 
 #------------------------------------------------------------------------------
 AUTHOR_STRING ?= JOAQUIM
-VERSION_STRING ?= V0.3.4
-PROJECT_NAME := cfw_joaquimorg_oefw_V0.3.4
+VERSION_STRING ?= V0.3.5_e
+PROJECT_NAME := cfw_joaquimorg_oefw_V0.3.5_e
 
 BUILD := _build
 BIN := firmware
