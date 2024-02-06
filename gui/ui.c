@@ -22,6 +22,10 @@
 #include "printf.h"
 #include "driver/st7565.h"
 
+#ifdef ENABLE_REMOTE_CONTROL
+#include "app/uart.h"
+#endif
+
 bool UI_updateDisplay = false;
 bool UI_updateStatus = false;
 uint8_t UI_nextX = 0;
@@ -33,14 +37,16 @@ void UI_displayClear(void) {
 }
 
 void UI_displayUpdate(void) {
-	if ( UI_updateDisplay ) {		
+	if ( UI_updateDisplay ) {
+		sendScreeBuffer();
 		ST7565_BlitFullScreen(false);
 		UI_updateDisplay = false;
 	}
 }
 
 void UI_statusUpdate(void) {
-	if ( UI_updateStatus ) {		
+	if ( UI_updateStatus ) {
+		sendStatusBuffer();
 		ST7565_BlitFullScreen(true);
 		UI_updateStatus = false;
 	}

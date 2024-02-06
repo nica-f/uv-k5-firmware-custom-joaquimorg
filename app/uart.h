@@ -22,5 +22,10 @@
 bool UART_IsCommandAvailable(void);
 void UART_HandleCommand(void);
 
+#ifdef ENABLE_REMOTE_CONTROL
+void sendScreeBuffer(void);
+void sendStatusBuffer(void);
+#endif
+
 #endif
 

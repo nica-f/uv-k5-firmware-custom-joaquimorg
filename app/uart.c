@@ -46,7 +46,8 @@
 	#include "sram-overlay.h"
 #endif
 
-#ifdef ENABLE_SCREEN_DUMP
+#ifdef ENABLE_REMOTE_CONTROL
+	#include "driver/keyboard.h"
 	#include "driver/st7565.h"
 #endif
 
@@ -146,6 +147,16 @@ typedef struct {
 	Header_t Header;
 	uint32_t Timestamp;
 } CMD_052F_t;
+
+
+#ifdef ENABLE_REMOTE_CONTROL
+typedef struct {
+	Header_t Header;
+	uint8_t Key;
+	uint8_t Padding;
+	uint32_t Timestamp;
+} CMD_0A01_t; // simulate key press
+#endif
 
 static const uint8_t Obfuscation[16] =
 {
@@ -424,6 +435,10 @@ static void CMD_052F(const uint8_t *pBuffer)
 	gEeprom.VfoInfo[0].DTMF_DECODING_ENABLE          = false;
 #endif
 
+	#ifdef ENABLE_NOAA
+		gIsNoaaMode = false;
+	#endif
+
 	if (gCurrentFunction == FUNCTION_POWER_SAVE)
 		FUNCTION_Select(FUNCTION_FOREGROUND);
 
@@ -437,13 +452,41 @@ static void CMD_052F(const uint8_t *pBuffer)
 	SendVersion();
 }
 
+#ifdef ENABLE_REMOTE_CONTROL
 
-#ifdef ENABLE_SCREEN_DUMP
-static void CMD_0A03() // dumps the LCD screen memory to the PC. Not used in the Dock, is just for debug purposes
-{
-	const uint16_t screenDumpIdByte = 0xEFAB;
+void sendScreeBuffer(void) {
+	const uint16_t screenDumpIdByte = 0xEDAB;
 	UART_Send(&screenDumpIdByte, 2);
-	UART_Send(gFrameBuffer, 1024);
+	UART_Send(*gFrameBuffer + 128, 896);
+}
+
+void sendStatusBuffer(void) {
+	const uint16_t screenDumpIdByte = 0xEEAB;
+	UART_Send(&screenDumpIdByte, 2);
+	UART_Send(gFrameBuffer, 128);
+}
+
+
+static void CMD_0A01(const uint8_t *pBuffer) // smulate a key press
+{
+	(void)pBuffer;
+	/*const CMD_0A01_t *pCmd = (const CMD_0A01_t *)pBuffer;
+	const uint8_t key = pCmd->Key & 0x1f;
+	const bool click = pCmd->Key & 32;
+	if(key != KEY_INVALID)
+	{
+		gSimulateKey = key;
+		gDebounceDefeat = 0;
+		if(key == KEY_PTT)
+			gPttCounter = 40;
+	}
+	gSimulateHold = click ? KEY_INVALID : key;
+	*/
+
+	/*const uint16_t screenDumpIdByte = 0xA1AB;
+	UART_Send(&screenDumpIdByte, 2);	
+	UART_Send(&key, 1);
+	UART_Send(&click, 1);*/
 }
 #endif
 
@@ -491,6 +534,16 @@ void remove(char cstring[], char letter) {
         if(cstring[i] == letter) cstring[i] = '\0';
     } 
 }
+bool findchar(uint8_t start, char letter) {
+    for(int i = start; UART_DMA_Buffer[i] != '\0'; i++) {
+        if(UART_DMA_Buffer[i] == letter) return true;
+    } 
+	return false;
+}
+
+uint8_t txtStart = 0;
+bool newTxtMsg = false;
+
 #endif
 
 bool UART_IsCommandAvailable(void)
@@ -510,25 +563,38 @@ bool UART_IsCommandAvailable(void)
 #if defined(ENABLE_MESSENGER) || defined(ENABLE_MESSENGER_UART)
 
 		if ( UART_DMA_Buffer[gUART_WriteIndex] == 'S' && UART_DMA_Buffer[gUART_WriteIndex + 1] == 'M' && UART_DMA_Buffer[ gUART_WriteIndex + 2] == 'S' && UART_DMA_Buffer[gUART_WriteIndex + 3] == ':') {
-		
-		char txMessage[TX_MSG_LENGTH + 4];
-		memset(txMessage, 0, sizeof(txMessage));
-		snprintf(txMessage, (TX_MSG_LENGTH + 4), "%s", &UART_DMA_Buffer[gUART_WriteIndex + 4]);
-
-		remove(txMessage, '\n');
-		remove(txMessage, '\r');      
-
-		if (strlen(txMessage) > 0) {        
-			MSG_Send(txMessage, false);
-			UART_printf("SMS>%s\r\n", txMessage);
-			gUpdateDisplay = true;
-		}      
-		
+			txtStart = gUART_WriteIndex;
+			newTxtMsg = true;
+			//UART_printf("1:%s\r\n", &UART_DMA_Buffer[txtStart]);
 		}
-  
-#endif  
+
+		if (findchar(txtStart, '\n') && newTxtMsg) {
+			//UART_printf("2:%s\r\n", &UART_DMA_Buffer[txtStart]);
+			char txMessage[TX_MSG_LENGTH + 4];
+			memset(txMessage, 0, sizeof(txMessage));
+			snprintf(txMessage, (TX_MSG_LENGTH + 4), "%s", &UART_DMA_Buffer[txtStart + 4]);
+
+			remove(txMessage, '\n');
+			remove(txMessage, '\r');      
+
+			if (strlen(txMessage) > 0) {        
+				MSG_Send(txMessage, false);
+				UART_printf("SMS>%s\r\n", txMessage);
+				gUpdateDisplay = true;
+			}
+			newTxtMsg = false;
+			txtStart = 0;
+			memset(UART_DMA_Buffer, 0, sizeof(UART_DMA_Buffer));
+			gUART_WriteIndex = 0;
+			return false;			
+		}
+		
+		while (gUART_WriteIndex != DmaLength && UART_DMA_Buffer[gUART_WriteIndex] != 0xABU && UART_DMA_Buffer[gUART_WriteIndex] != 'S')
+			gUART_WriteIndex = DMA_INDEX(gUART_WriteIndex, 1);
+#else  
 		while (gUART_WriteIndex != DmaLength && UART_DMA_Buffer[gUART_WriteIndex] != 0xABU)
 			gUART_WriteIndex = DMA_INDEX(gUART_WriteIndex, 1);
+#endif  
 
 		if (gUART_WriteIndex == DmaLength)
 			return false;
@@ -661,11 +727,18 @@ void UART_HandleCommand(void)
 			CMD_0602_WriteBK4819Reg(UART_Command.Buffer);
 			break;
 #endif
-#ifdef ENABLE_SCREEN_DUMP
+
+#ifdef ENABLE_REMOTE_CONTROL
+
+		case 0x0A01: // simulate key press
+			CMD_0A01(UART_Command.Buffer);
+			break;			
 		case 0x0A03: // screen dump
-			CMD_0A03();
+			sendStatusBuffer();
+			sendScreeBuffer();
 			break;
 #endif
+
 
 	}
 }
