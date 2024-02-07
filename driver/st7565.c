@@ -15,6 +15,7 @@
  */
 
 #include <stdint.h>
+#include <string.h>
 #include <stdio.h>     // NULL
 
 #include "bsp/dp32g030/gpio.h"
@@ -25,10 +26,15 @@
 #include "driver/system.h"
 #include "misc.h"
 
+#ifdef ENABLE_REMOTE_CONTROL
+#include "app/uart.h"
+#endif
+
 
 uint8_t contrast = 31;  // 0 ~ 63
 
 uint8_t gFrameBuffer[FRAME_LINES][LCD_WIDTH];
+uint8_t gFrameBufferBack[FRAME_LINES][LCD_WIDTH];
 
 void ST7565_WriteByte(uint8_t Value);
 void ST7565_SelectColumnAndLine(uint8_t Column, uint8_t Line);
@@ -42,22 +48,42 @@ static inline void ST7565_LowLevelWrite(uint8_t Value)
 
 void ST7565_BlitFullScreen(bool onlystatus)
 {
-	SPI_ToggleMasterMode(&SPI0->CR, false);
-	ST7565_WriteByte(0x40);
-	uint8_t lines = FRAME_LINES;
-	if (onlystatus) {
-		lines = 1;
-	}
-	for (unsigned line = 0; line < lines; line++) {
-		ST7565_SelectColumnAndLine(4, line);
-		GPIO_SetBit(&GPIOB->DATA, GPIOB_PIN_ST7565_A0);
-		for (unsigned column = 0; column < LCD_WIDTH; column++) {
-            ST7565_LowLevelWrite(gFrameBuffer[line][column]);
+	bool updateLine[FRAME_LINES] = { false };
+	uint8_t sendType = 0;
+	for (unsigned line = (onlystatus ? 0 : 1); line < (onlystatus ? 1 : FRAME_LINES); line++) {
+		if (memcmp(gFrameBuffer[line], gFrameBufferBack[line], sizeof(gFrameBufferBack[line])) != 0 ) {
+			updateLine[line] = true;
+			memcpy(gFrameBufferBack[line], gFrameBuffer[line], sizeof(gFrameBuffer[line]));
+			if (line == 0) {
+				sendType = 1;
+			} else {
+				sendType = 2;
+			}
 		}
-		SPI_WaitForUndocumentedTxFifoStatusBit();
 	}
-	
-	SPI_ToggleMasterMode(&SPI0->CR, true);
+
+	if ( sendType != 0 ) {
+		SPI_ToggleMasterMode(&SPI0->CR, false);
+		ST7565_WriteByte(0x40);
+		for (unsigned line = (onlystatus ? 0 : 1); line < (onlystatus ? 1 : FRAME_LINES); line++) {
+			if ( updateLine[line] ) {
+				ST7565_SelectColumnAndLine(4, line);
+				GPIO_SetBit(&GPIOB->DATA, GPIOB_PIN_ST7565_A0);
+				for (unsigned column = 0; column < LCD_WIDTH; column++) {
+					ST7565_LowLevelWrite(gFrameBuffer[line][column]);
+				}
+				SPI_WaitForUndocumentedTxFifoStatusBit();
+			}
+		}	
+		SPI_ToggleMasterMode(&SPI0->CR, true);
+	}
+#ifdef ENABLE_REMOTE_CONTROL
+	if (sendType == 2) {
+		sendScreeBuffer();
+	} else if (sendType == 1) {
+		sendStatusBuffer();
+	}
+#endif	
 }
 
 /*
@@ -212,7 +238,9 @@ void ST7565_Init(void)
 	SPI_ToggleMasterMode(&SPI0->CR, true);
 
 	//ST7565_FillScreen(0x00);
-	ST7565_BlitFullScreen(false);
+	//ST7565_BlitFullScreen(false);
+	memset(gFrameBufferBack, 0xFF, sizeof(gFrameBufferBack));
+	memset(gFrameBuffer, 0, sizeof(gFrameBuffer));
 }
 
 void ST7565_FixInterfGlitch(void)

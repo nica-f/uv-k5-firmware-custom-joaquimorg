@@ -85,17 +85,16 @@ void idle_timer_callback(TimerHandle_t xTimer) {
 void render_timer_callback(TimerHandle_t xTimer) {
 
 	if (currentApplication->render) {
-        UI_updateDisplay = currentApplication->render();
+        currentApplication->render();
     }
 
     if (currentApplication->showStatusLine) {
         UI_DisplayStatus();
-        UI_updateStatus = true;
     }
 
     if ( currentAppPopup != APP_POPUP_NONE ) {
         if (currentApplication->renderPopup) {
-            UI_updateDisplay = currentApplication->renderPopup(currentAppPopup);
+            currentApplication->renderPopup(currentAppPopup);
         }       
     }
 
@@ -222,7 +221,6 @@ void change_application(app_t *application) {
         currentApplication = application;        
         xTimerStop(renderTimer, 0);
         currentApplication->init();
-        UI_updateDisplay = true;
         UI_displayUpdate();
         xTimerStart(renderTimer, 0);
     }    

@@ -212,10 +212,6 @@ void MainVFO_showVFO(void) {
         UI_printf(&font_small, TEXT_ALIGN_LEFT, 2, 20, yPosVFO + 2, true, false, "VFO");
     }
 
-    if ( FUNCTION_IsRx() ) {
-        MainVFO_showRSSI();
-    }
-
     // extra info
     //UI_drawFastVLine(97, 46, 17, true);
 
@@ -223,19 +219,22 @@ void MainVFO_showVFO(void) {
 
 
 void MainVFO_initFunction() {
-    UI_displayClear();
-    MainVFO_showVFO();
-    UI_updateDisplay = true;
+    
 }
 
-bool MainVFO_renderFunction() {
-    MainVFO_initFunction();
-    return UI_updateDisplay;
+void MainVFO_renderFunction() {
+
+    UI_displayClear();
+    MainVFO_showVFO();
+
+    if ( FUNCTION_IsRx() ) {
+        MainVFO_showRSSI();
+    }
+
 }
 
 
 void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
-
     switch (key)
     {
         case KEY_1:
@@ -304,7 +303,7 @@ void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 
 /* --------------------------------------------------------------------------- */
 
-bool MainVFO_renderPopupFunction(APPS_Popup_t popup) {
+void MainVFO_renderPopupFunction(APPS_Popup_t popup) {
 
     const uint8_t popupW = 68;
 	const uint8_t popupH = 42;
@@ -338,7 +337,6 @@ bool MainVFO_renderPopupFunction(APPS_Popup_t popup) {
         default:
             break;
     }
-    return UI_updateDisplay;
 }
 
 void MainVFO_popupSave(APPS_Popup_t popup) {
@@ -362,8 +360,7 @@ void MainVFO_popupSave(APPS_Popup_t popup) {
 }
 
 void MainVFO_keyHandlerPopupFunction(KEY_Code_t key, KEY_State_t state, APPS_Popup_t popup) {
-
-   if ( state == KEY_PRESSED ) {
+    if ( state == KEY_PRESSED ) {
         switch (key)
         {
             case KEY_6:

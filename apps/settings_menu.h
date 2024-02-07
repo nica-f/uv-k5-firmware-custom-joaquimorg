@@ -1247,7 +1247,7 @@ void MainMenu_initFunction() {
     settingsSubMenuActive = false;
 }
 
-bool MainMenu_renderFunction() {
+void MainMenu_renderFunction() {
 
     UI_displayClear();
     UI_drawFastVLine(2, 9, 53, true);
@@ -1274,7 +1274,6 @@ bool MainMenu_renderFunction() {
     }
 
 	//UI_printf(7, 125, 60, true, false,	"%i %i", settingsCurrentSubMenu, settingsSubmenuSize);
-	return true;
 }
 
 void MainMenu_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {

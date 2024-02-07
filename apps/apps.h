@@ -37,8 +37,8 @@ typedef enum APPS_Popup_e APPS_Popup_t;
 
 
 typedef void (*InitFunction)();
-typedef bool (*RenderFunction)();
-typedef bool (*RenderFunctionPopup)(APPS_Popup_t popup);
+typedef void (*RenderFunction)();
+typedef void (*RenderFunctionPopup)(APPS_Popup_t popup);
 typedef void (*KeyHandlerFunction)(KEY_Code_t key, KEY_State_t state);
 typedef void (*KeyHandlerFunctionPopup)(KEY_Code_t key, KEY_State_t state, APPS_Popup_t popup);
 

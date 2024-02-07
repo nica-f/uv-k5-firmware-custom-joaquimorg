@@ -23,8 +23,6 @@
 
 #include "font.h"
 
-extern bool UI_updateDisplay;
-extern bool UI_updateStatus;
 extern uint8_t UI_nextX;
 
 enum TEXT_Align_e {

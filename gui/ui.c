@@ -26,8 +26,6 @@
 #include "app/uart.h"
 #endif
 
-bool UI_updateDisplay = false;
-bool UI_updateStatus = false;
 uint8_t UI_nextX = 0;
 
 void UI_displayClear(void) {
@@ -37,28 +35,19 @@ void UI_displayClear(void) {
 }
 
 void UI_displayUpdate(void) {
-	if ( UI_updateDisplay ) {
-		sendScreeBuffer();
-		ST7565_BlitFullScreen(false);
-		UI_updateDisplay = false;
-	}
+	ST7565_BlitFullScreen(false);
 }
 
 void UI_statusUpdate(void) {
-	if ( UI_updateStatus ) {
-		sendStatusBuffer();
-		ST7565_BlitFullScreen(true);
-		UI_updateStatus = false;
-	}
+	ST7565_BlitFullScreen(true);
 }
 
 /**************************************************************************/
 
 void setPixel(uint8_t x, uint8_t y, bool isBlack) {
 	if (x < LCD_WIDTH && y < LCD_HEIGHT) {
-		const uint8_t pixel = (1 << (y % 8)); 
+		const uint8_t pixel = (1 << (y % 8));
 		const uint8_t row = y / 8;
-	
     	if (isBlack) {
         	gFrameBuffer[row][x] |= pixel;
     	} else {
@@ -67,22 +56,22 @@ void setPixel(uint8_t x, uint8_t y, bool isBlack) {
 	}
 }
 
-void UI_drawFastVLine(uint8_t x, uint8_t y, uint8_t h, bool isBlack) {  
+void UI_drawFastVLine(uint8_t x, uint8_t y, uint8_t h, bool isBlack) {
   	for (uint8_t i = y; i < y + h; i++) {
         setPixel(x, i, isBlack);
     }
 }
 
-void UI_drawFastHLine(uint8_t x, uint8_t y, uint8_t w, bool isBlack) {    	
+void UI_drawFastHLine(uint8_t x, uint8_t y, uint8_t w, bool isBlack) {
   	for (uint8_t i = x; i < x + w; i++) {
 		setPixel(i, y, isBlack);
 	}
 }
 
-void UI_fillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, bool isBlack) {  
+void UI_fillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, bool isBlack) {
 	for (uint8_t i = y; i < y + h; i++) {
     	UI_drawFastHLine(x, i, w, isBlack);
-  	}  
+  	}
 }
 
 void UI_drawCircleHelper(uint8_t x0, uint8_t y0, uint8_t r, uint8_t cornername, bool isBlack) {
@@ -301,7 +290,7 @@ void UI_drawStringInt(const GFXfont * font, TEXT_Align_t tAlign, uint8_t xstart,
 		startX += drawChar(startX, y, *str, isBlack, font);
         str++;
     }
-	
+
 }
 
 
@@ -315,7 +304,7 @@ void UI_drawStringBox(const GFXfont * font, TEXT_Align_t tAlign, uint8_t xstart,
 
 void UI_printf(const GFXfont * font, TEXT_Align_t tAlign, uint8_t xstart, uint8_t xend, uint8_t y, bool isBlack, bool isFill, const char *str, ...) {
 	char text[52];
-	
+
 	va_list va;
 	va_start(va, str);
 		vsnprintf(text, sizeof(text), str, va);

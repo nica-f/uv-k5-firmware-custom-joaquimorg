@@ -309,7 +309,7 @@ void UI_DisplayMain(void) {
 		//gUpdateDisplay = true;
 	}
 
-	UI_displayUpdate();
+	//UI_displayUpdate();
 }
 
 void UI_MAIN_TimeSlice500ms(void)
