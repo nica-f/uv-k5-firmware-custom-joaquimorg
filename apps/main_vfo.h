@@ -217,18 +217,6 @@ void MainVFO_showVFO(void) {
 
 }
 
-
-void MainVFO_showInput() {
-    const uint8_t popupW = 80;
-	const uint8_t popupH = 30;
-
-    uint8_t startX;
-    uint8_t startY;
-    GUI_showPopup(popupW, popupH, &startX, &startY);
-    UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, "Input Memory");
-    GUI_inputShow(startX, startX + popupW - 2, startY + 14);
-}
-
 void MainVFO_initFunction() {
 
 }
@@ -242,89 +230,85 @@ void MainVFO_renderFunction() {
         MainVFO_showRSSI();
     }
 
-    if (GUI_inputGetSize() > 0) {
-        MainVFO_showInput();
+    if (GUI_inputNotEmpty()) {
+        if (IS_MR_CHANNEL(gEeprom.ScreenChannel[gEeprom.TX_VFO])) {
+            GUI_inputShow("Input Memory", "M ");
+        } else {
+            GUI_inputShow("Input Freq.", "");
+        }
+        
     }
 
 }
 
 
 void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
-    switch (key)
-    {
-        case KEY_1:
-            if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
-            }
-            break;
-        case KEY_2:
-            if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
-                main_push_message(RADIO_VFO_SWITCH);
-            }
-            break;
-        case KEY_3:
-            if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
-                main_push_message(RADIO_VFO_SWITCH_MODE);
-            }
-            break;
-        case KEY_4:
-            if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
-                popupListSelected = gTxVfo->CHANNEL_BANDWIDTH;
-                application_showPopup(APP_POPUP_W_N, true);
-            }
-            break;
-        case KEY_5:
-            if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
-                popupListSelected = gTxVfo->Modulation;
-                application_showPopup(APP_POPUP_AM, true);
-            }
-            break;
-        case KEY_6:
-            if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
-                popupListSelected = gTxVfo->OUTPUT_POWER;
-                application_showPopup(APP_POPUP_TXP, true);
-            }
-            break;
-        case KEY_STAR:
-            if ( state == KEY_PRESSED ) {
-            }
-            break;
-
-        case KEY_UP:
-        case KEY_DOWN:
-            if ( state == KEY_PRESSED || state == KEY_LONG_PRESSED_CONT) {
-                main_push_message(key == KEY_UP ? RADIO_VFO_UP : RADIO_VFO_DOWN);
-            } else if (state == KEY_RELEASED ) {
-                // save if key released
-                if (IS_FREQ_CHANNEL(gEeprom.ScreenChannel[gEeprom.TX_VFO])) {
-                    main_push_message(RADIO_SAVE_CHANNEL);
-                } else {
-                    main_push_message(RADIO_SAVE_VFO);
-                    main_push_message(RADIO_VFO_CONFIGURE_RELOAD);
-                    main_push_message(RADIO_RECONFIGURE_VFO);
+    if (!GUI_inputNotEmpty()) {
+        switch (key)
+        {
+            case KEY_1:
+                if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
                 }
+                break;
+            case KEY_2:
+                if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
+                    main_push_message(RADIO_VFO_SWITCH);
+                }
+                break;
+            case KEY_3:
+                if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
+                    main_push_message(RADIO_VFO_SWITCH_MODE);
+                }
+                break;
+            case KEY_4:
+                if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
+                    popupListSelected = gTxVfo->CHANNEL_BANDWIDTH;
+                    application_showPopup(APP_POPUP_W_N, true);
+                }
+                break;
+            case KEY_5:
+                if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
+                    popupListSelected = gTxVfo->Modulation;
+                    application_showPopup(APP_POPUP_AM, true);
+                }
+                break;
+            case KEY_6:
+                if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
+                    popupListSelected = gTxVfo->OUTPUT_POWER;
+                    application_showPopup(APP_POPUP_TXP, true);
+                }
+                break;
+            case KEY_STAR:
+                if ( state == KEY_PRESSED ) {
+                }
+                break;
 
-            }
-            break;
+            case KEY_UP:
+            case KEY_DOWN:
+                if ( state == KEY_PRESSED || state == KEY_LONG_PRESSED_CONT) {
+                    main_push_message(key == KEY_UP ? RADIO_VFO_UP : RADIO_VFO_DOWN);
+                } else if (state == KEY_RELEASED ) {
+                    // save if key released
+                    if (IS_FREQ_CHANNEL(gEeprom.ScreenChannel[gEeprom.TX_VFO])) {
+                        main_push_message(RADIO_SAVE_CHANNEL);
+                    } else {
+                        main_push_message(RADIO_SAVE_VFO);
+                        main_push_message(RADIO_VFO_CONFIGURE_RELOAD);
+                        main_push_message(RADIO_RECONFIGURE_VFO);
+                    }
 
-        case KEY_MENU:
-            if ( state == KEY_PRESSED ) {
-                if (GUI_inputGetSize() > 0) {
-                    GUI_inputReset();
-                } else {
+                }
+                break;
+
+            case KEY_MENU:
+                if ( state == KEY_PRESSED ) {
                     load_application(APP_MENU);
                 }
-            }
-            break;
-        case KEY_EXIT:
-            if ( state == KEY_PRESSED ) {
-                if (GUI_inputGetSize() > 0) {
-                    GUI_inputReset();
-                }
-            }
-            break;
+                break;
 
-        default:
-            break;
+            default:
+                break;
+        }
     }
 
     if ( state == KEY_RELEASED ) {
@@ -342,8 +326,29 @@ void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
             case KEY_0:
             case KEY_STAR:
             case KEY_F:
-                GUI_inputAppendKey(key);
+                if (IS_MR_CHANNEL(gEeprom.ScreenChannel[gEeprom.TX_VFO])) {
+                    GUI_inputAppendKey(key, 3, false);
+                } else {
+                    GUI_inputAppendKey(key, 12, true);
+                }
             break;
+            case KEY_MENU:
+                if (GUI_inputGetSize() > 0) {
+                    if (IS_MR_CHANNEL(gEeprom.ScreenChannel[gEeprom.TX_VFO])) {
+                        const uint8_t selChannel = (uint8_t)GUI_inputGetNumber() - 1;
+                        main_push_message_value(RADIO_SET_CHANNEL, selChannel);
+                    } else {
+                        const uint32_t selFreq = GUI_inputGetNumber();
+                        //UART_printf("FREQ : %i\r\n", selFreq);
+                        main_push_message_value(RADIO_SET_FREQ, selFreq);                        
+                    }                    
+                }
+                break;
+            case KEY_EXIT:
+                if (GUI_inputGetSize() > 0) {
+                    GUI_inputReset();
+                }
+                break;
 
             default:
                 break;

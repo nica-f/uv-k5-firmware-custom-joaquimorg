@@ -24,13 +24,16 @@
 
 void        GUI_drawBattery(void);
 
-void        GUI_inputAppendKey(const KEY_Code_t key);
+void        GUI_inputAppendKey(const KEY_Code_t key, uint8_t length, bool decimal);
 uint8_t     GUI_inputGetSize();
+bool        GUI_inputNotEmpty();
 void        GUI_inputReset();
-void        GUI_inputShow(uint8_t startX, uint8_t endX, uint8_t startY);
+void        GUI_inputShow(const char *title, const char *prefix);
 uint32_t    GUI_inputGetNumber();
 
 void        GUI_showPopup(uint8_t popupW, uint8_t popupH, uint8_t *startX, uint8_t *startY);
+
+void        GUI_updateCursor();
 
 int Clamp(int v, int min, int max);
 

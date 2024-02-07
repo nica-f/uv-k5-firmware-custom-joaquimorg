@@ -300,6 +300,60 @@ void main_task(void* arg) {
 					SETTINGS_SaveSettings();
                     break;
 
+				case RADIO_SET_CHANNEL:
+					if ( msg.payload != 0 ) {
+						if (!RADIO_CheckValidChannel((uint8_t)msg.payload, false, 0)) {
+				            main_push_message_value(MAIN_MSG_PLAY_BEEP, BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL);
+				            return;
+			            }
+                        gEeprom.MrChannel[gEeprom.TX_VFO]     = (uint8_t)msg.payload;
+			            gEeprom.ScreenChannel[gEeprom.TX_VFO] = (uint8_t)msg.payload;
+			            main_push_message(RADIO_SAVE_VFO);
+                        main_push_message(RADIO_VFO_CONFIGURE_RELOAD);
+                        main_push_message(RADIO_RECONFIGURE_VFO);
+					}
+					break;
+
+				case RADIO_SET_FREQ:
+					if ( msg.payload != 0 ) {
+						uint32_t Frequency = msg.payload;
+						// clamp the frequency entered to some valid value
+                        if (Frequency < frequencyBandTable[0].lower) {
+                            Frequency = frequencyBandTable[0].lower;
+                        }
+                        else if (Frequency >= BX4819_band1.upper && Frequency < BX4819_band2.lower) {
+                            const uint32_t center = (BX4819_band1.upper + BX4819_band2.lower) / 2;
+                            Frequency = (Frequency < center) ? BX4819_band1.upper : BX4819_band2.lower;
+                        }
+                        else if (Frequency > frequencyBandTable[BAND_N_ELEM - 1].upper) {
+                            Frequency = frequencyBandTable[BAND_N_ELEM - 1].upper;
+                        }
+
+                        const FREQUENCY_Band_t band = FREQUENCY_GetBand(Frequency);
+
+                        if (gTxVfo->Band != band) {
+                            gTxVfo->Band               = band;
+                            gEeprom.ScreenChannel[gEeprom.TX_VFO] = band + FREQ_CHANNEL_FIRST;
+                            gEeprom.FreqChannel[gEeprom.TX_VFO]   = band + FREQ_CHANNEL_FIRST;
+
+                            main_push_message(RADIO_SAVE_VFO);
+                            main_push_message(RADIO_VFO_CONFIGURE_CHANNEL);
+                        }
+
+                        Frequency = FREQUENCY_RoundToStep(Frequency, gTxVfo->StepFrequency);
+
+                        if (Frequency >= BX4819_band1.upper && Frequency < BX4819_band2.lower)
+                        {	// clamp the frequency to the limit
+                            const uint32_t center = (BX4819_band1.upper + BX4819_band2.lower) / 2;
+                            Frequency = (Frequency < center) ? BX4819_band1.upper - gTxVfo->StepFrequency : BX4819_band2.lower;
+                        }
+
+                        gTxVfo->freq_config_RX.Frequency = Frequency;
+
+                        main_push_message(RADIO_SAVE_CHANNEL);
+					}
+					break;
+
 			}
 		}
 		//APP_Update();

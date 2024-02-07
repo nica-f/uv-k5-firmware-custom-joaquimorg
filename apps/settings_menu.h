@@ -1292,7 +1292,7 @@ void MainMenu_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 		case KEY_9:
 			if ( state == KEY_PRESSED ) {
 				if ( !settingsSubMenuActive ) {
-					GUI_inputAppendKey(key);
+					GUI_inputAppendKey(key, 2, false);
 					if( GUI_inputGetSize() == 2 ) {
 						const uint8_t inputValue = GUI_inputGetNumber();
 						if ( inputValue > 0 && inputValue < ARRAY_SIZE(MenuList) - 1) {

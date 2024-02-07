@@ -367,8 +367,11 @@ void keyboard_task() {
 			else {
 				// Check if the key was previously pressed
 				if (prev_key_state[i][j] != KEY_RELEASED) {
-					// Call the callback function with the key released state
-					key_callback(keyboard[i].pins[j].key, KEY_RELEASED);
+					
+					if (prev_key_state[i][j] != KEY_LONG_PRESSED && prev_key_state[i][j] != KEY_LONG_PRESSED_CONT) {
+						// Call the callback function with the key released state
+						key_callback(keyboard[i].pins[j].key, KEY_RELEASED);
+					}
 
 					// Stop the long press timer
 					long_press_timer[i][j] = 0;

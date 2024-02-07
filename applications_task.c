@@ -83,7 +83,7 @@ void idle_timer_callback(TimerHandle_t xTimer) {
         main_push_message_value(MAIN_MSG_PLAY_BEEP, BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL);
     }
 
-    if(GUI_inputGetSize() > 0) {
+    if(GUI_inputNotEmpty()) {
         GUI_inputReset();
     }
 
@@ -92,6 +92,9 @@ void idle_timer_callback(TimerHandle_t xTimer) {
 }
 
 void render_timer_callback(TimerHandle_t xTimer) {
+    if(GUI_inputNotEmpty()) {
+        GUI_updateCursor();
+    }
 
 	if (currentApplication->render) {
         currentApplication->render();

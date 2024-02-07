@@ -24,8 +24,14 @@
 #include "gui.h"
 #include "ui.h"
 
-char    inputKeys[8];
-uint8_t inputKeysIndex = 0;
+#ifdef ENABLE_UART
+	#include "driver/uart.h"
+#endif
+
+char inputKeys[13];
+int8_t inputKeysIndex = -1;
+bool showCursor = false;
+uint8_t showCursorCount = 0;
 
 void GUI_drawBattery(void) {
 
@@ -45,14 +51,19 @@ void GUI_drawBattery(void) {
 	}
 }
 
+void GUI_updateCursor() {	
+	if ( ++showCursorCount > 5 ) {
+		showCursorCount = 0;
+		showCursor = !showCursor;
+	}
+}
 
-void GUI_inputAppendKey(const KEY_Code_t key) {
+void GUI_inputAppendKey(const KEY_Code_t key, uint8_t length, bool decimal) {
 	
-	if (inputKeysIndex >= sizeof(inputKeys))
-		return;
-
-	if (inputKeysIndex == 0)
-		memset(inputKeys, 0x5F, sizeof(inputKeys));
+	if (inputKeysIndex == -1 && key != KEY_STAR && key != KEY_F) {
+		memset(inputKeys, 0x00, sizeof(inputKeys));
+		inputKeysIndex = 0;
+	}
 
 	switch (key)
 	{
@@ -66,38 +77,78 @@ void GUI_inputAppendKey(const KEY_Code_t key) {
 		case KEY_7:
 		case KEY_8:
 		case KEY_9:
-			inputKeys[inputKeysIndex++] = '0' + key;
+			if (inputKeysIndex < length) {
+				inputKeys[inputKeysIndex++] = '0' + key;
+			}
 			break;
 		case KEY_STAR:
-			inputKeys[inputKeysIndex++] = '.';
+			if (decimal && inputKeysIndex < length && inputKeysIndex > 0 && inputKeys[inputKeysIndex - 1] != '.') {
+				inputKeys[inputKeysIndex++] = '.';				
+			}
 			break;
 		case KEY_F:
 			if (inputKeysIndex > 0) {
 				inputKeys[--inputKeysIndex] = 0x00;
-			}
-			gWasFKeyPressed = false;
+				gWasFKeyPressed = false;
+			}			
 			break;
 		default:
 			break;
-	}
+	}	
 
 }
 
 uint8_t GUI_inputGetSize() {
-	return inputKeysIndex;
+	if (inputKeysIndex >= 0) {
+		return inputKeysIndex;
+	} else {
+		return 0;
+	}
+}
+
+
+bool GUI_inputNotEmpty() {
+	if (inputKeysIndex == -1) {
+		return false;
+	} else {
+		return true;
+	}
 }
 
 void GUI_inputReset() {
-	inputKeysIndex = 0;
+	inputKeysIndex = -1;
+}
+
+uint32_t string_to_uint32(const char *str) {
+    uint32_t result = 0;
+    const uint8_t len = strlen(str);
+
+    for (uint8_t i = 0; i < len; i++) {
+        if (str[i] != '.') {
+            result = result * 10 + (str[i] - '0');
+        }
+    }
+
+    return result;
 }
 
 uint32_t GUI_inputGetNumber() {
-	inputKeysIndex = 0;
-	return (uint32_t)strtoul(inputKeys, NULL, 10);	
+	inputKeysIndex = -1;
+	return (uint32_t)string_to_uint32(inputKeys);	
 }
 
-void GUI_inputShow(uint8_t startX, uint8_t endX, uint8_t startY) {
-	UI_printf(&font_10, TEXT_ALIGN_CENTER, startX, endX, startY, true, false, "MEM %s", inputKeys);
+void GUI_inputShow(const char *title, const char *prefix) {
+	const uint8_t popupW = 80;
+	const uint8_t popupH = 30;
+	(void)prefix;
+    uint8_t startX;
+    uint8_t startY;
+    GUI_showPopup(popupW, popupH, &startX, &startY);
+    UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, title);
+	UI_printf(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 14, true, false, "%s%s", prefix, inputKeys);	
+	if ( showCursor ) {
+		UI_drawString(&font_10, TEXT_ALIGN_CENTER, UI_nextX, 0, startY + 14, "`", true, false);
+	}
 }
 
 

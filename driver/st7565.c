@@ -46,12 +46,13 @@ static inline void ST7565_LowLevelWrite(uint8_t Value)
 	SPI0->WDR = Value;
 }
 
-uint16_t sumArray(uint8_t array[], int size) {
-    int sum = 0;
+
+uint16_t checksumArray(uint8_t array[], uint8_t size) {
+    uint16_t checksum = 0;
     for (int i = 0; i < size; i++) {
-        sum += array[i];
+        checksum += (i + 1) * array[i];
     }
-    return sum;
+    return checksum;
 }
 
 void ST7565_BlitFullScreen(bool onlystatus)
@@ -60,7 +61,7 @@ void ST7565_BlitFullScreen(bool onlystatus)
 	bool updateLine[FRAME_LINES] = { false };
 	uint8_t sendType = 0;
 	for (unsigned line = (onlystatus ? 0 : 1); line < (onlystatus ? 1 : FRAME_LINES); line++) {
-		const uint16_t sumLine = sumArray(gFrameBuffer[line], LCD_WIDTH);
+		const uint16_t sumLine = checksumArray(gFrameBuffer[line], LCD_WIDTH);
 		if ( sumLine !=  gFrameBufferBack[line] ) {
 			updateLine[line] = true;
 			gFrameBufferBack[line] = sumLine;
