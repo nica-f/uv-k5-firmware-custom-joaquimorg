@@ -52,7 +52,7 @@ void GUI_inputAppendKey(const KEY_Code_t key) {
 		return;
 
 	if (inputKeysIndex == 0)
-		memset(inputKeys, 0, sizeof(inputKeys));
+		memset(inputKeys, 0x5F, sizeof(inputKeys));
 
 	switch (key)
 	{
@@ -75,6 +75,7 @@ void GUI_inputAppendKey(const KEY_Code_t key) {
 			if (inputKeysIndex > 0) {
 				inputKeys[--inputKeysIndex] = 0x00;
 			}
+			gWasFKeyPressed = false;
 			break;
 		default:
 			break;
@@ -86,9 +87,17 @@ uint8_t GUI_inputGetSize() {
 	return inputKeysIndex;
 }
 
+void GUI_inputReset() {
+	inputKeysIndex = 0;
+}
+
 uint32_t GUI_inputGetNumber() {
 	inputKeysIndex = 0;
 	return (uint32_t)strtoul(inputKeys, NULL, 10);	
+}
+
+void GUI_inputShow(uint8_t startX, uint8_t endX, uint8_t startY) {
+	UI_printf(&font_10, TEXT_ALIGN_CENTER, startX, endX, startY, true, false, "MEM %s", inputKeys);
 }
 
 

@@ -22,10 +22,12 @@
 #include <stdio.h>
 #include "driver/keyboard.h"
 
-void GUI_drawBattery(void);
+void        GUI_drawBattery(void);
 
 void        GUI_inputAppendKey(const KEY_Code_t key);
 uint8_t     GUI_inputGetSize();
+void        GUI_inputReset();
+void        GUI_inputShow(uint8_t startX, uint8_t endX, uint8_t startY);
 uint32_t    GUI_inputGetNumber();
 
 void        GUI_showPopup(uint8_t popupW, uint8_t popupH, uint8_t *startX, uint8_t *startY);

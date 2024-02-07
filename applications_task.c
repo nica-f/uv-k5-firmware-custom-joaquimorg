@@ -78,6 +78,15 @@ void idle_timer_callback(TimerHandle_t xTimer) {
 
 	app_push_message(APP_MSG_TIMEOUT);
 
+    if (gWasFKeyPressed) {
+        gWasFKeyPressed = false;
+        main_push_message_value(MAIN_MSG_PLAY_BEEP, BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL);
+    }
+
+    if(GUI_inputGetSize() > 0) {
+        GUI_inputReset();
+    }
+
     //xTimerStart(xTimer, 0);
 
 }

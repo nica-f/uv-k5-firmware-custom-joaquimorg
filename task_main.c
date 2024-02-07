@@ -265,8 +265,9 @@ void main_task(void* arg) {
 
 				case RADIO_VFO_SWITCH_MODE:
                 	COMMON_SwitchVFOMode();
-					main_push_message(RADIO_SAVE_SETTINGS);
-					main_push_message(RADIO_VFO_CONFIGURE_RELOAD);
+					main_push_message(RADIO_SAVE_VFO);
+					main_push_message(RADIO_VFO_CONFIGURE_CHANNEL);
+					main_push_message(RADIO_RECONFIGURE_VFO);
 					break;
 
 				case RADIO_SAVE_VFO:
@@ -285,6 +286,10 @@ void main_task(void* arg) {
 
                 case RADIO_VFO_CONFIGURE:
 					RADIO_ConfigureChannel(gEeprom.TX_VFO, VFO_CONFIGURE);
+                    break;
+
+				case RADIO_VFO_CONFIGURE_CHANNEL:
+					RADIO_ConfigureChannel(gEeprom.TX_VFO, VFO_CONFIGURE_RELOAD);
                     break;
 
 				case RADIO_SAVE_CHANNEL:

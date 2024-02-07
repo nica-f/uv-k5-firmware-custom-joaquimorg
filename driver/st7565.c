@@ -34,7 +34,7 @@
 uint8_t contrast = 31;  // 0 ~ 63
 
 uint8_t gFrameBuffer[FRAME_LINES][LCD_WIDTH];
-uint8_t gFrameBufferBack[FRAME_LINES][LCD_WIDTH];
+uint16_t gFrameBufferBack[FRAME_LINES];
 
 void ST7565_WriteByte(uint8_t Value);
 void ST7565_SelectColumnAndLine(uint8_t Column, uint8_t Line);
@@ -46,14 +46,24 @@ static inline void ST7565_LowLevelWrite(uint8_t Value)
 	SPI0->WDR = Value;
 }
 
+uint16_t sumArray(uint8_t array[], int size) {
+    int sum = 0;
+    for (int i = 0; i < size; i++) {
+        sum += array[i];
+    }
+    return sum;
+}
+
 void ST7565_BlitFullScreen(bool onlystatus)
 {
+	// validate which lines are different and only updates those
 	bool updateLine[FRAME_LINES] = { false };
 	uint8_t sendType = 0;
 	for (unsigned line = (onlystatus ? 0 : 1); line < (onlystatus ? 1 : FRAME_LINES); line++) {
-		if (memcmp(gFrameBuffer[line], gFrameBufferBack[line], sizeof(gFrameBufferBack[line])) != 0 ) {
+		const uint16_t sumLine = sumArray(gFrameBuffer[line], LCD_WIDTH);
+		if ( sumLine !=  gFrameBufferBack[line] ) {
 			updateLine[line] = true;
-			memcpy(gFrameBufferBack[line], gFrameBuffer[line], sizeof(gFrameBuffer[line]));
+			gFrameBufferBack[line] = sumLine;
 			if (line == 0) {
 				sendType = 1;
 			} else {
@@ -62,6 +72,7 @@ void ST7565_BlitFullScreen(bool onlystatus)
 		}
 	}
 
+	// have lines to update ?
 	if ( sendType != 0 ) {
 		SPI_ToggleMasterMode(&SPI0->CR, false);
 		ST7565_WriteByte(0x40);
@@ -77,6 +88,8 @@ void ST7565_BlitFullScreen(bool onlystatus)
 		}	
 		SPI_ToggleMasterMode(&SPI0->CR, true);
 	}
+
+	
 #ifdef ENABLE_REMOTE_CONTROL
 	if (sendType == 2) {
 		sendScreeBuffer();
@@ -239,7 +252,7 @@ void ST7565_Init(void)
 
 	//ST7565_FillScreen(0x00);
 	//ST7565_BlitFullScreen(false);
-	memset(gFrameBufferBack, 0xFF, sizeof(gFrameBufferBack));
+	memset(gFrameBufferBack, 0xFFFF, sizeof(gFrameBufferBack));
 	memset(gFrameBuffer, 0, sizeof(gFrameBuffer));
 }
 

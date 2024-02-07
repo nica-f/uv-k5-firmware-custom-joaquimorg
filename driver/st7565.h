@@ -25,7 +25,6 @@
 #define FRAME_LINES       8
 
 extern uint8_t gFrameBuffer[FRAME_LINES][LCD_WIDTH];
-extern uint8_t gFrameBufferBack[FRAME_LINES][LCD_WIDTH];
 
 void ST7565_BlitFullScreen(bool onlystatus);
 

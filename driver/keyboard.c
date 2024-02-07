@@ -28,7 +28,6 @@
 KEY_Code_t gKeyReading0     = KEY_INVALID;
 KEY_Code_t gKeyReading1     = KEY_INVALID;
 uint16_t   gDebounceCounter = 0;
-bool       gWasFKeyPressed  = false;
 
 #if 0
 static const struct {
@@ -242,7 +241,7 @@ TickType_t long_press_timer[ROWS][COLS] = {0};
 // Define the long press time in milliseconds
 #define LONG_PRESS_TIME 500
 
-static bool isFkeyPressed = false;
+bool gWasFKeyPressed  = false;
 
 // Declare a global variable to store the callback function pointer
 static key_callback_t key_callback = NULL;
@@ -336,15 +335,15 @@ void keyboard_task() {
 				// Check if the key was previously released
 				if (prev_key_state[i][j] == KEY_RELEASED) {
 					// Call the callback function with the key pressed state
-					if(isFkeyPressed) {
+					if(gWasFKeyPressed) {
 						key_callback(keyboard[i].pins[j].key, KEY_PRESSED_WITH_F);
-						isFkeyPressed = false;
+						gWasFKeyPressed = false;
 					} else {
 						key_callback(keyboard[i].pins[j].key, KEY_PRESSED);
 					}
 
 					if ( keyboard[i].pins[j].key == KEY_F ) {
-						isFkeyPressed = true;
+						gWasFKeyPressed = true;
 					}
 
 					// Start the long press timer

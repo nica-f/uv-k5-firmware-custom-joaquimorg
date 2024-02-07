@@ -218,8 +218,19 @@ void MainVFO_showVFO(void) {
 }
 
 
+void MainVFO_showInput() {
+    const uint8_t popupW = 80;
+	const uint8_t popupH = 30;
+
+    uint8_t startX;
+    uint8_t startY;
+    GUI_showPopup(popupW, popupH, &startX, &startY);
+    UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, "Input Memory");
+    GUI_inputShow(startX, startX + popupW - 2, startY + 14);
+}
+
 void MainVFO_initFunction() {
-    
+
 }
 
 void MainVFO_renderFunction() {
@@ -229,6 +240,10 @@ void MainVFO_renderFunction() {
 
     if ( FUNCTION_IsRx() ) {
         MainVFO_showRSSI();
+    }
+
+    if (GUI_inputGetSize() > 0) {
+        MainVFO_showInput();
     }
 
 }
@@ -242,7 +257,7 @@ void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
             }
             break;
         case KEY_2:
-            if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {                
+            if ( state == KEY_PRESSED_WITH_F || state == KEY_LONG_PRESSED ) {
                 main_push_message(RADIO_VFO_SWITCH);
             }
             break;
@@ -274,7 +289,7 @@ void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
             }
             break;
 
-        case KEY_UP:            
+        case KEY_UP:
         case KEY_DOWN:
             if ( state == KEY_PRESSED || state == KEY_LONG_PRESSED_CONT) {
                 main_push_message(key == KEY_UP ? RADIO_VFO_UP : RADIO_VFO_DOWN);
@@ -287,25 +302,62 @@ void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
                     main_push_message(RADIO_VFO_CONFIGURE_RELOAD);
                     main_push_message(RADIO_RECONFIGURE_VFO);
                 }
-                
-            }            
+
+            }
             break;
 
         case KEY_MENU:
             if ( state == KEY_PRESSED ) {
-                load_application(APP_MENU);
+                if (GUI_inputGetSize() > 0) {
+                    GUI_inputReset();
+                } else {
+                    load_application(APP_MENU);
+                }
             }
             break;
+        case KEY_EXIT:
+            if ( state == KEY_PRESSED ) {
+                if (GUI_inputGetSize() > 0) {
+                    GUI_inputReset();
+                }
+            }
+            break;
+
         default:
             break;
+    }
+
+    if ( state == KEY_RELEASED ) {
+        switch (key)
+        {
+            case KEY_1:
+            case KEY_2:
+            case KEY_3:
+            case KEY_4:
+            case KEY_5:
+            case KEY_6:
+            case KEY_7:
+            case KEY_8:
+            case KEY_9:
+            case KEY_0:
+            case KEY_STAR:
+            case KEY_F:
+                GUI_inputAppendKey(key);
+            break;
+
+            default:
+                break;
+        }
     }
 }
 
 /* --------------------------------------------------------------------------- */
+// Popups
+/* --------------------------------------------------------------------------- */
 
 void MainVFO_renderPopupFunction(APPS_Popup_t popup) {
 
-    const uint8_t popupW = 68;
+    const uint8_t popupW = 70;
 	const uint8_t popupH = 42;
 
     uint8_t startX;
@@ -317,21 +369,18 @@ void MainVFO_renderPopupFunction(APPS_Popup_t popup) {
             GUI_showPopup(popupW, popupH, &startX, &startY);
             UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, "VFO %s - TX POWER", gEeprom.TX_VFO == 0 ? "A" : "B");
             popupListSize = ARRAY_SIZE(gSubMenu_TXP) - 1;
-            //popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, ARRAY_SIZE_ELEMENT(gSubMenu_TXP), gSubMenu_TXP);
             popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, gSubMenu_TXP);
             break;
         case APP_POPUP_W_N:
             GUI_showPopup(popupW, popupH, &startX, &startY);
             UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, "VFO %s - BANDWIDTH", gEeprom.TX_VFO == 0 ? "A" : "B");
             popupListSize = ARRAY_SIZE(gSubMenu_W_N) - 1;
-            //popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, ARRAY_SIZE_ELEMENT(gSubMenu_W_N), gSubMenu_W_N);
             popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, gSubMenu_W_N);
             break;
         case APP_POPUP_AM:
             GUI_showPopup(popupW, popupH, &startX, &startY);
             UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, "VFO %s - MODULATION", gEeprom.TX_VFO == 0 ? "A" : "B");
             popupListSize = MODULATION_UKNOWN - 1;
-            //popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, ARRAY_SIZE_ELEMENT(gModulationStr), gModulationStr);
             popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, gModulationStr);
             break;
         default:
@@ -394,7 +443,8 @@ void MainVFO_keyHandlerPopupFunction(KEY_Code_t key, KEY_State_t state, APPS_Pop
 }
 
 /* --------------------------------------------------------------------------- */
-
+// APP Main VFO
+/* --------------------------------------------------------------------------- */
 
 app_t APPMainVFO = {
     .showStatusLine = true,
