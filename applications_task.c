@@ -47,7 +47,7 @@
 #define QUEUE_LENGTH    10
 #define ITEM_SIZE       sizeof( APP_Messages_t )
 
-StackType_t app_task_stack[configMINIMAL_STACK_SIZE + 100];
+StackType_t app_task_stack[configMINIMAL_STACK_SIZE + 150];
 StaticTask_t app_task_buffer;
 
 static StaticQueue_t appTasksQueue;
@@ -62,6 +62,9 @@ static APPS_t currentApp;
 TimerHandle_t idleTimer;
 StaticTimer_t idleTimerBuffer;
 
+TimerHandle_t lightTimer;
+StaticTimer_t lightTimerBuffer;
+
 TimerHandle_t renderTimer;
 StaticTimer_t renderTimerBuffer;
 /*-----------------------------------------------------------*/
@@ -72,11 +75,15 @@ static bool autoReturntoMain = true;
 
 /*-----------------------------------------------------------*/
 
+void light_timer_callback(TimerHandle_t xTimer) {
+    (void)xTimer;
+    main_push_message(MAIN_MSG_BKLIGHT_OFF);
+    UART_printf("MAIN_MSG_BKLIGHT_OFF\r\n");
+}
+
 void idle_timer_callback(TimerHandle_t xTimer) {
 
-	(void)xTimer;
-
-	app_push_message(APP_MSG_TIMEOUT);
+	(void)xTimer;	
 
     if (gWasFKeyPressed) {
         gWasFKeyPressed = false;
@@ -87,8 +94,9 @@ void idle_timer_callback(TimerHandle_t xTimer) {
         GUI_inputReset();
     }
 
+    app_push_message(APP_MSG_TIMEOUT);
     //xTimerStart(xTimer, 0);
-
+    //UART_printf("APP_MSG_TIMEOUT\r\n");
 }
 
 void render_timer_callback(TimerHandle_t xTimer) {
@@ -119,7 +127,7 @@ void render_timer_callback(TimerHandle_t xTimer) {
 
 void keyboard_callback(KEY_Code_t key, KEY_State_t state) {
     xTimerReset(idleTimer, 0);
-
+    
     if ( currentAppPopup != APP_POPUP_NONE ) {
         if (currentApplication->keyhandlerPopup) {
             currentApplication->keyhandlerPopup(key, state, currentAppPopup);
@@ -132,6 +140,8 @@ void keyboard_callback(KEY_Code_t key, KEY_State_t state) {
 
     if ( !BACKLIGHT_IsOn() ) {
         app_push_message(APP_MSG_WAKEUP);
+    } else {
+        xTimerReset(lightTimer, 0);
     }
 
     if ( state != KEY_RELEASED && state != KEY_LONG_PRESSED_CONT ) {
@@ -152,11 +162,13 @@ void app_task(void* arg) {
 
     renderTimer = xTimerCreateStatic("render", pdMS_TO_TICKS(50), pdFALSE, NULL, render_timer_callback, &renderTimerBuffer);
     idleTimer = xTimerCreateStatic("idle", pdMS_TO_TICKS(5000), pdTRUE, NULL, idle_timer_callback, &idleTimerBuffer);
+    lightTimer = xTimerCreateStatic("light", pdMS_TO_TICKS(BACKLIGHT_getTime()), pdFALSE, NULL, light_timer_callback, &lightTimerBuffer);
 
     load_application(APP_WELCOME);
     
     xTimerStart(idleTimer, 0);
     xTimerStart(renderTimer, 0);
+    xTimerStart(lightTimer, 0);
     //UART_printf("APPs Ready\r\n");
     
     while(true) {
@@ -172,8 +184,6 @@ void app_task(void* arg) {
                         if( currentAppPopup != APP_POPUP_NONE && popupAutoClose) {
                             currentAppPopup = APP_POPUP_NONE;
                             xTimerReset( idleTimer, 0 );
-                        } else {
-                            main_push_message(MAIN_MSG_BKLIGHT_OFF);
                         }
                     }
                     break;
@@ -186,8 +196,13 @@ void app_task(void* arg) {
                     break;
 
 				case APP_MSG_WAKEUP:
-					main_push_message(MAIN_MSG_BKLIGHT_ON);
+                    xTimerReset(lightTimer, 0);
+					main_push_message(MAIN_MSG_BKLIGHT_ON);                    
 					break;
+
+                case APP_MSG_BACKLIGHT:
+                    xTimerChangePeriod( lightTimer, pdMS_TO_TICKS(BACKLIGHT_getTime()), 0 );
+                    break;
 
                 case APP_MSG_IDLE:
 					//global_status.isRX = false;
@@ -197,7 +212,9 @@ void app_task(void* arg) {
                     //global_status.isRX = true;
                     xTimerReset( idleTimer, 0 );
 					if ( !BACKLIGHT_IsOn() ) {
-						main_push_message(MAIN_MSG_BKLIGHT_ON);
+                        //xTimerReset(lightTimer, 0);
+						//main_push_message(MAIN_MSG_BKLIGHT_ON);
+                        app_push_message(APP_MSG_WAKEUP);
 					}
                     break;
 

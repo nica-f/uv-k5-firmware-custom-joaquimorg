@@ -337,9 +337,11 @@ void keyboard_task() {
 					// Call the callback function with the key pressed state
 					if(gWasFKeyPressed) {
 						key_callback(keyboard[i].pins[j].key, KEY_PRESSED_WITH_F);
+						prev_key_state[i][j] = KEY_PRESSED_WITH_F;
 						gWasFKeyPressed = false;
 					} else {
 						key_callback(keyboard[i].pins[j].key, KEY_PRESSED);
+						prev_key_state[i][j] = KEY_PRESSED;
 					}
 
 					if ( keyboard[i].pins[j].key == KEY_F ) {
@@ -348,7 +350,7 @@ void keyboard_task() {
 
 					// Start the long press timer
 					long_press_timer[i][j] = current_tick;
-					prev_key_state[i][j] = KEY_PRESSED;
+					//prev_key_state[i][j] = KEY_PRESSED;
 
 				} else if (prev_key_state[i][j] == KEY_PRESSED) {
 					// Check if the long press time has elapsed
@@ -368,7 +370,7 @@ void keyboard_task() {
 				// Check if the key was previously pressed
 				if (prev_key_state[i][j] != KEY_RELEASED) {
 					
-					if (prev_key_state[i][j] != KEY_LONG_PRESSED && prev_key_state[i][j] != KEY_LONG_PRESSED_CONT) {
+					if (prev_key_state[i][j] != KEY_PRESSED_WITH_F && prev_key_state[i][j] != KEY_LONG_PRESSED && prev_key_state[i][j] != KEY_LONG_PRESSED_CONT) {
 						// Call the callback function with the key released state
 						key_callback(keyboard[i].pins[j].key, KEY_RELEASED);
 					}

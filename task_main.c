@@ -216,7 +216,7 @@ void main_task(void* arg) {
     	if (xQueueReceive(mainTasksMsgQueue, &msg, 20)) {
 			switch(msg.message) {
 				case MAIN_MSG_INIT:
-					UART_printf("MSG INIT \r\n");
+					//UART_printf("MSG INIT \r\n");
 					break;
 				case MAIN_MSG_IDLE:
 					break;

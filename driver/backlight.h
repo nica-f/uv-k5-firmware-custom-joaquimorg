@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-extern uint16_t gBacklightCountdown_500ms;
+//extern uint16_t gBacklightCountdown_500ms;
 extern uint8_t gBacklightBrightness;
 
 #ifdef ENABLE_BLMIN_TMP_OFF
@@ -33,6 +33,7 @@ typedef enum {
 
 void BACKLIGHT_InitHardware();
 void BACKLIGHT_TurnOn();
+uint32_t BACKLIGHT_getTime(void);
 void BACKLIGHT_TurnOff();
 bool BACKLIGHT_IsOn();
 void BACKLIGHT_SetBrightness(uint8_t brigtness);
