@@ -103,6 +103,8 @@ void MainVFO_showRSSI(void) {
 
 void MainVFO_showVFO(void) {
 
+    const char *code_list[] = {"CT", "DCS", "DCR"};
+
     char String[17] = { 0 };
     uint8_t vfoNumA;
     uint8_t vfoNumB;
@@ -135,7 +137,7 @@ void MainVFO_showVFO(void) {
 
     // Frequency A
     frequency = vfoInfoA->pRX->Frequency;
-    if ( frequency > _1GHz_in_KHz ) {
+    if ( frequency >= _1GHz_in_KHz ) {
         UI_printf(&font_n_20, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO, true, false, "%1u.%3u.%03u", (frequency / 100000000), (frequency / 100000) % 1000, (frequency % 100000) / 100);
     } else {
         UI_printf(&font_n_20, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO, true, false, "%3u.%03u", (frequency / 100000), (frequency % 100000) / 100);
@@ -153,7 +155,6 @@ void MainVFO_showVFO(void) {
         // DCS/CT/DCR A
         const unsigned int code_type = vfoInfoA->pRX->CodeType;
         if ( code_type > 0 ) {
-            const char *code_list[] = {"CT", "DCS", "DCR"};
             UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + 3, 0, yPosVFO - 1, false, true, code_list[code_type - 1]);
         }
     }
@@ -189,7 +190,7 @@ void MainVFO_showVFO(void) {
 
     // Frequency B
     frequency = vfoInfoB->pRX->Frequency;
-    if ( frequency > _1GHz_in_KHz ) {
+    if ( frequency >= _1GHz_in_KHz ) {
         UI_printf(&font_n_16, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO - 4, true, false, "%1u.%3u.%03u.%02u", (frequency / 100000000), (frequency / 100000) % 1000, (frequency % 100000) / 100, (frequency % 100));
     } else {
         UI_printf(&font_n_16, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO - 4, true, false, "%3u.%03u.%02u", (frequency / 100000), (frequency % 100000) / 100, (frequency % 100));
@@ -212,9 +213,19 @@ void MainVFO_showVFO(void) {
         UI_printf(&font_small, TEXT_ALIGN_LEFT, 2, 20, yPosVFO + 2, true, false, "VFO");
     }
 
+    if ( vfoInfoB->Modulation == MODULATION_FM ) {
+        // DCS/CT/DCR A
+        const unsigned int code_type = vfoInfoB->pRX->CodeType;
+        if ( code_type > 0 ) {
+            UI_printf(&font_small, TEXT_ALIGN_LEFT, 78, 0, yPosVFO + 2, true, false, code_list[code_type - 1]);
+        }
+    }
+
     // extra info
     //UI_drawFastVLine(97, 46, 17, true);
+    UI_drawDottedLine(98, 47, 98, 64, true, 2);
 
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, 102, 0, 52, true, false, "'$ A");
 }
 
 void MainVFO_initFunction() {

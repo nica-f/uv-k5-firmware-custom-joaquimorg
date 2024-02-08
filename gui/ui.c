@@ -74,6 +74,32 @@ void UI_fillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, bool isBlack) {
   	}
 }
 
+static void sort(uint8_t *a, uint8_t *b) {
+	if(*a > *b) {
+		uint8_t t = *a;
+		*a = *b;
+		*b = t;
+	}
+}
+
+void UI_drawDottedLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, bool black, int dotSpacing) {
+    if (x2 == x1) {
+        sort(&y1, &y2);
+        for (uint8_t i = y1; i <= y2; i += dotSpacing) {
+            setPixel(x1, i, black);
+        }
+    } else {
+        const int multipl = 1000;
+        int a = (y2 - y1) * multipl / (x2 - x1);
+        int b = y1 - a * x1 / multipl;
+
+        sort(&x1, &x2);
+        for (int i = x1; i <= x2; i += dotSpacing) {
+            setPixel(i, i * a / multipl + b, black);
+        }
+    }
+}
+
 void UI_drawCircleHelper(uint8_t x0, uint8_t y0, uint8_t r, uint8_t cornername, bool isBlack) {
   int16_t f = 1 - r;
   int16_t ddF_x = 1;
