@@ -202,6 +202,7 @@ C_SRC += \
 	gui/font_n_16.c \
 	gui/font_n_20.c \
 
+
 ifeq ($(ENABLE_UART),1)
 	C_SRC += driver/aes.c
 endif

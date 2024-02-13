@@ -21,8 +21,10 @@
 
 enum APPS_e {
 	APP_WELCOME = 0,
+    APP_EMPTY,
     APP_MAIN_VFO,
     APP_MENU,
+    APP_MENU_VFO,
 };
 typedef enum APPS_e APPS_t;
 

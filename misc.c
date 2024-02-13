@@ -278,6 +278,12 @@ const char* const gSubMenu_BACKLIGHT[] =
 	"ON"
 };
 
+const char* const gSubMenu_SFT_D[] =
+{
+	"OFF",
+	"+",
+	"-"
+};
 
 inline void FUNCTION_NOP() { ; }
 

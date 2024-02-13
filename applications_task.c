@@ -42,7 +42,9 @@
 #include "apps/apps.h"
 #include "apps/welcome.h"
 #include "apps/main_vfo.h"
-#include "apps/settings_menu.h"
+#include "apps/menu_vfo.h"
+
+#include "apps/empty_app.h"
 
 #define QUEUE_LENGTH    10
 #define ITEM_SIZE       sizeof( APP_Messages_t )
@@ -265,9 +267,15 @@ void load_application(APPS_t application) {
         //strcpy(global_status.statusMessage, "VFO\0");
         change_application(&APPMainVFO);
         break;
-    case APP_MENU:
+
+    case APP_EMPTY:
         //strcpy(global_status.statusMessage, "MENU\0");
-        change_application(&APPMainMenu);
+        change_application(&APPEmptyAPP);
+        break;
+
+    case APP_MENU_VFO:
+        //strcpy(global_status.statusMessage, "MENU\0");
+        change_application(&APPMenuVFO);
         break;
 
     default:

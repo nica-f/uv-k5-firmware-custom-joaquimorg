@@ -257,14 +257,6 @@ const char* const gSubMenu_F_LOCK[] =
 	//"UNLOCK\nALL",
 };
 
-
-const char* const gSubMenu_SFT_D[] =
-{
-	"OFF",
-	"+",
-	"-"
-};
-
 const char* const gSubMenu_RXMode[] =
 {
 	"MAIN RX TX", 		// TX and RX on main only
@@ -1236,7 +1228,7 @@ void compareValuesInt(uint32_t value1) {
 	needToSave = (value1 |= settingsCurrentSubMenu);
 }
 
-void MainMenu_saveSetting(void) {
+void MenuVFO_saveSetting(void) {
 	FREQ_Config_t *pConfig = &gTxVfo->freq_config_RX;
 
 	switch (MenuList[settingsCurrentMenu].menu_id)
@@ -1635,13 +1627,13 @@ void MainMenu_saveSetting(void) {
 	//gRequestSaveSettings = true;
 }
 
-void MainMenu_initFunction() {
+void MenuVFO_initFunction() {
     settingsSubMenuTime = xTaskGetTickCount();
     settingsShowSubMenu = false;
     settingsSubMenuActive = false;
 }
 
-void MainMenu_renderFunction() {
+void MenuVFO_renderFunction() {
 
     UI_displayClear();
     UI_drawFastVLine(2, 9, 53, true);
@@ -1670,7 +1662,7 @@ void MainMenu_renderFunction() {
 	//UI_printf(7, 125, 60, true, false,	"%i %i", settingsCurrentSubMenu, settingsSubmenuSize);
 }
 
-void MainMenu_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
+void MenuVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 
 	switch (key)
 	{
@@ -1740,7 +1732,7 @@ void MainMenu_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 			if ( state == KEY_PRESSED ) {
 				if ( settingsSubMenuActive ) {
 					//save submenu
-					MainMenu_saveSetting();
+					MenuVFO_saveSetting();
 					settingsSubMenuActive = false;
 					app_push_message(APP_MSG_TIMEOUT_RETURN_MAIN);
 				} else {
@@ -1768,9 +1760,9 @@ void MainMenu_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 }
 
 
-app_t APPMainMenu = {
+app_t APPMenuVFO = {
     .showStatusLine = true,
-    .init = MainMenu_initFunction,
-    .render = MainMenu_renderFunction,
-    .keyhandler = MainMenu_keyHandlerFunction
+    .init = MenuVFO_initFunction,
+    .render = MenuVFO_renderFunction,
+    .keyhandler = MenuVFO_keyHandlerFunction
 };

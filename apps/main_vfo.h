@@ -46,141 +46,131 @@ const int8_t dBmCorrTable[7] = {
 
 void MainVFO_showRSSI(void) {
 
-    const uint8_t yPosVFO = 37;
+    const uint8_t xPosVFO = 14;
+    const uint8_t yPosVFO = 50;
 
     // 0x26 '&' RSSI Empty
     // 0x3F '?' RSSI Sep
     // 0x40 '@' RSSI Box
 
-    UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO + 3, true, false, gEeprom.RX_VFO == 0 ? "SA" : "SB");
-    UI_printf(&font_small, TEXT_ALIGN_LEFT, 18, 0, yPosVFO, true, false, "1?3?5?7?9?20?60?90");
-
-    const int16_t s0_dBm   = -gEeprom.S0_LEVEL;                  // S0 .. base level
-	const int16_t rssi_dBm =
-		BK4819_GetRSSI_dBm()
-/*#ifdef ENABLE_AM_FIX
-		+ ((gSetting_AM_fix && gRxVfo->Modulation == MODULATION_AM) ? AM_fix_get_gain_diff() : 0)
-#endif*/
-		+ dBmCorrTable[gRxVfo->Band];
-
-    int s0_9 = gEeprom.S0_LEVEL - gEeprom.S9_LEVEL;
-	const uint8_t s_level = MIN(MAX((int32_t)(rssi_dBm - s0_dBm)*100 / (s0_9*100/9), 0), 9); // S0 - S9
-	uint8_t overS9dBm = MIN(MAX(rssi_dBm + gEeprom.S9_LEVEL, 0), 99);
-	uint8_t overS9Bars = MIN(overS9dBm/10, 9);
-
+    UI_printf(&font_10, TEXT_ALIGN_LEFT, xPosVFO, 0, yPosVFO + 3, true, false, gEeprom.RX_VFO == 0 ? "SA" : "SB");
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, xPosVFO + 16, 0, yPosVFO, true, false, "1?3?5?7?9?20?60?90");
+	
     uint8_t bar[19];
     memset(bar, '&', sizeof(bar));
     bar[18] = 0x00;
 
-    memset(bar, '@', s_level + overS9Bars);
+    if ( FUNCTION_IsRx() ) {
 
-    if(overS9Bars != 0) {
-        UI_printf(&font_small, TEXT_ALIGN_LEFT, 91, 0, yPosVFO + 4, true, false, "S9+%2d", overS9dBm);
+        const int16_t s0_dBm   = -gEeprom.S0_LEVEL;                  // S0 .. base level
+	    const int16_t rssi_dBm = BK4819_GetRSSI_dBm() + dBmCorrTable[gRxVfo->Band];
+    
+        int s0_9 = gEeprom.S0_LEVEL - gEeprom.S9_LEVEL;
+        const uint8_t s_level = MIN(MAX((int32_t)(rssi_dBm - s0_dBm)*100 / (s0_9*100/9), 0), 9); // S0 - S9
+        uint8_t overS9dBm = MIN(MAX(rssi_dBm + gEeprom.S9_LEVEL, 0), 99);
+        uint8_t overS9Bars = MIN(overS9dBm/10, 9);
+
+        memset(bar, '@', s_level + overS9Bars);
+
+        if(overS9Bars != 0) {
+            UI_printf(&font_small, TEXT_ALIGN_LEFT, xPosVFO + 89, 0, yPosVFO + 4, true, false, "S9+%2d", overS9dBm);
+        }        
     }
 
-    UI_printf(&font_small, TEXT_ALIGN_LEFT, 18, 0, yPosVFO + 6, true, false, "%s", bar);
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, xPosVFO + 16, 0, yPosVFO + 6, true, false, "%s", bar);
 
-    /*int16_t rssi = BK4819_GetRSSI();
-	uint8_t level;
+}
 
-	if (rssi >= settings_RSSI_CALIB[gRxVfo->Band][3]) {
-		level = 6;
-	} else if (rssi >= settings_RSSI_CALIB[gRxVfo->Band][2]) {
-		level = 4;
-	} else if (rssi >= settings_RSSI_CALIB[gRxVfo->Band][1]) {
-		level = 2;
-	} else if (rssi >= settings_RSSI_CALIB[gRxVfo->Band][0]) {
-		level = 1;
-	} else {
-		level = 0;
-	}
-
-    UI_printf(&font_small, TEXT_ALIGN_LEFT, 100, 0, 51, true, false, "%u", level);*/
-
-    //UI_printf(&font_small, TEXT_ALIGN_LEFT, 9, 0, yPosVFO + 6, true, false,    "@@@@@@@@@&&&&&&&&&");
-    //@@@@@@@@@&&&&&&&&&
+void MainVFO_showCTCSS(const char *tx_rx, uint8_t code_type, uint8_t code_value, uint8_t ypos) {
+    
+    if ( code_type == CODE_TYPE_CONTINUOUS_TONE ) {
+        UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + 3, 0, ypos, false, true, "%s CT %u.%uHz", tx_rx, CTCSS_Options[code_value] / 10, CTCSS_Options[code_value] % 10);
+    } else if (code_type == CODE_TYPE_REVERSE_DIGITAL) {
+        UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + 3, 0, ypos, false, true, "%s D %03o N", tx_rx, DCS_Options[code_value]);
+    } else if (code_type == CODE_TYPE_DIGITAL) {
+        UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + 3, 0, ypos, false, true, "%s D %03o I", tx_rx, DCS_Options[code_value]);
+    }
 }
 
 void MainVFO_showVFO(void) {
 
-    const char *code_list[] = {"CT", "DCS", "DCR"};
-
     char String[17] = { 0 };
     uint8_t vfoNumA;
-    uint8_t vfoNumB;
+    //uint8_t vfoNumB;
 
     if(gEeprom.TX_VFO == 0) {
         vfoNumA = 0;
-        vfoNumB = 1;
+        //vfoNumB = 1;
     } else {
         vfoNumA = 1;
-        vfoNumB = 0;
+        //vfoNumB = 0;
     }
 
     const VFO_Info_t *vfoInfoA = &gEeprom.VfoInfo[vfoNumA];
-    const VFO_Info_t *vfoInfoB = &gEeprom.VfoInfo[vfoNumB];
+    //const VFO_Info_t *vfoInfoB = &gEeprom.VfoInfo[vfoNumB];
 
     const bool isChannelModeA = IS_MR_CHANNEL(gEeprom.ScreenChannel[vfoNumA]);
-    const bool isChannelModeB = IS_MR_CHANNEL(gEeprom.ScreenChannel[vfoNumB]);
+    //const bool isChannelModeB = IS_MR_CHANNEL(gEeprom.ScreenChannel[vfoNumB]);
 
     uint32_t frequency;
-    uint8_t  yPosVFO = 22;
+    uint8_t  yPosVFO = 23;
 
     // VFO A
-	if(FUNCTION_IsRx()) {
-		UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO - 7, false, true, "%s %s", vfoNumA == 0 ? "A" : "B", gEeprom.RX_VFO == vfoNumA ? "$" : "");
-	} else if (gCurrentFunction == FUNCTION_TRANSMIT){
-		UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO - 7, false, true, "%s %s", vfoNumA == 0 ? "A" : "B", gEeprom.TX_VFO == vfoNumA ? "&" : "");
-	} else {
-    	UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO - 7, false, true, vfoNumA == 0 ? "A" : "B");
-	}
-
-    // Frequency A
-    frequency = vfoInfoA->pRX->Frequency;
-    if ( frequency >= _1GHz_in_KHz ) {
-        UI_printf(&font_n_20, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO, true, false, "%1u.%3u.%03u", (frequency / 100000000), (frequency / 100000) % 1000, (frequency % 100000) / 100);
-    } else {
-        UI_printf(&font_n_20, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO, true, false, "%3u.%03u", (frequency / 100000), (frequency % 100000) / 100);
-    }
-    UI_printf(&font_n_16,   TEXT_ALIGN_LEFT, 78, 90, yPosVFO - 2, true, false, "%02u", (frequency % 100));
-
-    // Modulation A
-    UI_printf(&font_small, TEXT_ALIGN_LEFT, 92, 0, yPosVFO - 9, false, true, gModulationStr[vfoInfoA->Modulation]);
-    // OUTPUT_POWER
-    UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + 3, 0, yPosVFO - 9, false, true, gSubMenu_TXP[vfoInfoA->OUTPUT_POWER % 3]);
-    // BANDWIDTH A
-    UI_printf(&font_small, TEXT_ALIGN_LEFT, 92, 0, yPosVFO - 1, false, true, gSubMenu_W_N[vfoInfoA->CHANNEL_BANDWIDTH]);
-
-    if ( vfoInfoA->Modulation == MODULATION_FM ) {
-        // DCS/CT/DCR A
-        const unsigned int code_type = vfoInfoA->pRX->CodeType;
-        if ( code_type > 0 ) {
-            UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + 3, 0, yPosVFO - 1, false, true, code_list[code_type - 1]);
-        }
-    }
-    if (vfoInfoA->freq_config_RX.Frequency != vfoInfoA->freq_config_TX.Frequency) {
-        // show the TX offset symbol
-        if(vfoInfoA->TX_OFFSET_FREQUENCY_DIRECTION <=2 ) {
-            const char dir_list[] = "\0+-";
-            UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO, true, false, "%c", dir_list[vfoInfoA->TX_OFFSET_FREQUENCY_DIRECTION]);
-        }
-    }
+    UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO - 8, false, true, vfoNumA == 0 ? "VFO A" : "VFO B");
 
     if ( isChannelModeA ) {
         // Channel Name A
         memcpy(String, vfoInfoA->Name, 16);
         if (String[0] == 0) {
-            UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO + 7, true, false, "CH-%03u", gEeprom.ScreenChannel[vfoNumA] + 1);
+            UI_printf(&font_10, TEXT_ALIGN_LEFT, UI_nextX + 4, 0, yPosVFO - 8, true, false, "CH-%03u", gEeprom.ScreenChannel[vfoNumA] + 1);
         } else {
-            UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO + 8, true, false, "M%03u", gEeprom.ScreenChannel[vfoNumA] + 1);
-            UI_printf(&font_10, TEXT_ALIGN_RIGHT, UI_nextX + 1, 90, yPosVFO + 8, true, false, String);
+            UI_printf(&font_10, TEXT_ALIGN_LEFT, UI_nextX + 4, 0, yPosVFO - 8, true, false, "M%03u", gEeprom.ScreenChannel[vfoNumA] + 1);
+            UI_printf(&font_10, TEXT_ALIGN_RIGHT, UI_nextX + 4, 124, yPosVFO - 8, true, false, String);
         }
-    } else {
+    } /*else {
         UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO + 7, true, false, "VFO");
+    }*/
+
+    // Frequency A
+    frequency = vfoInfoA->pRX->Frequency;
+    if ( frequency >= _1GHz_in_KHz ) {
+        UI_printf(&font_n_20, TEXT_ALIGN_RIGHT, 15, 100, yPosVFO + 10, true, false, "%1u.%3u.%03u", (frequency / 100000000), (frequency / 100000) % 1000, (frequency % 100000) / 100);
+    } else {
+        UI_printf(&font_n_20, TEXT_ALIGN_RIGHT, 15, 100, yPosVFO + 10, true, false, "%3u.%03u", (frequency / 100000), (frequency % 100000) / 100);
+    }
+    UI_printf(&font_n_16,   TEXT_ALIGN_LEFT, 100, 0, yPosVFO + 10, true, false, " %02u", (frequency % 100));
+
+    if(FUNCTION_IsRx()) {
+		UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO + 5, false, true, "$");
+	} else if (gCurrentFunction == FUNCTION_TRANSMIT){
+		UI_printf(&font_10, TEXT_ALIGN_LEFT, 3, 0, yPosVFO + 5, false, true, "&");
+	}
+
+    if (vfoInfoA->freq_config_RX.Frequency != vfoInfoA->freq_config_TX.Frequency) {
+        // show the TX offset symbol
+        if(vfoInfoA->TX_OFFSET_FREQUENCY_DIRECTION <=2 && vfoInfoA->TX_OFFSET_FREQUENCY_DIRECTION > 0) {
+            UI_printf(&font_n_20, TEXT_ALIGN_LEFT, 15, 0, yPosVFO + 10, true, false, "%s", gSubMenu_SFT_D[vfoInfoA->TX_OFFSET_FREQUENCY_DIRECTION]);
+        }
     }
 
+    // Modulation A
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, 3, 0, yPosVFO + 18, false, true, gModulationStr[vfoInfoA->Modulation]);
+    // OUTPUT_POWER
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + 3, 0, yPosVFO + 18, false, true, gSubMenu_TXP[vfoInfoA->OUTPUT_POWER % 3]);
+    // BANDWIDTH A
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, UI_nextX + 3, 0, yPosVFO + 18, false, true, gSubMenu_W_N[vfoInfoA->CHANNEL_BANDWIDTH]);
 
-    yPosVFO = 61;
+    if ( vfoInfoA->Modulation == MODULATION_FM ) {
+        // DCS/CT/DCR A
+        if ( vfoInfoA->pRX->CodeType > 0 ) {
+            MainVFO_showCTCSS("$", vfoInfoA->pRX->CodeType, vfoInfoA->pRX->Code, yPosVFO + 18);
+        }
+        if ( vfoInfoA->pTX->CodeType > 0 ) {
+            MainVFO_showCTCSS("\"", vfoInfoA->pTX->CodeType, vfoInfoA->pTX->Code, yPosVFO + 18);
+        }
+    }
+
+/*    yPosVFO = 61;
     // VFO B
 	if(FUNCTION_IsRx()) {
 		UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO - 8, true, false, "%s %s", vfoNumB == 1 ? "B" : "A", gEeprom.RX_VFO == vfoNumB ? "$" : "");
@@ -226,6 +216,7 @@ void MainVFO_showVFO(void) {
     UI_drawDottedLine(98, 47, 98, 64, true, 2);
 
     UI_printf(&font_small, TEXT_ALIGN_LEFT, 102, 0, 52, true, false, "'$ A");
+    */
 }
 
 void MainVFO_initFunction() {
@@ -237,9 +228,7 @@ void MainVFO_renderFunction() {
     UI_displayClear();
     MainVFO_showVFO();
 
-    if ( FUNCTION_IsRx() ) {
-        MainVFO_showRSSI();
-    }
+    MainVFO_showRSSI();
 
     if (GUI_inputNotEmpty()) {
         if (IS_MR_CHANNEL(gEeprom.ScreenChannel[gEeprom.TX_VFO])) {
@@ -247,7 +236,7 @@ void MainVFO_renderFunction() {
         } else {
             GUI_inputShow("Input Freq.", "");
         }
-        
+
     }
 
 }
@@ -312,8 +301,8 @@ void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
                 break;
 
             case KEY_MENU:
-                if ( state == KEY_PRESSED ) {
-                    load_application(APP_MENU);
+                if ( state == KEY_LONG_PRESSED ) {
+                    load_application(APP_EMPTY);
                 }
                 break;
 
@@ -351,8 +340,10 @@ void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
                     } else {
                         const uint32_t selFreq = GUI_inputGetNumber();
                         //UART_printf("FREQ : %i\r\n", selFreq);
-                        main_push_message_value(RADIO_SET_FREQ, selFreq);                        
-                    }                    
+                        main_push_message_value(RADIO_SET_FREQ, selFreq);
+                    }
+                } else {
+                    load_application(APP_MENU_VFO);
                 }
                 break;
             case KEY_EXIT:

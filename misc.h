@@ -329,6 +329,7 @@ extern const char* const gSubMenu_TXP[3];
 extern const char* const gSubMenu_W_N[3];
 extern const char* const gSubMenu_TOT[11];
 extern const char* const gSubMenu_BACKLIGHT[8];
+extern const char* const gSubMenu_SFT_D[3];
 
 void FUNCTION_NOP();
 

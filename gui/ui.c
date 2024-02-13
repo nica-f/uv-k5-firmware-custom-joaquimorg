@@ -74,11 +74,12 @@ void UI_fillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, bool isBlack) {
   	}
 }
 
+
 static void sort(uint8_t *a, uint8_t *b) {
 	if(*a > *b) {
-		uint8_t t = *a;
-		*a = *b;
-		*b = t;
+		*a ^= *b;
+		*b ^= *a;
+		*a ^= *b;
 	}
 }
 
