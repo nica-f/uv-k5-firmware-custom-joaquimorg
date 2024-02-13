@@ -142,92 +142,94 @@ const menu_item_t MenuList[] =
 	{"Busy CL", 	MENU_BCL           }, // was "BCL"
 	{"Compand", 	MENU_COMPAND       },
 //	{"Demodu", MENU_AM            }, // was "AM"
-	{"Scan Add1", 	MENU_S_ADD1        },
-	{"Scan Add2", 	MENU_S_ADD2        },
-	{"Chan. Save", 	MENU_MEM_CH        }, // was "MEM-CH"
-	{"Chan. Dele", 	MENU_DEL_CH        }, // was "DEL-CH"
-	{"Chan. Name", 	MENU_MEM_NAME      },
+//	{"Scan Add1", 	MENU_S_ADD1        },
+//	{"Scan Add2", 	MENU_S_ADD2        },
+//	{"Chan. Save", 	MENU_MEM_CH        }, // was "MEM-CH"
+//	{"Chan. Dele", 	MENU_DEL_CH        }, // was "DEL-CH"
+//	{"Chan. Name", 	MENU_MEM_NAME      },
 
-	{"Scan List",  	MENU_S_LIST        },
-	{"Scan List1", 	MENU_SLIST1        },
-	{"Scan List2", 	MENU_SLIST2        },
-	{"Scan Rev", 	MENU_SC_REV        },
+//	{"Scan List",  	MENU_S_LIST        },
+//	{"Scan List1", 	MENU_SLIST1        },
+//	{"Scan List2", 	MENU_SLIST2        },
+//	{"Scan Rev", 	MENU_SC_REV        },
 
-	{"F1 Short", 	MENU_F1SHRT        },
-	{"F1 Long", 	MENU_F1LONG        },
-	{"F2 Short", 	MENU_F2SHRT        },
-	{"F2 Long", 	MENU_F2LONG        },
-	{"M Long", 		MENU_MLONG         },
+//	{"F1 Short", 	MENU_F1SHRT        },
+//	{"F1 Long", 	MENU_F1LONG        },
+//	{"F2 Short", 	MENU_F2SHRT        },
+//	{"F2 Long", 	MENU_F2LONG        },
+//	{"M Long", 		MENU_MLONG         },
 
-	{"Key Lock", 	MENU_AUTOLK        }, // was "AUTOLk"
+//	{"Key Lock", 	MENU_AUTOLK        }, // was "AUTOLk"
 	{"Tx TimeOut", 	MENU_TOT           }, // was "TOT"
-	{"Bat Save", 	MENU_SAVE          }, // was "SAVE"
-	{"Mic",    		MENU_MIC           },
-#ifdef ENABLE_AUDIO_BAR
-	{"Mic Bar", 	MENU_MIC_BAR       },
-#endif
+//	{"Bat Save", 	MENU_SAVE          }, // was "SAVE"
+//	{"Mic",    		MENU_MIC           },
+//#ifdef ENABLE_AUDIO_BAR
+//	{"Mic Bar", 	MENU_MIC_BAR       },
+//#endif
 	//{"ChDisp", MENU_MDF           }, // was "MDF"
-	{"Pow. onMsg", 	MENU_PONMSG        },
-	{"Bat Txt", 	MENU_BAT_TXT       },
-	{"Back Lt", 	MENU_ABR           }, // was "ABR"
-	{"BL Min",  	MENU_ABR_MIN       },
-	{"BL Max",  	MENU_ABR_MAX       },
-#ifdef ENABLE_C
-	{"LCD Ctr", 	MENU_CONTRAST      },
-#endif
-	{"Blt TRX", 	MENU_ABR_ON_TX_RX  },
-	{"Beep",   		MENU_BEEP          },
-	{"Roger",  		MENU_ROGER         },
-	{"STE",    		MENU_STE           },
-	{"RP STE", 		MENU_RP_STE        },
-	{"1 Call", 		MENU_1_CALL        },
-#ifdef ENABLE_ALARM
-	{"Alarm T", 	MENU_AL_MOD        },
-#endif
-#ifdef ENABLE_DTMF_CALLING
-	{"ANI ID", 		MENU_ANI_ID        },
-#endif
-	{"UP Code", 	MENU_UPCODE        },
-	{"DW Code", 	MENU_DWCODE        },
+//	{"Pow. onMsg", 	MENU_PONMSG        },
+//	{"Bat Txt", 	MENU_BAT_TXT       },
+//	{"Back Lt", 	MENU_ABR           }, // was "ABR"
+//	{"BL Min",  	MENU_ABR_MIN       },
+//	{"BL Max",  	MENU_ABR_MAX       },
+
+//	{"LCD Ctr", 	MENU_CONTRAST      },
+
+//	{"Blt TRX", 	MENU_ABR_ON_TX_RX  },
+//	{"Beep",   		MENU_BEEP          },
+//	{"Roger",  		MENU_ROGER         },
+//	{"STE",    		MENU_STE           },
+//	{"RP STE", 		MENU_RP_STE        },
+//	{"1 Call", 		MENU_1_CALL        },
+//#ifdef ENABLE_ALARM
+//	{"Alarm T", 	MENU_AL_MOD        },
+//#endif
+//#ifdef ENABLE_DTMF_CALLING
+//	{"ANI ID", 		MENU_ANI_ID        },
+//#endif
+//	{"UP Code", 	MENU_UPCODE        },
+//	{"DW Code", 	MENU_DWCODE        },
 	{"PTT ID", 		MENU_PTT_ID        },
 	{"D ST",   		MENU_D_ST          },
-#ifdef ENABLE_DTMF_CALLING
-    {"DTMF Resp", 	MENU_D_RSP         },
-	{"DTMF Hold", 	MENU_D_HOLD        },
-#endif
-	{"DTMF Prel", 	MENU_D_PRE         },
-#ifdef ENABLE_DTMF_CALLING
-	{"DTMF Decod", 	MENU_D_DCD         },
-	{"DTMF List", 	MENU_D_LIST        },
-#endif
+//#ifdef ENABLE_DTMF_CALLING
+//    {"DTMF Resp", 	MENU_D_RSP         },
+//	{"DTMF Hold", 	MENU_D_HOLD        },
+//#endif
+//	{"DTMF Prel", 	MENU_D_PRE         },
+//#ifdef ENABLE_DTMF_CALLING
+//	{"DTMF Decod", 	MENU_D_DCD         },
+//	{"DTMF List", 	MENU_D_LIST        },
+//#endif
 	{"DTMF Live", 	MENU_D_LIVE_DEC    }, // live DTMF decoder
-#ifdef ENABLE_AM_FIX
-	{"AM Fix", 		MENU_AM_FIX        },
-#endif
-#ifdef ENABLE_VOX
-	{"VOX",    		MENU_VOX           },
-#endif
+//#ifdef ENABLE_AM_FIX
+//	{"AM Fix", 		MENU_AM_FIX        },
+//#endif
+//#ifdef ENABLE_VOX
+//	{"VOX",    		MENU_VOX           },
+//#endif
 	{"Bat Vol", 	MENU_VOL           }, // was "VOL"
 	{"Rx Mode", 	MENU_TDR           },
 	{"SQL",    		MENU_SQL           },
 
 	// hidden menu items from here on
 	// enabled if pressing both the PTT and upper side button at power-on
-	{"F Lock", 		MENU_F_LOCK        },
-	{"Tx 200", 		MENU_200TX         }, // was "200TX"
-	{"Tx 350", 		MENU_350TX         }, // was "350TX"
-	{"Tx 500", 		MENU_500TX         }, // was "500TX"
-	{"350 En", 		MENU_350EN         }, // was "350EN"
-	{"Scra En", 	MENU_SCREN         }, // was "SCREN"
-#ifdef ENABLE_F_CAL_MENU
-	{"Frq Cali", 	MENU_F_CALI        }, // reference xtal calibration
-#endif
-	{"Bat Cali", 	MENU_BATCAL        }, // battery voltage calibration
-	{"Bat Type", 	MENU_BATTYP        }, // battery type 1600/2200mAh
-	{"Reset",  		MENU_RESET         }, // might be better to move this to the hidden menu items ?
+//	{"F Lock", 		MENU_F_LOCK        },
+//	{"Tx 200", 		MENU_200TX         }, // was "200TX"
+//	{"Tx 350", 		MENU_350TX         }, // was "350TX"
+//	{"Tx 500", 		MENU_500TX         }, // was "500TX"
+//	{"350 En", 		MENU_350EN         }, // was "350EN"
+//	{"Scra En", 	MENU_SCREN         }, // was "SCREN"
+//#ifdef ENABLE_F_CAL_MENU
+//	{"Frq Cali", 	MENU_F_CALI        }, // reference xtal calibration
+//#endif
+//	{"Bat Cali", 	MENU_BATCAL        }, // battery voltage calibration
+//	{"Bat Type", 	MENU_BATTYP        }, // battery type 1600/2200mAh
+//	{"Reset",  		MENU_RESET         }, // might be better to move this to the hidden menu items ?
 
-	{"",       0xff               }  // end of list - DO NOT delete or move this this
+//	{"",       0xff               }  // end of list - DO NOT delete or move this this
 };
+
+#define MENU_VFO_SIZE 17
 
 const char* const gSubMenu_OFF_ON[] =
 {
@@ -354,21 +356,22 @@ bool needToSave = false;
 
 void SettingsMenu_showList() {
     uint8_t yPos = 15;
-    uint8_t menuSize = ARRAY_SIZE(MenuList) - 2 - 1;
-	const uint8_t offset = Clamp(settingsCurrentMenu - 2, 0, menuSize - 3);
+	const uint8_t offset = Clamp(settingsCurrentMenu - 2, 0, MENU_VFO_SIZE - 5);
 
     for (uint8_t i = 0; i < 5; i++) {
-		bool isFill = settingsCurrentMenu == i + offset ? true : false;
-    
-        UI_printf(&font_small, TEXT_ALIGN_LEFT, 8, 0, yPos - 1, true, false, "%0.2i", (i + 1) + offset);
-    
-        UI_printf(&font_10, TEXT_ALIGN_LEFT, 18, 0, yPos, !isFill, isFill,
-            "%s", MenuList[i + offset].name);
-        yPos += 11;
+		if ( (i + offset) < MENU_VFO_SIZE ) {
+			bool isFill = settingsCurrentMenu == i + offset ? true : false;
+		
+			UI_printf(&font_small, TEXT_ALIGN_LEFT, 8, 0, yPos - 1, true, false, "%0.2i", (i + 1) + offset);
+		
+			UI_printf(&font_10, TEXT_ALIGN_LEFT, 18, 0, yPos, !isFill, isFill,
+				"%s", MenuList[i + offset].name);
+			yPos += 11;
+		}
     }
 
     yPos = 10;
-    yPos += ((( (100 * settingsCurrentMenu) / (menuSize + 2) ) / 100.0) * 52);
+    yPos += ((( (100 * settingsCurrentMenu) / MENU_VFO_SIZE ) / 100.0) * 54);
 
     UI_drawFastVLine(1, yPos - 1, 3, true);
     UI_drawFastVLine(3, yPos - 1, 3, true);
@@ -674,9 +677,9 @@ void SettingsMenu_loadSubListValues() {
 			settingsCurrentSubMenu = gTxVfo->OUTPUT_POWER;
 			break;*/
 
-		case MENU_RESET:
+		/*case MENU_RESET:
 			settingsCurrentSubMenu = 0;
-			break;
+			break;*/
 
 		case MENU_R_DCS:
 		case MENU_R_CTCS:
@@ -737,9 +740,9 @@ void SettingsMenu_loadSubListValues() {
 			settingsCurrentSubMenu = gTxVfo->TX_OFFSET_FREQUENCY;
 			break;
 
-		case MENU_W_N:
+		/*case MENU_W_N:
 			settingsCurrentSubMenu = gTxVfo->CHANNEL_BANDWIDTH;
-			break;
+			break;*/
 
 		case MENU_SCR:
 			settingsCurrentSubMenu = gTxVfo->SCRAMBLING_TYPE;
@@ -749,7 +752,7 @@ void SettingsMenu_loadSubListValues() {
 			settingsCurrentSubMenu = gTxVfo->BUSY_CHANNEL_LOCK;
 			break;
 
-		case MENU_MEM_CH:
+		/*case MENU_MEM_CH:
 			#if 0
 				settingsCurrentSubMenu = gEeprom.MrChannel[0];
 			#else
@@ -789,29 +792,29 @@ void SettingsMenu_loadSubListValues() {
 
 		case MENU_ABR_ON_TX_RX:
 			settingsCurrentSubMenu = gSetting_backlight_on_tx_rx;
-			break;
+			break;*/
 
 		case MENU_TDR:
 			settingsCurrentSubMenu = (gEeprom.DUAL_WATCH != DUAL_WATCH_OFF) + (gEeprom.CROSS_BAND_RX_TX != CROSS_BAND_OFF) * 2;
 			break;
 
-		case MENU_BEEP:
+		/*case MENU_BEEP:
 			settingsCurrentSubMenu = gEeprom.BEEP_CONTROL;
-			break;
+			break;*/
 
 		case MENU_TOT:
 			settingsCurrentSubMenu = gEeprom.TX_TIMEOUT_TIMER;
 			break;
 
-		case MENU_SC_REV:
+		/*case MENU_SC_REV:
 			settingsCurrentSubMenu = gEeprom.SCAN_RESUME_MODE;
-			break;
+			break;*/
 
 		/*case MENU_MDF:
 			settingsCurrentSubMenu = gEeprom.CHANNEL_DISPLAY_MODE;
 			break;*/
 
-		case MENU_AUTOLK:
+		/*case MENU_AUTOLK:
 			settingsCurrentSubMenu = gEeprom.AUTO_KEYPAD_LOCK;
 			break;
 
@@ -840,12 +843,12 @@ void SettingsMenu_loadSubListValues() {
 			settingsCurrentSubMenu = gSetting_mic_bar;
 			break;
 #endif
-
+*/
 		case MENU_COMPAND:
 			settingsCurrentSubMenu = gTxVfo->Compander;
 			return;
 
-		case MENU_1_CALL:
+		/*case MENU_1_CALL:
 			settingsCurrentSubMenu = gEeprom.CHAN_1_CALL;
 			break;
 
@@ -883,14 +886,14 @@ void SettingsMenu_loadSubListValues() {
 		case MENU_D_PRE:
 			settingsCurrentSubMenu = gEeprom.DTMF_PRELOAD_TIME / 10;
 			break;
-
+*/
 		case MENU_PTT_ID:
 			settingsCurrentSubMenu = gTxVfo->DTMF_PTT_ID_TX_MODE;
 			break;
 
-		case MENU_BAT_TXT:
+		/*case MENU_BAT_TXT:
 			settingsCurrentSubMenu = gSetting_battery_text;
-			return;
+			return;*/
 
 #ifdef ENABLE_DTMF_CALLING
 		case MENU_D_DCD:
@@ -905,7 +908,7 @@ void SettingsMenu_loadSubListValues() {
 			settingsCurrentSubMenu = gSetting_live_DTMF_decoder;
 			break;
 
-		case MENU_PONMSG:
+		/*case MENU_PONMSG:
 			settingsCurrentSubMenu = gEeprom.POWER_ON_DISPLAY_MODE;
 			break;
 
@@ -915,7 +918,7 @@ void SettingsMenu_loadSubListValues() {
 
 		case MENU_AM:
 			settingsCurrentSubMenu = gTxVfo->Modulation;
-			break;
+			break;*/
 
 #ifdef ENABLE_AM_FIX
 		case MENU_AM_FIX:
@@ -923,7 +926,7 @@ void SettingsMenu_loadSubListValues() {
 			break;
 #endif
 
-		case MENU_DEL_CH:
+		/*case MENU_DEL_CH:
 			#if 0
 				settingsCurrentSubMenu = RADIO_FindNextChannel(gEeprom.MrChannel[0], 1, false, 1);
 			#else
@@ -973,7 +976,7 @@ void SettingsMenu_loadSubListValues() {
 		case MENU_F1LONG:
 		case MENU_F2SHRT:
 		case MENU_F2LONG:
-		case MENU_MLONG:
+		case MENU_MLONG:*/
 		/*{
 			uint8_t * fun[]= {
 				&gEeprom.KEY_1_SHORT_PRESS_ACTION,
@@ -992,7 +995,7 @@ void SettingsMenu_loadSubListValues() {
 			}
 			break;
 		}*/
-			break;
+			//break;
 
 		default:
 			return;
@@ -1681,7 +1684,7 @@ void MenuVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 					GUI_inputAppendKey(key, 2, false);
 					if( GUI_inputGetSize() == 2 ) {
 						const uint8_t inputValue = GUI_inputGetNumber();
-						if ( inputValue > 0 && inputValue < ARRAY_SIZE(MenuList) - 1) {
+						if ( inputValue > 0 && inputValue < MENU_VFO_SIZE ) {
 							settingsCurrentMenu = inputValue - 1;
 						}
 					}
@@ -1702,7 +1705,7 @@ void MenuVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 					if ( settingsCurrentMenu > 0 ) {
 						settingsCurrentMenu--;
 					} else {
-						settingsCurrentMenu = ARRAY_SIZE(MenuList) - 1 - 1;
+						settingsCurrentMenu = MENU_VFO_SIZE - 1;
 					}
 					settingsSubMenuTime = xTaskGetTickCount();
 					settingsShowSubMenu = false;
@@ -1718,7 +1721,7 @@ void MenuVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 						settingsCurrentSubMenu = settingsSubmenuMin;
 					}
 				} else {
-					if ( settingsCurrentMenu < ARRAY_SIZE(MenuList) - 1 ) {
+					if ( settingsCurrentMenu < MENU_VFO_SIZE - 1 ) {
 						settingsCurrentMenu++;
 					} else {
 						settingsCurrentMenu = 0;
