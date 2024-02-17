@@ -176,7 +176,7 @@ void app_task(void* arg) {
     while(true) {
 
         APP_Messages_t msg;
-    	if (xQueueReceive(appTasksMsgQueue, &msg, 50)) {
+    	if (xQueueReceive(appTasksMsgQueue, &msg, 20)) {
 
 			switch(msg.message) {
                 case APP_MSG_TIMEOUT:
@@ -258,28 +258,27 @@ void change_application(app_t *application) {
 }
 
 void load_application(APPS_t application) {
-    switch (application)
-    {
-    case APP_WELCOME:
-        change_application(&APPWelcome);
-        break;
-    case APP_MAIN_VFO:
-        //strcpy(global_status.statusMessage, "VFO\0");
-        change_application(&APPMainVFO);
-        break;
+    switch (application) {
+        case APP_WELCOME:
+            change_application(&APPWelcome);
+            break;
+        case APP_MAIN_VFO:
+            //strcpy(global_status.statusMessage, "VFO\0");
+            change_application(&APPMainVFO);
+            break;
 
-    case APP_EMPTY:
-        //strcpy(global_status.statusMessage, "MENU\0");
-        change_application(&APPEmptyAPP);
-        break;
+        case APP_EMPTY:
+            //strcpy(global_status.statusMessage, "MENU\0");
+            change_application(&APPEmptyAPP);
+            break;
 
-    case APP_MENU_VFO:
-        //strcpy(global_status.statusMessage, "MENU\0");
-        change_application(&APPMenuVFO);
-        break;
+        case APP_MENU_VFO:
+            //strcpy(global_status.statusMessage, "MENU\0");
+            change_application(&APPMenuVFO);
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
     currentApp = application;
 }
@@ -293,9 +292,15 @@ void application_showPopup(APPS_Popup_t popup, bool autoClose) {
 }
 
 void application_closePopup(void) {
-    currentAppPopup = APP_POPUP_NONE;
-    popupAutoClose = false;
-    xTimerReset( idleTimer, 0 );
+    if ( currentAppPopup != APP_POPUP_NONE ) {
+        currentAppPopup = APP_POPUP_NONE;
+        popupAutoClose = false;
+        xTimerReset( idleTimer, 0 );
+    }
+}
+
+APPS_Popup_t application_getPopup(void) {
+    return currentAppPopup;
 }
 
 /*-----------------------------------------------------------*/

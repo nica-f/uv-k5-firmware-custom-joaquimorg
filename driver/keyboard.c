@@ -240,6 +240,7 @@ TickType_t long_press_timer[ROWS][COLS] = {0};
 
 // Define the long press time in milliseconds
 #define LONG_PRESS_TIME 500
+#define DEBOUNCE_TIME 10
 
 bool gWasFKeyPressed  = false;
 
@@ -277,8 +278,15 @@ void keyboard_task() {
 					1u << GPIOA_PIN_KEYBOARD_7;
 
 	GPIOA->DATA &= keyboard[ROWS - 1].set_to_zero_mask;
-	SYSTICK_DelayUs(1);
+
+	//SYSTICK_DelayUs(1);	
+	for (uint8_t i = 0; i < 8; i++) {
+		regL = GPIOA->DATA;
+		SYSTICK_DelayUs(1);
+	}
+	
 	regL = GPIOA->DATA;
+	
 	for (uint8_t j = 0; j < 2; j++) {
 		const uint16_t mask = 1u << keyboard[ROWS - 1].pins[j].pin;
 		key_state[ROWS - 1][j] = (bool)!(regL & mask);
@@ -293,12 +301,16 @@ void keyboard_task() {
 						1u << GPIOA_PIN_KEYBOARD_6 |
 						1u << GPIOA_PIN_KEYBOARD_7;
 
-		SYSTICK_DelayUs(1);
+		//SYSTICK_DelayUs(1);
 		regH = GPIOA->DATA;
-		SYSTICK_DelayUs(1);
+		//SYSTICK_DelayUs(1);
 		// Clear the pin we are selecting
 		GPIOA->DATA &= keyboard[i].set_to_zero_mask;
-		SYSTICK_DelayUs(1);
+		//SYSTICK_DelayUs(1);
+		for (uint8_t i = 0; i < 8; i++) {
+			regL = GPIOA->DATA;
+			SYSTICK_DelayUs(1);
+		}
 		regL = GPIOA->DATA;
 
 		for (uint8_t j = 0; j < COLS; j++) {
@@ -319,7 +331,7 @@ void keyboard_task() {
 	GPIO_SetBit(  &GPIOA->DATA, GPIOA_PIN_KEYBOARD_7);
 
 
-	//vTaskDelay(pdMS_TO_TICKS(DEBOUNCE_TIME));
+	vTaskDelay(pdMS_TO_TICKS(DEBOUNCE_TIME));
 
 	// Scan each row and column of the matrix keyboard
     for (uint8_t i = 0; i < ROWS; i++) {

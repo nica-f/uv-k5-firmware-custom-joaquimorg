@@ -166,35 +166,39 @@ uint8_t drawChar(uint8_t x, uint8_t y, unsigned char c, bool isBlack, const GFXf
     // newlines, returns, non-printable characters, etc.  Calling
     // drawChar() directly with 'bad' characters of font may cause mayhem!
 
-    c -= (uint8_t)font->first;
-    GFXglyph *glyph = font->glyph + c;
+	uint8_t first = (uint8_t)font->first,
+		last = (uint8_t)font->last;
+	if ((c >= first) && (c <= last)) { // Char present in this font?
 
-	uint8_t w = glyph->width,
-			h = glyph->height;
+		c -= first;
+		GFXglyph *glyph = font->glyph + c;
 
-	if ((w > 0) && (h > 0)) { // Is there an associated bitmap?
-		uint8_t *bitmap = font->bitmap;
-		uint16_t bo = glyph->bitmapOffset;
-		uint8_t w = glyph->width, h = glyph->height;
-		int8_t xo = glyph->xOffset,
-			yo = glyph->yOffset;
-		uint8_t xx, yy, bits = 0, bit = 0;
+		uint8_t w = glyph->width,
+				h = glyph->height;
 
-		for (yy = 0; yy < h; yy++) {
-			for (xx = 0; xx < w; xx++) {
-				if (!(bit++ & 7)) {
-					bits = bitmap[bo++];
+		if ((w > 0) && (h > 0)) { // Is there an associated bitmap?
+			uint8_t *bitmap = font->bitmap;
+			uint16_t bo = glyph->bitmapOffset;
+			uint8_t w = glyph->width, h = glyph->height;
+			int8_t xo = glyph->xOffset,
+				yo = glyph->yOffset;
+			uint8_t xx, yy, bits = 0, bit = 0;
+
+			for (yy = 0; yy < h; yy++) {
+				for (xx = 0; xx < w; xx++) {
+					if (!(bit++ & 7)) {
+						bits = bitmap[bo++];
+					}
+					if (bits & 0x80) {
+						setPixel(x + xo + xx, y + yo + yy, isBlack);
+					}
+					bits <<= 1;
 				}
-				if (bits & 0x80) {
-					setPixel(x + xo + xx, y + yo + yy, isBlack);
-				}
-				bits <<= 1;
 			}
 		}
+		return (uint8_t)glyph->xAdvance;
 	}
-
-	return (uint8_t)glyph->xAdvance;
-
+	return 0;
 }
 
 void getStringFontSize(const char *str, uint8_t * size, const GFXfont * font) {

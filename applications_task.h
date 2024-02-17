@@ -29,4 +29,5 @@ void app_push_message(APP_MSG_t msg);
 void load_application(APPS_t application);
 void application_showPopup(APPS_Popup_t popup, bool autoClose);
 void application_closePopup(void);
+APPS_Popup_t application_getPopup(void);
 

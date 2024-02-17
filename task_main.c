@@ -302,15 +302,15 @@ void main_task(void* arg) {
 
 				case RADIO_SET_CHANNEL:
 					if ( msg.payload != 0 ) {
-						if (!RADIO_CheckValidChannel((uint8_t)msg.payload, false, 0)) {
-				            main_push_message_value(MAIN_MSG_PLAY_BEEP, BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL);
-				            return;
-			            }
-                        gEeprom.MrChannel[gEeprom.TX_VFO]     = (uint8_t)msg.payload;
-			            gEeprom.ScreenChannel[gEeprom.TX_VFO] = (uint8_t)msg.payload;
-			            main_push_message(RADIO_SAVE_VFO);
-                        main_push_message(RADIO_VFO_CONFIGURE_RELOAD);
-                        main_push_message(RADIO_RECONFIGURE_VFO);
+						if (!RADIO_CheckValidChannel((uint16_t)msg.payload, false, 0)) {
+				            main_push_message_value(MAIN_MSG_PLAY_BEEP, BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL);				            
+			            } else {
+							gEeprom.MrChannel[gEeprom.TX_VFO]     = (uint8_t)msg.payload;
+							gEeprom.ScreenChannel[gEeprom.TX_VFO] = (uint8_t)msg.payload;
+							main_push_message(RADIO_SAVE_VFO);
+							main_push_message(RADIO_VFO_CONFIGURE_RELOAD);
+							main_push_message(RADIO_RECONFIGURE_VFO);
+						}
 					}
 					break;
 
@@ -356,13 +356,7 @@ void main_task(void* arg) {
 
 			}
 		}
-		//APP_Update();
-		/*
-		//SystickHandlerA();
-		//APP_TimeSlice10ms();
-		APP_Update();
-		vTaskDelay(pdMS_TO_TICKS(5));
-		*/
+
 	}
 }
 
