@@ -44,6 +44,16 @@ const int8_t dBmCorrTable[7] = {
 			 -1  // band 7
 		};
 
+const char *VfoStateStr[] = {
+       [VFO_STATE_NORMAL]="",
+       [VFO_STATE_BUSY]="BUSY",
+       [VFO_STATE_BAT_LOW]="BAT LOW",
+       [VFO_STATE_TX_DISABLE]="TX DISABLE",
+       [VFO_STATE_TIMEOUT]="TIMEOUT",
+       [VFO_STATE_ALARM]="ALARM",
+       [VFO_STATE_VOLTAGE_HIGH]="VOLT HIGH"
+};
+
 void MainVFO_showRSSI(void) {
 
     const uint8_t xPosVFO = 14;
@@ -177,6 +187,8 @@ void MainVFO_showVFO(void) {
     enum VfoState_t state = VfoState[vfoNumA];
 	if (state != VFO_STATE_NORMAL) {
 		if (state < ARRAY_SIZE(VfoStateStr)) {
+            uint8_t startX;
+            uint8_t startY;
 			const uint8_t popupW = 80;
 			const uint8_t popupH = 30;
 			GUI_showPopup(popupW, popupH, &startX, &startY);
