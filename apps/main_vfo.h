@@ -174,6 +174,16 @@ void MainVFO_showVFO(void) {
         }
     }
 
+    enum VfoState_t state = VfoState[vfoNumA];
+	if (state != VFO_STATE_NORMAL) {
+		if (state < ARRAY_SIZE(VfoStateStr)) {
+			const uint8_t popupW = 80;
+			const uint8_t popupH = 30;
+			GUI_showPopup(popupW, popupH, &startX, &startY);
+			UI_drawString(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 10, VfoStateStr[state], true, false);
+		}
+	}
+
 /*    yPosVFO = 61;
     // VFO B
 	if(FUNCTION_IsRx()) {
@@ -230,7 +240,7 @@ void MainVFO_initFunction() {
 void MainVFO_renderFunction() {
 
     UI_displayClear();
-    MainVFO_showVFO();
+    MainVFO_showVFO();    
 
     if (GUI_inputNotEmpty()) {
         if (IS_MR_CHANNEL(gEeprom.ScreenChannel[gEeprom.TX_VFO])) {
@@ -286,7 +296,7 @@ void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 
             case KEY_UP:
             case KEY_DOWN:
-                if ( state == KEY_PRESSED/* || state == KEY_LONG_PRESSED_CONT*/) {
+                if ( state == KEY_PRESSED || state == KEY_LONG_PRESSED_CONT ) {
                     main_push_message(key == KEY_UP ? RADIO_VFO_UP : RADIO_VFO_DOWN);
                 } else if (state == KEY_RELEASED ) {
                     // save if key released

@@ -237,7 +237,8 @@ void main_task(void* arg) {
 
 				/* -------------------------------------------------------- */
 				case RADIO_TX:
-					FUNCTION_Select(FUNCTION_TRANSMIT);
+					//FUNCTION_Select(FUNCTION_TRANSMIT);
+					RADIO_PrepareTX();
 					break;
 
 				case RADIO_RX:
