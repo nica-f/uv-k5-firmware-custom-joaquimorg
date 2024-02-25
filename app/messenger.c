@@ -14,6 +14,7 @@
 #include "frequencies.h"
 #include "driver/system.h"
 #include "app/messenger.h"
+#include "app/generic.h"
 #include "ui/ui.h"
 
 #if defined(ENABLE_UART)
@@ -827,7 +828,11 @@ void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 		switch (Key)
 		{
 			case KEY_F:
-				MSG_Init();
+				if (gEeprom.KEY_LOCK && gKeypadLocked) {
+		 			GENERIC_Key_F(bKeyPressed, bKeyHeld);
+				} else {
+					MSG_Init();
+				}
 				break;
 			default:
 				AUDIO_PlayBeep(BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL);
