@@ -83,6 +83,7 @@ static void sort(uint8_t *a, uint8_t *b) {
 	}
 }
 
+
 void UI_drawDottedLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, bool black, int dotSpacing) {
     if (x2 == x1) {
         sort(&y1, &y2);
@@ -100,6 +101,7 @@ void UI_drawDottedLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, bool blac
         }
     }
 }
+
 
 void UI_drawCircleHelper(uint8_t x0, uint8_t y0, uint8_t r, uint8_t cornername, bool isBlack) {
   int16_t f = 1 - r;

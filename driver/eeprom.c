@@ -17,12 +17,16 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include "driver/eeprom.h"
 #include "driver/i2c.h"
 #include "driver/system.h"
 
 void EEPROM_ReadBuffer(uint16_t Address, void *pBuffer, uint8_t Size)
 {
+	taskENTER_CRITICAL();
 	I2C_Start();
 
 	I2C_Write(0xA0);
@@ -37,6 +41,7 @@ void EEPROM_ReadBuffer(uint16_t Address, void *pBuffer, uint8_t Size)
 	I2C_ReadBuffer(pBuffer, Size);
 
 	I2C_Stop();
+	taskEXIT_CRITICAL();
 }
 
 void EEPROM_WriteBuffer(uint16_t Address, const void *pBuffer)
@@ -51,6 +56,7 @@ void EEPROM_WriteBuffer(uint16_t Address, const void *pBuffer)
 		return;
 	}
 
+	taskENTER_CRITICAL();
 	I2C_Start();
 	I2C_Write(0xA0);
 	I2C_Write((Address >> 8) & 0xFF);
@@ -60,4 +66,5 @@ void EEPROM_WriteBuffer(uint16_t Address, const void *pBuffer)
 
 	// give the EEPROM time to burn the data in (apparently takes 5ms)
 	SYSTEM_DelayMs(8);
+	taskEXIT_CRITICAL();
 }

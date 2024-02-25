@@ -832,7 +832,7 @@ void RADIO_PrepareTX(void)
 {
 	VfoState_t State = VFO_STATE_NORMAL;  // default to OK to TX
 
-	if (gEeprom.DUAL_WATCH != DUAL_WATCH_OFF)
+	/*if (gEeprom.DUAL_WATCH != DUAL_WATCH_OFF)
 	{	// dual-RX is enabled
 
 		gDualWatchCountdown_10ms = dual_watch_count_after_tx_10ms;
@@ -848,7 +848,7 @@ void RADIO_PrepareTX(void)
 		// let the user see that DW is not active
 		gDualWatchActive = false;
 		gUpdateStatus    = true;
-	}
+	}*/
 
 	RADIO_SelectCurrentVfo();
 

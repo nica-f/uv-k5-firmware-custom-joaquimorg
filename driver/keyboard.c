@@ -233,7 +233,9 @@ KEY_Code_t KEYBOARD_Poll(void) {
 
 // Declare local variables to store the current and previous key states
 bool key_state[ROWS][COLS] = {0};
+bool key_ptt = false;
 KEY_State_t prev_key_state[ROWS][COLS] = {0};
+KEY_State_t prev_state_ptt = KEY_RELEASED;
 
 //TickType_t debounce_timer[ROWS][COLS] = {0};
 TickType_t long_press_timer[ROWS][COLS] = {0};
@@ -269,7 +271,18 @@ void keyboard_task() {
 	uint16_t regH, regL;
 
 	// KEY_PTT
-	key_state[ROWS - 1][3] = !GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT);
+	key_ptt = !GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT);
+	if( prev_state_ptt == KEY_PRESSED && key_ptt == false ) {
+		key_callback(KEY_PTT, KEY_RELEASED);
+		prev_state_ptt = KEY_RELEASED;
+		//return;
+	} else if( prev_state_ptt == KEY_RELEASED && key_ptt == true ) {
+		key_callback(KEY_PTT, KEY_PRESSED);
+		prev_state_ptt = KEY_PRESSED;
+		//return;
+	} else if( prev_state_ptt == KEY_PRESSED && key_ptt == true ) {
+		return;
+	}
 
 	// Set high for FN Keys
 	GPIOA->DATA |=  1u << GPIOA_PIN_KEYBOARD_4 |

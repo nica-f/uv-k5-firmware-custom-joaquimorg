@@ -46,6 +46,9 @@ enum MAIN_MSG_e
 
 	RADIO_SET_CHANNEL,
 	RADIO_SET_FREQ,
+
+	RADIO_TX,
+	RADIO_RX,
 	
 };
 

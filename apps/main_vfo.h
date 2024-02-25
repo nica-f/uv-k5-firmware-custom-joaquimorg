@@ -286,7 +286,7 @@ void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 
             case KEY_UP:
             case KEY_DOWN:
-                if ( state == KEY_PRESSED || state == KEY_LONG_PRESSED_CONT) {
+                if ( state == KEY_PRESSED/* || state == KEY_LONG_PRESSED_CONT*/) {
                     main_push_message(key == KEY_UP ? RADIO_VFO_UP : RADIO_VFO_DOWN);
                 } else if (state == KEY_RELEASED ) {
                     // save if key released

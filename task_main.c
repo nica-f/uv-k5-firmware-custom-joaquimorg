@@ -236,6 +236,13 @@ void main_task(void* arg) {
 					break;
 
 				/* -------------------------------------------------------- */
+				case RADIO_TX:
+					FUNCTION_Select(FUNCTION_TRANSMIT);
+					break;
+
+				case RADIO_RX:
+					APP_EndTransmission(true);
+					break;
 
 				case RADIO_SQUELCH_LOST:
 					gCurrentFunction = FUNCTION_INCOMING;

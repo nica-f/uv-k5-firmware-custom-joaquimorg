@@ -177,9 +177,9 @@ void FUNCTION_Transmit()
 	}
 #endif
 
-	gUpdateStatus = true;
+	//gUpdateStatus = true;
 
-	GUI_DisplayScreen();
+	//GUI_DisplayScreen();
 
 	RADIO_SetTxParameters();
 

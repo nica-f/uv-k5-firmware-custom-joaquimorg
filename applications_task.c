@@ -130,6 +130,25 @@ void render_timer_callback(TimerHandle_t xTimer) {
 void keyboard_callback(KEY_Code_t key, KEY_State_t state) {
     xTimerReset(idleTimer, 0);
     
+    if ( !BACKLIGHT_IsOn() ) {
+        app_push_message(APP_MSG_WAKEUP);
+    } else {
+        xTimerReset(lightTimer, 0);
+    }
+    
+    if ( key == KEY_PTT ) {
+        if ( state == KEY_PRESSED ) {
+            if (gCurrentFunction != FUNCTION_TRANSMIT) {
+                main_push_message(RADIO_TX);
+            }            
+        } else if ( state == KEY_RELEASED ) {
+            main_push_message(RADIO_RX); 
+        }
+        return;
+        //UART_printf("PTT : %i\r\n", state);   
+
+    }
+
     if ( currentAppPopup != APP_POPUP_NONE ) {
         if (currentApplication->keyhandlerPopup) {
             currentApplication->keyhandlerPopup(key, state, currentAppPopup);
@@ -138,12 +157,6 @@ void keyboard_callback(KEY_Code_t key, KEY_State_t state) {
         if (currentApplication->keyhandler) {
             currentApplication->keyhandler(key, state);
         }
-    }
-
-    if ( !BACKLIGHT_IsOn() ) {
-        app_push_message(APP_MSG_WAKEUP);
-    } else {
-        xTimerReset(lightTimer, 0);
     }
 
     if ( state != KEY_RELEASED && state != KEY_LONG_PRESSED_CONT ) {
