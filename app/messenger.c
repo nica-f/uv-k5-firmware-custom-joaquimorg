@@ -14,7 +14,7 @@
 #include "frequencies.h"
 #include "driver/system.h"
 #include "app/messenger.h"
-#include "app/generic.h"
+#include "common.h"
 #include "ui/ui.h"
 
 #if defined(ENABLE_UART)
@@ -26,11 +26,6 @@ typedef enum MsgStatus {
   	SENDING,
   	RECEIVING,
 } MsgStatus;
-
-const uint8_t MSG_BUTTON_STATE_HELD = 1 << 1;
-
-const uint8_t MSG_BUTTON_EVENT_SHORT =  0;
-const uint8_t MSG_BUTTON_EVENT_LONG =  MSG_BUTTON_STATE_HELD;
 
 const uint8_t MAX_MSG_LENGTH = TX_MSG_LENGTH - 1;
 
@@ -774,9 +769,23 @@ void processBackspace() {
 }
 
 void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
-	uint8_t state = bKeyPressed + 2 * bKeyHeld;
 
-	if (state == MSG_BUTTON_EVENT_SHORT) {
+	if (bKeyPressed && bKeyHeld) {
+		switch (Key)
+		{
+			case KEY_F:
+				if (gEeprom.KEY_LOCK && gKeypadLocked > 0) {
+		 			COMMON_KeypadLockToggle();
+				} else {
+					MSG_Init();
+				}
+				break;
+			default:
+				AUDIO_PlayBeep(BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL);
+				break;
+		}
+
+	} else if (bKeyPressed && !bKeyHeld) {
 
 		switch (Key)
 		{
@@ -811,6 +820,7 @@ void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 			/*case KEY_DOWN:
 				break;*/
 			case KEY_MENU:
+			case KEY_PTT:
 				// Send message
 				MSG_Send(cMessage, false);
 				break;
@@ -823,21 +833,6 @@ void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 				break;
 		}
 
-	} else if (state == MSG_BUTTON_EVENT_LONG) {
-
-		switch (Key)
-		{
-			case KEY_F:
-				if (gEeprom.KEY_LOCK && gKeypadLocked) {
-		 			GENERIC_Key_F(bKeyPressed, bKeyHeld);
-				} else {
-					MSG_Init();
-				}
-				break;
-			default:
-				AUDIO_PlayBeep(BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL);
-				break;
-		}
 	}
 
 }

@@ -21,9 +21,10 @@ void UI_DisplayMSG(void) {
 	//memset(gFrameBuffer, 0, sizeof(gFrameBuffer));
 	UI_DisplayClear();
 
-	if (gEeprom.KEY_LOCK && gKeypadLocked) {
-		UI_PrintString("Long Press #", 0, 127, 1, 8);
-		UI_PrintString("To Unlock", 0, 127, 3, 8);
+	if (gEeprom.KEY_LOCK && gKeypadLocked > 0)
+	{	// tell user how to unlock the keyboard
+		UI_PrintString("Long press #", 0, LCD_WIDTH, 1, 8);
+		UI_PrintString("to unlock",    0, LCD_WIDTH, 3, 8);
 		ST7565_BlitFullScreen();
 		return;
 	}
