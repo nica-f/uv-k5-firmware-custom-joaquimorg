@@ -40,6 +40,10 @@
 #include "settings.h"
 #include "ui/menu.h"
 
+#ifdef ENABLE_UART
+	#include "driver/uart.h"	
+#endif
+
 VFO_Info_t    *gTxVfo;
 VFO_Info_t    *gRxVfo;
 VFO_Info_t    *gCurrentVfo;
@@ -503,7 +507,8 @@ static void RADIO_SelectCurrentVfo(void)
 	// otherwise it is set to gRxVfo which is set to gTxVfo in RADIO_SelectVfos
 	// so in the end gCurrentVfo is equal to gTxVfo unless dual watch changes it on incomming transmition (again, this can only happen when XB off)
 	// note: it is called only in certain situations so could be not up-to-date
- 	gCurrentVfo = (gEeprom.CROSS_BAND_RX_TX == CROSS_BAND_OFF || gEeprom.DUAL_WATCH != DUAL_WATCH_OFF) ? gRxVfo : gTxVfo;
+ 	//gCurrentVfo = (gEeprom.CROSS_BAND_RX_TX == CROSS_BAND_OFF || gEeprom.DUAL_WATCH != DUAL_WATCH_OFF) ? gRxVfo : gTxVfo;
+	gCurrentVfo = gTxVfo;
 }
 
 void RADIO_SelectVfos(void)
@@ -710,6 +715,8 @@ void RADIO_SetTxParameters(void)
 			break;
 	}
 
+	// 
+	//UART_printf("freq. %u \r\n", gCurrentVfo->pTX->Frequency);
 	BK4819_SetFrequency(gCurrentVfo->pTX->Frequency);
 
 	// TX compressor

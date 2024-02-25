@@ -20,7 +20,11 @@
 #include "functions.h"
 #include "radio.h"
 #include "app.h"
+#include "audio.h"
 #include "task_main.h"
+#ifdef ENABLE_UART
+	#include "driver/uart.h"	
+#endif
 
 
 
@@ -33,12 +37,16 @@ void VFO_Up_Down(uint8_t Direction) {
 
         if (RX_freq_check(frequency) < 0) { // frequency not allowed
             //gBeepToPlay = BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL;
+            main_push_message_value(MAIN_MSG_PLAY_BEEP, BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL);
             return;
         }
         gTxVfo->freq_config_RX.Frequency = frequency;
         BK4819_SetFrequency(frequency);
         BK4819_RX_TurnOn();
         //gRequestSaveChannel = 1;
+        main_push_message(RADIO_SAVE_CHANNEL);
+        main_push_message(RADIO_VFO_CONFIGURE);        
+        //UART_printf("freq up/down. %u \r\n",  gTxVfo->freq_config_RX.Frequency);
         return;
     }
 
@@ -49,5 +57,6 @@ void VFO_Up_Down(uint8_t Direction) {
         return;
     gEeprom.MrChannel[gEeprom.TX_VFO] = Next;
     gEeprom.ScreenChannel[gEeprom.TX_VFO] = Next;
-
+    main_push_message(RADIO_SAVE_VFO);
+    main_push_message(RADIO_VFO_CONFIGURE_RELOAD);
 }

@@ -60,7 +60,7 @@ ENABLE_MESSENGER_UART					?= 0
 
 #### Display and Keypad remote Control ####
 # https://home.joaquim.org/display-explorer/
-ENABLE_REMOTE_CONTROL			  		?= 1
+ENABLE_REMOTE_CONTROL			  		?= 0
 
 #------------------------------------------------------------------------------
 AUTHOR_STRING ?= JOAQUIM
