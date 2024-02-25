@@ -496,7 +496,7 @@ static void SelectNearestPreset(bool inc) {
 static void UpdateDBMax(bool inc) {
   if (inc && settings.dbMax < 10) {
     settings.dbMax += 1;
-  } else if (!inc && settings.dbMax > settings.dbMin) {
+  } else if (!inc && settings.dbMax > 12+settings.dbMin) {
     settings.dbMax -= 1;
   } else {
     return;

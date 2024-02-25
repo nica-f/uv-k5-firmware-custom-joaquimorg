@@ -53,6 +53,10 @@ inline static void ACTION_Alarm() { ACTION_AlarmOr1750(false); }
 inline static void ACTION_1750() { ACTION_AlarmOr1750(true); };
 #endif
 
+#ifdef ENABLE_SPECTRUM
+#include "app/spectrum.h"
+#endif
+
 inline static void ACTION_ScanRestart() { ACTION_Scan(true); };
 
 void (*action_opt_table[])(void) = {
@@ -101,6 +105,11 @@ void (*action_opt_table[])(void) = {
 	[ACTION_OPT_BLMIN_TMP_OFF] = &FUNCTION_NOP,
 #endif
 
+#ifdef ENABLE_SPECTRUM
+	[ACTION_OPT_SPECTRUM] = &APP_RunSpectrum,
+#else
+	[ACTION_OPT_SPECTRUM] = &FUNCTION_NOP,
+#endif
 };
 
 //static_assert(ARRAY_SIZE(action_opt_table) == ACTION_OPT_LEN);
