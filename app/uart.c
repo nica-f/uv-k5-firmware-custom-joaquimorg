@@ -216,7 +216,7 @@ static void SendVersion(void)
 
 	Reply.Header.ID = 0x0515;
 	Reply.Header.Size = sizeof(Reply.Data);
-	strcpy(Reply.Data.Version, Version);
+	strcpy(Reply.Data.Version, "1o11");
 	Reply.Data.bHasCustomAesKey = bHasCustomAesKey;
 	Reply.Data.bIsInLockScreen = bIsInLockScreen;
 	Reply.Data.Challenge[0] = gChallenge[0];

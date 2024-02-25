@@ -67,8 +67,8 @@ ENABLE_SCREEN_DUMP			  ?= 0
 
 #------------------------------------------------------------------------------
 AUTHOR_STRING ?= JOAQUIM
-VERSION_STRING ?= V0.3.4
-PROJECT_NAME := cfw_joaquimorg_oefw_V0.3.4
+VERSION_STRING ?= V0.3.5
+PROJECT_NAME := cfw_joaquimorg_oefw_V0.3.5
 
 BUILD := _build
 BIN := firmware
@@ -96,7 +96,7 @@ ifeq ($(OS), Windows_NT) # windows
 	FixPath = $(subst /,\,$1)
 	WHERE = where
 	DEL = del /q
-	K5PROG = utils/k5prog/k5prog.exe -D -F -YYYYY -p /dev/com9 -b
+	K5PROG = utils/k5prog/k5prog.exe -D -F -YYYYY -p /dev/com3 -b
 else
 	MKDIR = mkdir -p $(1)
 	RM = rm -rf
