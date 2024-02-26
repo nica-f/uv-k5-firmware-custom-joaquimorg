@@ -413,6 +413,7 @@ endif
 # C flags common to all targets
 CFLAGS += -Os -Wall -Werror -mcpu=cortex-m0 -fno-builtin -fshort-enums -fno-delete-null-pointer-checks -std=c2x -MMD
 CFLAGS += -flto=auto
+CFLAGS += -ftree-vectorize -funroll-loops
 CFLAGS += -Wextra
 
 # Assembler flags common to all targets
@@ -423,7 +424,7 @@ LDFLAGS +=
 LDFLAGS += -z noexecstack -mcpu=cortex-m0 -nostartfiles -Wl,-L,linker -Wl,-T,$(LD_FILE) -Wl,--gc-sections
 
 # Use newlib-nano instead of newlib
-LDFLAGS += --specs=nosys.specs --specs=nano.specs 
+LDFLAGS += --specs=nosys.specs --specs=nano.specs
 
 #show size
 LDFLAGS += -Wl,--print-memory-usage
