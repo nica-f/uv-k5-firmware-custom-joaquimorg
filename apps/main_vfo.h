@@ -65,8 +65,6 @@ void MainVFO_showRSSI(void) {
 
     if(FUNCTION_IsRx()) {
 		UI_printf(&font_10, TEXT_ALIGN_LEFT, xPosVFO - 4, 0, yPosVFO + 3, false, true, "$");
-	} else if (gCurrentFunction == FUNCTION_TRANSMIT){
-		UI_printf(&font_10, TEXT_ALIGN_LEFT, xPosVFO - 4, 0, yPosVFO + 3, false, true, "&");
 	}
 
     UI_printf(&font_10, TEXT_ALIGN_LEFT, xPosVFO + 8, 0, yPosVFO + 3, true, false, "S");
@@ -97,6 +95,54 @@ void MainVFO_showRSSI(void) {
 
 }
 
+unsigned int sqrt16(unsigned int value)
+{	// return square root of 'value'
+	unsigned int shift = 16;         // number of bits supplied in 'value' .. 2 ~ 32
+	unsigned int bit   = 1u << --shift;
+	unsigned int sqrti = 0;
+	while (bit)
+	{
+		const unsigned int temp = ((sqrti << 1) | bit) << shift--;
+		if (value >= temp) {
+			value -= temp;
+			sqrti |= bit;
+		}
+		bit >>= 1;
+	}
+	return sqrti;
+}
+
+void MainVFO_showMICBar(void) {
+
+    const uint8_t xPosVFO = 14;
+    const uint8_t yPosVFO = 40;
+
+    // 0x26 '&' RSSI Empty
+    // 0x3F '?' RSSI Sep
+    // 0x40 '@' RSSI Box
+
+    UI_printf(&font_10, TEXT_ALIGN_LEFT, xPosVFO - 4, 0, yPosVFO + 3, false, true, "&");
+
+    UI_printf(&font_10, TEXT_ALIGN_LEFT, xPosVFO + 8, 0, yPosVFO + 3, true, false, "M");
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, xPosVFO + 16, 0, yPosVFO, true, false, "1?3?5?7?9?10");
+	
+    uint8_t bar[13];
+    memset(bar, '&', sizeof(bar));
+    bar[12] = 0x00;
+
+    const unsigned int voice_amp  = BK4819_GetVoiceAmplitudeOut();  // 15:0
+
+    // make non-linear to make more sensitive at low values
+    const unsigned int level      = MIN(voice_amp * 8, 65535u);
+    const unsigned int sqrt_level = MIN(sqrt16(level), 124u);
+    uint8_t bars = 11 * sqrt_level / 124;
+    bars = MIN(bars, 11);
+    memset(bar, '@', bars);
+
+    UI_printf(&font_small, TEXT_ALIGN_LEFT, xPosVFO + 16, 0, yPosVFO + 6, true, false, "%s", bar);
+
+}
+
 void MainVFO_showCTCSS(const char *tx_rx, uint8_t code_type, uint8_t code_value, uint8_t ypos) {
     
     if ( code_type == CODE_TYPE_CONTINUOUS_TONE ) {
@@ -108,10 +154,12 @@ void MainVFO_showCTCSS(const char *tx_rx, uint8_t code_type, uint8_t code_value,
     }
 }
 
+uint8_t vfoNumA = 0;
+
 void MainVFO_showVFO(void) {
 
     char String[17] = { 0 };
-    uint8_t vfoNumA;
+    //uint8_t vfoNumA;
     //uint8_t vfoNumB;
 
     if(gEeprom.TX_VFO == 0) {
@@ -163,7 +211,11 @@ void MainVFO_showVFO(void) {
         }
     }
 
-    MainVFO_showRSSI();
+    if (gCurrentFunction == FUNCTION_TRANSMIT){
+        MainVFO_showMICBar();
+    } else {
+        MainVFO_showRSSI();
+    }
 
     yPosVFO = 53;
 
@@ -184,65 +236,15 @@ void MainVFO_showVFO(void) {
         }
     }
 
-    enum VfoState_t state = VfoState[vfoNumA];
-	if (state != VFO_STATE_NORMAL) {
-		if (state < ARRAY_SIZE(VfoStateStr)) {
-            uint8_t startX;
-            uint8_t startY;
-			const uint8_t popupW = 80;
-			const uint8_t popupH = 30;
-			GUI_showPopup(popupW, popupH, &startX, &startY);
-			UI_drawString(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 10, VfoStateStr[state], true, false);
-		}
-	}
-
-/*    yPosVFO = 61;
-    // VFO B
-	if(FUNCTION_IsRx()) {
-		UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO - 8, true, false, "%s %s", vfoNumB == 1 ? "B" : "A", gEeprom.RX_VFO == vfoNumB ? "$" : "");
-	} else {
-    	UI_printf(&font_10, TEXT_ALIGN_LEFT, 2, 0, yPosVFO - 8, true, false, vfoNumB == 1 ? "B" : "A");
-	}
-
-    // Frequency B
-    frequency = vfoInfoB->pRX->Frequency;
-    if ( frequency >= _1GHz_in_KHz ) {
-        UI_printf(&font_n_16, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO - 4, true, false, "%1u.%3u.%03u.%02u", (frequency / 100000000), (frequency / 100000) % 1000, (frequency % 100000) / 100, (frequency % 100));
-    } else {
-        UI_printf(&font_n_16, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO - 4, true, false, "%3u.%03u.%02u", (frequency / 100000), (frequency % 100000) / 100, (frequency % 100));
-    }
-    // Modulation B
-    UI_printf(&font_small, TEXT_ALIGN_LEFT, 78, 0, yPosVFO - 10, true, false, gModulationStr[vfoInfoB->Modulation]);
-    // OUTPUT_POWER
-    UI_printf(&font_small, TEXT_ALIGN_LEFT, 78, 0, yPosVFO - 4, true, false, gSubMenu_W_N[vfoInfoB->CHANNEL_BANDWIDTH]);
-
-    if ( isChannelModeB ) {
-        // Channel Name B
-        memcpy(String, vfoInfoB->Name, 16);
-        if (String[0] == 0) {
-            UI_printf(&font_small, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO + 2, true, false, "CH-%03u", gEeprom.ScreenChannel[vfoNumB] + 1);
-        } else {
-            UI_printf(&font_small, TEXT_ALIGN_LEFT, 2, 20, yPosVFO + 2, true, false, "M%03u", gEeprom.ScreenChannel[vfoNumB] + 1);
-            UI_printf(&font_small, TEXT_ALIGN_RIGHT, 20, 76, yPosVFO + 2, true, false, String);
-        }
-    } else {
-        UI_printf(&font_small, TEXT_ALIGN_LEFT, 2, 20, yPosVFO + 2, true, false, "VFO");
-    }
-
-    if ( vfoInfoB->Modulation == MODULATION_FM ) {
-        // DCS/CT/DCR A
-        const unsigned int code_type = vfoInfoB->pRX->CodeType;
-        if ( code_type > 0 ) {
-            UI_printf(&font_small, TEXT_ALIGN_LEFT, 78, 0, yPosVFO + 2, true, false, code_list[code_type - 1]);
+    if ( application_getPopup() != APP_POPUP_INFO ) {    
+        enum VfoState_t state = VfoState[vfoNumA];
+        if (state != VFO_STATE_NORMAL) {
+            if (state < ARRAY_SIZE(VfoStateStr)) {
+                application_showPopup(APP_POPUP_INFO, true);
+                //UART_printf("VFO_STATE %i\r\n", state);
+            }
         }
     }
-
-    // extra info
-    //UI_drawFastVLine(97, 46, 17, true);
-    UI_drawDottedLine(98, 47, 98, 64, true, 2);
-
-    UI_printf(&font_small, TEXT_ALIGN_LEFT, 102, 0, 52, true, false, "'$ A");
-    */
 }
 
 void MainVFO_initFunction() {
@@ -411,6 +413,10 @@ void MainVFO_renderPopupFunction(APPS_Popup_t popup) {
             popupListSize = MODULATION_UKNOWN - 1;
             popupShowList(popupListSelected, popupListSize, startX, startY + 8, startX + popupW - 2, gModulationStr);
             break;
+        case APP_POPUP_INFO:
+            GUI_showPopup(popupW + 10, popupH - 10, &startX, &startY);
+            UI_drawString(&font_10, TEXT_ALIGN_CENTER, startX, startX + (popupW + 10) - 2, startY + 10, VfoStateStr[VfoState[vfoNumA]], true, false);
+            break;
         default:
             break;
     }
@@ -420,15 +426,15 @@ void MainVFO_popupSave(APPS_Popup_t popup) {
     switch (popup) {
         case APP_POPUP_TXP:
             gTxVfo->OUTPUT_POWER = popupListSelected;
-            //sys_push_message(RADIO_SAVE_CHANNEL);
+            //main_push_message(RADIO_SAVE_CHANNEL);
             break;
         case APP_POPUP_W_N:
             gTxVfo->CHANNEL_BANDWIDTH = popupListSelected;
-			//sys_push_message(RADIO_SAVE_CHANNEL);
+			//main_push_message(RADIO_SAVE_CHANNEL);
             break;
         case APP_POPUP_AM:
             gTxVfo->Modulation = popupListSelected;
-			//sys_push_message(RADIO_SAVE_CHANNEL);
+			//main_push_message(RADIO_SAVE_CHANNEL);
             break;
         default:
             break;
@@ -436,6 +442,9 @@ void MainVFO_popupSave(APPS_Popup_t popup) {
 }
 
 void MainVFO_keyHandlerPopupFunction(KEY_Code_t key, KEY_State_t state, APPS_Popup_t popup) {
+    if ( popup == APP_POPUP_INFO ) {
+        return;
+    }
     if ( state == KEY_PRESSED) {
         switch (key) {
             case KEY_6:

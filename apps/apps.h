@@ -34,6 +34,7 @@ enum APPS_Popup_e {
 	APP_POPUP_TXP,
     APP_POPUP_W_N,
     APP_POPUP_AM,
+    APP_POPUP_INFO,
 };
 typedef enum APPS_Popup_e APPS_Popup_t;
 

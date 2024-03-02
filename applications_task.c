@@ -197,6 +197,10 @@ void app_task(void* arg) {
                         load_application(APP_MAIN_VFO);
                     } else {
                         if( currentAppPopup != APP_POPUP_NONE && popupAutoClose) {
+                            if ( currentAppPopup == APP_POPUP_INFO ) {
+                                main_push_message(SET_VFO_STATE_NORMAL);
+                            }
+                            popupAutoClose = false;
                             currentAppPopup = APP_POPUP_NONE;
                             xTimerReset( idleTimer, 0 );
                         }

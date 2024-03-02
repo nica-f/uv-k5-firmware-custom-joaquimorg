@@ -49,6 +49,8 @@ enum MAIN_MSG_e
 
 	RADIO_TX,
 	RADIO_RX,
+
+	SET_VFO_STATE_NORMAL,
 	
 };
 

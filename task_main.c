@@ -236,6 +236,10 @@ void main_task(void* arg) {
 					break;
 
 				/* -------------------------------------------------------- */
+
+				case SET_VFO_STATE_NORMAL:
+					RADIO_SetVfoState(VFO_STATE_NORMAL);
+					break;
 				case RADIO_TX:
 					//FUNCTION_Select(FUNCTION_TRANSMIT);
 					RADIO_PrepareTX();
