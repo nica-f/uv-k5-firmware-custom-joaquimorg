@@ -49,10 +49,10 @@ typedef struct app_struct {
     bool showStatusLine;
     InitFunction init;
     RenderFunction render;
-    KeyHandlerFunction keyhandler;
+    KeyHandlerFunction keyHandler;
 
     RenderFunctionPopup renderPopup;
-    KeyHandlerFunctionPopup keyhandlerPopup;
+    KeyHandlerFunctionPopup keyHandlerPopup;
 } app_t;
 
 

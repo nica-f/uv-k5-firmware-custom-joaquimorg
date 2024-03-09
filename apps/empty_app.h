@@ -45,6 +45,6 @@ void EmptyAPP_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 app_t APPEmptyAPP = {
     .showStatusLine = true,
     .init = EmptyAPP_initFunction,
-    .keyhandler = EmptyAPP_keyHandlerFunction
+    .keyHandler = EmptyAPP_keyHandlerFunction
 };
 

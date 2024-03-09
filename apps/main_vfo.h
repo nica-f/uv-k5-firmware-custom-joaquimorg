@@ -248,7 +248,6 @@ void MainVFO_showVFO(void) {
 }
 
 void MainVFO_initFunction() {
-
 }
 
 void MainVFO_renderFunction() {
@@ -327,7 +326,7 @@ void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 
             case KEY_MENU:
                 if ( state == KEY_LONG_PRESSED ) {
-                    load_application(APP_EMPTY);
+                    load_application(APP_MENU);
                 }
                 break;
 
@@ -495,9 +494,8 @@ app_t APPMainVFO = {
     .showStatusLine = true,
     .init = MainVFO_initFunction,
     .render = MainVFO_renderFunction,
-    .keyhandler = MainVFO_keyHandlerFunction,
-
+    .keyHandler = MainVFO_keyHandlerFunction,
     .renderPopup = MainVFO_renderPopupFunction,
-    .keyhandlerPopup = MainVFO_keyHandlerPopupFunction,
+    .keyHandlerPopup = MainVFO_keyHandlerPopupFunction,
 };
 

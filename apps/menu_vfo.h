@@ -1767,5 +1767,5 @@ app_t APPMenuVFO = {
     .showStatusLine = true,
     .init = MenuVFO_initFunction,
     .render = MenuVFO_renderFunction,
-    .keyhandler = MenuVFO_keyHandlerFunction
+    .keyHandler = MenuVFO_keyHandlerFunction
 };

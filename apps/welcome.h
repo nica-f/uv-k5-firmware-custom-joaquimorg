@@ -48,6 +48,6 @@ void Welcome_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
 app_t APPWelcome = {
     .showStatusLine = false,
     .init = Welcome_initFunction,
-    .keyhandler = Welcome_keyHandlerFunction
+    .keyHandler = Welcome_keyHandlerFunction
 };
 

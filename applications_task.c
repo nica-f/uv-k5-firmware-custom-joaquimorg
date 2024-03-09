@@ -43,7 +43,7 @@
 #include "apps/welcome.h"
 #include "apps/main_vfo.h"
 #include "apps/menu_vfo.h"
-
+#include "apps/main_menu.h"
 #include "apps/empty_app.h"
 
 #define QUEUE_LENGTH    10
@@ -150,12 +150,12 @@ void keyboard_callback(KEY_Code_t key, KEY_State_t state) {
     }
 
     if ( currentAppPopup != APP_POPUP_NONE ) {
-        if (currentApplication->keyhandlerPopup) {
-            currentApplication->keyhandlerPopup(key, state, currentAppPopup);
+        if (currentApplication->keyHandlerPopup) {
+            currentApplication->keyHandlerPopup(key, state, currentAppPopup);
         }
     } else {
-        if (currentApplication->keyhandler) {
-            currentApplication->keyhandler(key, state);
+        if (currentApplication->keyHandler) {
+            currentApplication->keyHandler(key, state);
         }
     }
 
@@ -288,6 +288,11 @@ void load_application(APPS_t application) {
             //strcpy(global_status.statusMessage, "MENU\0");
             change_application(&APPEmptyAPP);
             break;
+
+        case APP_MENU:
+            //strcpy(global_status.statusMessage, "MENU\0");
+            change_application(&APPMenuAPP);
+            break;            
 
         case APP_MENU_VFO:
             //strcpy(global_status.statusMessage, "MENU\0");
