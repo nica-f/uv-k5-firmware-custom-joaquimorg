@@ -196,11 +196,14 @@ void MainVFO_showVFO(void) {
     }*/
 
     // Frequency A
-    frequency = vfoInfoA->pRX->Frequency;
+    frequency = vfoInfoA->pRX->Frequency;    
+
     if ( frequency >= _1GHz_in_KHz ) {
         UI_printf(&font_n_20, TEXT_ALIGN_RIGHT, 15, 100, yPosVFO + 10, true, false, "%1u.%03u.%03u", (frequency / 100000000), (frequency / 100000) % 1000, (frequency % 100000) / 100);
-    } else {
+    } else if ( frequency >= 10000000 ) {
         UI_printf(&font_n_20, TEXT_ALIGN_RIGHT, 15, 100, yPosVFO + 10, true, false, "%3u.%03u", (frequency / 100000), (frequency % 100000) / 100);
+    } else {
+        UI_printf(&font_n_20, TEXT_ALIGN_RIGHT, 15, 100, yPosVFO + 10, true, false, "%2u.%03u", (frequency / 100000), (frequency % 100000) / 100);
     }
     UI_printf(&font_n_16,   TEXT_ALIGN_LEFT, 100, 0, yPosVFO + 10, true, false, " %02u", (frequency % 100));
 
@@ -259,7 +262,7 @@ void MainVFO_renderFunction() {
         if (IS_MR_CHANNEL(gEeprom.ScreenChannel[gEeprom.TX_VFO])) {
             GUI_inputShow("Input Memory", "M ");
         } else {
-            GUI_inputShow("Input Freq.", "");
+            GUI_inputShowFreq("Input Freq.");
         }
 
     }
@@ -352,7 +355,7 @@ void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
                 if (IS_MR_CHANNEL(gEeprom.ScreenChannel[gEeprom.TX_VFO])) {
                     GUI_inputAppendKey(key, 3, false);
                 } else {
-                    GUI_inputAppendKey(key, 12, true);
+                    GUI_inputAppendKey(key, 9, true);
                 }
             break;
             case KEY_MENU:
@@ -361,9 +364,12 @@ void MainVFO_keyHandlerFunction(KEY_Code_t key, KEY_State_t state) {
                         const uint16_t selChannel = (uint16_t)GUI_inputGetNumber() - 1;
                         main_push_message_value(RADIO_SET_CHANNEL, selChannel);
                     } else {
-                        const uint32_t selFreq = GUI_inputGetNumber();
-                        //UART_printf("FREQ : %i\r\n", selFreq);
-                        main_push_message_value(RADIO_SET_FREQ, selFreq);
+                        if (GUI_inputGetSize() > 6) {
+                            const uint32_t selFreq = GUI_inputGetNumber();
+                            main_push_message_value(RADIO_SET_FREQ, selFreq);
+                        } else {
+                            main_push_message_value(MAIN_MSG_PLAY_BEEP, BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL);
+                        }
                     }
                 } else {
                     load_application(APP_MENU_VFO);

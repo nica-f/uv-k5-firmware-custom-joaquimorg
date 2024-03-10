@@ -59,7 +59,7 @@ void GUI_updateCursor() {
 }
 
 void GUI_inputAppendKey(const KEY_Code_t key, uint8_t length, bool decimal) {
-	
+	(void)decimal;
 	if (inputKeysIndex == -1 && key != KEY_STAR && key != KEY_F) {
 		memset(inputKeys, 0x00, sizeof(inputKeys));
 		inputKeysIndex = 0;
@@ -79,11 +79,6 @@ void GUI_inputAppendKey(const KEY_Code_t key, uint8_t length, bool decimal) {
 		case KEY_9:
 			if (inputKeysIndex < length) {
 				inputKeys[inputKeysIndex++] = '0' + key;
-			}
-			break;
-		case KEY_STAR:
-			if (decimal && inputKeysIndex < length && inputKeysIndex > 0 && inputKeys[inputKeysIndex - 1] != '.') {
-				inputKeys[inputKeysIndex++] = '.';				
 			}
 			break;
 		case KEY_F:
@@ -137,20 +132,37 @@ uint32_t GUI_inputGetNumber() {
 	return (uint32_t)string_to_uint32(inputKeys);	
 }
 
-void GUI_inputShow(const char *title, const char *prefix) {
+void GUI_inputShowFreq(const char *title) {
 	const uint8_t popupW = 80;
-	const uint8_t popupH = 30;
-	(void)prefix;
+	const uint8_t popupH = 30;	
     uint8_t startX;
     uint8_t startY;
+	uint32_t inputValue = (uint32_t)string_to_uint32(inputKeys);
     GUI_showPopup(popupW, popupH, &startX, &startY);
     UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, title);
-	UI_printf(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 14, true, false, "%s%s", prefix, inputKeys);	
+	if ( inputValue >= _1GHz_in_KHz ) {
+		UI_printf(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 14, true, false, "%1u.%03u.%03u.%02u", (inputValue / 100000000), (inputValue / 100000) % 1000, (inputValue % 100000) / 100, (inputValue % 100));	
+	} else {
+		UI_printf(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 14, true, false, "%03u.%03u.%02u", (inputValue / 100000) % 1000, (inputValue % 100000) / 100, (inputValue % 100));	
+	}
 	if ( showCursor ) {
 		UI_drawString(&font_10, TEXT_ALIGN_CENTER, UI_nextX, 0, startY + 14, "`", true, false);
 	}
 }
 
+
+void GUI_inputShow(const char *title, const char *prefix) {
+	const uint8_t popupW = 80;
+	const uint8_t popupH = 30;
+    uint8_t startX;
+    uint8_t startY;
+    GUI_showPopup(popupW, popupH, &startX, &startY);
+    UI_printf(&font_small, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY, true, false, title);
+	UI_printf(&font_10, TEXT_ALIGN_CENTER, startX, startX + popupW - 2, startY + 14, true, false, "%s%s", prefix, inputKeys);
+	if ( showCursor ) {
+		UI_drawString(&font_10, TEXT_ALIGN_CENTER, UI_nextX, 0, startY + 14, "`", true, false);
+	}
+}
 
 void GUI_showPopup(uint8_t popupW, uint8_t popupH, uint8_t *startX, uint8_t *startY) {
 	//const uint8_t popupW = 68;

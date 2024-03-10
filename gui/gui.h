@@ -28,6 +28,7 @@ void        GUI_inputAppendKey(const KEY_Code_t key, uint8_t length, bool decima
 uint8_t     GUI_inputGetSize();
 bool        GUI_inputNotEmpty();
 void        GUI_inputReset();
+void        GUI_inputShowFreq(const char *title);
 void        GUI_inputShow(const char *title, const char *prefix);
 uint32_t    GUI_inputGetNumber();
 

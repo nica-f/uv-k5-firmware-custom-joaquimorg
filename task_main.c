@@ -328,39 +328,38 @@ void main_task(void* arg) {
 
 				case RADIO_SET_FREQ:
 					if ( msg.payload != 0 ) {
-						uint32_t Frequency = msg.payload;
+						uint32_t frequency = msg.payload;
 						// clamp the frequency entered to some valid value
-                        if (Frequency < frequencyBandTable[0].lower) {
-                            Frequency = frequencyBandTable[0].lower;
+                        if (frequency < frequencyBandTable[0].lower) {
+                            frequency = frequencyBandTable[0].lower;
                         }
-                        else if (Frequency >= BX4819_band1.upper && Frequency < BX4819_band2.lower) {
+                        else if (frequency >= BX4819_band1.upper && frequency < BX4819_band2.lower) {
                             const uint32_t center = (BX4819_band1.upper + BX4819_band2.lower) / 2;
-                            Frequency = (Frequency < center) ? BX4819_band1.upper : BX4819_band2.lower;
+                            frequency = (frequency < center) ? BX4819_band1.upper : BX4819_band2.lower;
                         }
-                        else if (Frequency > frequencyBandTable[BAND_N_ELEM - 1].upper) {
-                            Frequency = frequencyBandTable[BAND_N_ELEM - 1].upper;
+                        else if (frequency > frequencyBandTable[BAND_N_ELEM - 1].upper) {
+                            frequency = frequencyBandTable[BAND_N_ELEM - 1].upper;
                         }
 
-                        const FREQUENCY_Band_t band = FREQUENCY_GetBand(Frequency);
+                        const FREQUENCY_Band_t band = FREQUENCY_GetBand(frequency);
 
                         if (gTxVfo->Band != band) {
-                            gTxVfo->Band               = band;
-                            gEeprom.ScreenChannel[gEeprom.TX_VFO] = band + FREQ_CHANNEL_FIRST;
-                            gEeprom.FreqChannel[gEeprom.TX_VFO]   = band + FREQ_CHANNEL_FIRST;
+                            gTxVfo->Band               				= band;
+                            gEeprom.ScreenChannel[gEeprom.TX_VFO] 	= band + FREQ_CHANNEL_FIRST;
+                            gEeprom.FreqChannel[gEeprom.TX_VFO]   	= band + FREQ_CHANNEL_FIRST;
 
                             main_push_message(RADIO_SAVE_VFO);
                             main_push_message(RADIO_VFO_CONFIGURE_CHANNEL);
                         }
 
-                        Frequency = FREQUENCY_RoundToStep(Frequency, gTxVfo->StepFrequency);
+                        frequency = FREQUENCY_RoundToStep(frequency, gTxVfo->StepFrequency);
 
-                        if (Frequency >= BX4819_band1.upper && Frequency < BX4819_band2.lower)
+                        if (frequency >= BX4819_band1.upper && frequency < BX4819_band2.lower)
                         {	// clamp the frequency to the limit
                             const uint32_t center = (BX4819_band1.upper + BX4819_band2.lower) / 2;
-                            Frequency = (Frequency < center) ? BX4819_band1.upper - gTxVfo->StepFrequency : BX4819_band2.lower;
+                            frequency = (frequency < center) ? BX4819_band1.upper - gTxVfo->StepFrequency : BX4819_band2.lower;
                         }
-
-                        gTxVfo->freq_config_RX.Frequency = Frequency;
+                        gTxVfo->freq_config_RX.Frequency = frequency;
 
                         main_push_message(RADIO_SAVE_CHANNEL);
 					}
