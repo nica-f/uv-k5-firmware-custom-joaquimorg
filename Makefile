@@ -5,16 +5,16 @@
 
 # ---- STOCK QUANSHENG FERATURES ----
 ENABLE_UART                   ?= 1
-ENABLE_AIRCOPY                ?= 0
-ENABLE_FMRADIO                ?= 0
+ENABLE_AIRCOPY                ?= 1
+ENABLE_FMRADIO                ?= 1
 ENABLE_NOAA                   ?= 0
 ENABLE_VOICE                  ?= 0
 ENABLE_VOX                    ?= 0
 ENABLE_ALARM                  ?= 0
 ENABLE_TX1750                 ?= 0
 ENABLE_PWRON_PASSWORD         ?= 0
-ENABLE_DTMF_CALLING           ?= 0
-ENABLE_FLASHLIGHT             ?= 0
+ENABLE_DTMF_CALLING           ?= 1
+ENABLE_FLASHLIGHT             ?= 1
 
 # ---- CUSTOM MODS ----
 ENABLE_BIG_FREQ               ?= 1
@@ -27,18 +27,19 @@ ENABLE_F_CAL_MENU             ?= 0
 ENABLE_CTCSS_TAIL_PHASE_SHIFT ?= 0
 ENABLE_BOOT_BEEPS             ?= 0
 ENABLE_SHOW_CHARGE_LEVEL      ?= 0
-ENABLE_REVERSE_BAT_SYMBOL     ?= 0
+ENABLE_REVERSE_BAT_SYMBOL     ?= 1
 ENABLE_NO_CODE_SCAN_TIMEOUT   ?= 1
 ENABLE_SQUELCH_MORE_SENSITIVE ?= 1
 ENABLE_FASTER_CHANNEL_SCAN    ?= 1
 ENABLE_RSSI_BAR               ?= 1
 ENABLE_AUDIO_BAR              ?= 1
-ENABLE_COPY_CHAN_TO_VFO       ?= 0
-ENABLE_SPECTRUM               ?= 1
-ENABLE_REDUCE_LOW_MID_TX_POWER?= 0
+ENABLE_COPY_CHAN_TO_VFO       ?= 1
+ENABLE_SPECTRUM               ?= 0
+ENABLE_REDUCE_LOW_MID_TX_POWER?= 1
 ENABLE_BYP_RAW_DEMODULATORS   ?= 0
 ENABLE_BLMIN_TMP_OFF          ?= 0
-ENABLE_SCAN_RANGES            ?= 0
+ENABLE_SCAN_RANGES            ?= 1
+ENABLE_CONTRAST               ?= 1
 
 # ---- DEBUGGING ----
 ENABLE_AGC_SHOW_DATA          ?= 0
@@ -66,9 +67,9 @@ ENABLE_PMR_MODE               ?= 0
 ENABLE_SCREEN_DUMP			  ?= 0
 
 #------------------------------------------------------------------------------
-AUTHOR_STRING ?= JOAQUIM
+AUTHOR_STRING ?= NICA-F
 VERSION_STRING ?= V0.3.5
-PROJECT_NAME := cfw_joaquimorg_oefw_V0.3.5
+PROJECT_NAME := cfw_nica-f_oefw_V0.3.5
 
 BUILD := _build
 BIN := firmware
