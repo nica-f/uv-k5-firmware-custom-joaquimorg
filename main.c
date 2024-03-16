@@ -42,6 +42,9 @@
 #ifdef ENABLE_UART
 	#include "driver/uart.h"
 #endif
+#ifdef ENABLE_CONTRAST
+	#include "driver/st7565.h"
+#endif
 
 #include "helper/battery.h"
 #include "helper/boot.h"

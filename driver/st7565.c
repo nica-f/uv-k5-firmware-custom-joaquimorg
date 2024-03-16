@@ -171,12 +171,6 @@ void ST7565_Init(void)
 
 	SYSTEM_DelayMs(40);
 
-	#ifdef ENABLE_CONTRAST
-		ST7565_WriteByte(contrast);  // brightness 0 ~ 63
-	#else
-		ST7565_WriteByte(31);        // brightness 0 ~ 63
-	#endif
-	
 	ST7565_WriteByte(ST7565_CMD_SET_START_LINE | 0);   // line 0
 	ST7565_WriteByte(ST7565_CMD_DISPLAY_ON_OFF | 1);   // D=1
 	SPI_WaitForUndocumentedTxFifoStatusBit();
@@ -227,6 +221,11 @@ void ST7565_WriteByte(uint8_t Value)
 	void ST7565_SetContrast(const uint8_t value)
 	{
 		contrast = (value > 45) ? 45 : (value < 26) ? 26 : value;
+		SPI_ToggleMasterMode(&SPI0->CR, false);
+		ST7565_WriteByte(ST7565_CMD_SET_EV);
+		ST7565_WriteByte(contrast);
+		SPI_WaitForUndocumentedTxFifoStatusBit();
+		SPI_ToggleMasterMode(&SPI0->CR, true);
 	}
 
 	uint8_t ST7565_GetContrast(void)
