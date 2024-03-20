@@ -142,8 +142,8 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			break;
 #ifdef ENABLE_CONTRAST	
 		case MENU_CONTRAST:
-			*pMin = 1;
-			*pMax = 63;
+			*pMin = 0;
+			*pMax = 25;
 			break;	
 #endif
 		case MENU_F_LOCK:
@@ -158,7 +158,7 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 
 		case MENU_TXP:
 			*pMin = 0;
-			*pMax = ARRAY_SIZE(gSubMenu_TXP) - 1;
+			*pMax = /*ARRAY_SIZE(gSubMenu_TXP)*/ 3 - 1;
 			break;
 
 		case MENU_SFT_D:
@@ -228,6 +228,10 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			*pMin = 0;
 			*pMax = ARRAY_SIZE(gSubMenu_RX_TX) - 1;
 			break;
+		case MENU_UART:
+			*pMin = 0;
+			*pMax = ARRAY_SIZE(gSubMenu_UART) - 1;
+			break;
 		#ifdef ENABLE_AUDIO_BAR
 			case MENU_MIC_BAR:
 		#endif
@@ -250,6 +254,7 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 		case MENU_500TX:
 		case MENU_350EN:
 		case MENU_SCREN:
+		case MENU_TXP_LIMIT:
 			*pMin = 0;
 			*pMax = ARRAY_SIZE(gSubMenu_OFF_ON) - 1;
 			break;
@@ -403,6 +408,10 @@ void MENU_AcceptSetting(void)
 				return;
 			}
 			return;
+
+		case MENU_TXP_LIMIT:
+			gEeprom.TX_POWER_LIMIT = gSubMenuSelection;
+			break;
 
 		case MENU_TXP:
 			gTxVfo->OUTPUT_POWER = gSubMenuSelection;
@@ -828,6 +837,10 @@ void MENU_ShowCurrentSetting(void)
 			gSubMenuSelection = FREQUENCY_GetSortedIdxFromStepIdx(gTxVfo->STEP_SETTING);
 			break;
 
+		case MENU_TXP_LIMIT:
+			gSubMenuSelection = gEeprom.TX_POWER_LIMIT;
+			break;
+
 		case MENU_TXP:
 			gSubMenuSelection = gTxVfo->OUTPUT_POWER;
 			break;
@@ -1086,6 +1099,9 @@ void MENU_ShowCurrentSetting(void)
 				gSubMenuSelection = gEeprom.NOAA_AUTO_SCAN;
 				break;
 		#endif
+
+		case MENU_UART:
+			break;
 
 		case MENU_DEL_CH:
 			#if 0

@@ -124,6 +124,16 @@ enum ROGER_Mode_t {
 };
 typedef enum ROGER_Mode_t ROGER_Mode_t;
 
+enum UART_MODE_t {
+	UART_OFF = 0,
+	UART_CPS,
+	UART_SMS,
+	UART_RMT,
+	UART_KISS,
+	UART_DBG
+};
+typedef enum UART_MODE_t UART_MODE_t;
+
 enum CHANNEL_DisplayMode_t {
 	MDF_FREQUENCY = 0,
 	MDF_CHANNEL,
@@ -169,9 +179,11 @@ typedef struct {
 	VOICE_Prompt_t    VOICE_PROMPT;
 #endif
 	bool                  BEEP_CONTROL;
-	#ifdef ENABLE_CONTRAST
-		uint8_t    		  LCD_CONTRAST;
-	#endif
+#ifdef ENABLE_CONTRAST
+	uint8_t               LCD_CONTRAST;
+#endif
+	bool                  TX_POWER_LIMIT;
+	uint8_t               UART_MODE;
 	uint8_t               CHANNEL_DISPLAY_MODE;
 	bool                  TAIL_TONE_ELIMINATION;
 	bool                  VFO_OPEN;

@@ -68,9 +68,9 @@ void SETTINGS_InitEEPROM(void)
 		gPMR_Mode_Active        = !!(Data[3] & (1u << 7));
 	#endif
 
-	gEeprom.KEY_LOCK             = (Data[4] <  2) ? Data[4] : false;
+	gEeprom.KEY_LOCK             = (Data[4] & 0x01);
 	#ifdef ENABLE_VOX
-		gEeprom.VOX_SWITCH       = (Data[5] <  2) ? Data[5] : false;
+		gEeprom.VOX_SWITCH       = (Data[5] & 0x01);
 		gEeprom.VOX_LEVEL        = (Data[6] < 10) ? Data[6] : 1;
 	#endif
 	gEeprom.MIC_SENSITIVITY      = (Data[7] <  5) ? Data[7] : 4;
@@ -89,13 +89,17 @@ void SETTINGS_InitEEPROM(void)
 	gEeprom.BACKLIGHT_TIME        = (Data[5] < ARRAY_SIZE(gSubMenu_BACKLIGHT)) ? Data[5] : 3;
 
 	//gEeprom.TAIL_TONE_ELIMINATION = (Data[6] < 2) ? Data[6] : false;
-	gEeprom.VFO_OPEN              = (Data[7] < 2) ? Data[7] : true;
-
-	gEeprom.TAIL_TONE_ELIMINATION = (Data[6] >> 7) & 1;
 
 #ifdef ENABLE_CONTRAST
-	gEeprom.LCD_CONTRAST		  = Data[6] & 0x7F;
+	gEeprom.LCD_CONTRAST          = Data[6] & 0x3F;
 #endif
+	// Data[6] bit 6 is still unused
+	gEeprom.TX_POWER_LIMIT = (Data[6] >> 6) & 0x01;
+	gEeprom.TAIL_TONE_ELIMINATION = (Data[6] >> 7) & 0x01;
+
+	//gEeprom.VFO_OPEN              = (Data[7] < 2) ? Data[7] : true;
+	gEeprom.VFO_OPEN              = (Data[7] & 0x01);
+	gEeprom.UART_MODE             = (Data[7] & 0x0e) >> 1; // three bits for 6 modes
 
 	// 0E80..0E87
 	EEPROM_ReadBuffer(0x0E80, Data, 8);
@@ -539,10 +543,10 @@ void SETTINGS_SaveSettings(void)
 	State[4] = gEeprom.DUAL_WATCH;
 	State[5] = gEeprom.BACKLIGHT_TIME;
 	//State[6] = gEeprom.TAIL_TONE_ELIMINATION;
-	State[7] = gEeprom.VFO_OPEN;
+	State[7] = (gEeprom.VFO_OPEN | (gEeprom.UART_MODE << 1)) & 0x0f;
 
 #ifdef ENABLE_CONTRAST
-	State[6] = (gEeprom.LCD_CONTRAST & 0x7F) | (gEeprom.TAIL_TONE_ELIMINATION << 7);
+	State[6] = (gEeprom.LCD_CONTRAST & 0x3F) | (gEeprom.TX_POWER_LIMIT << 6) | (gEeprom.TAIL_TONE_ELIMINATION << 7);
 #else
 	State[6] = (gEeprom.TAIL_TONE_ELIMINATION << 7);
 #endif

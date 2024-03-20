@@ -216,7 +216,8 @@ static void SendVersion(void)
 
 	Reply.Header.ID = 0x0515;
 	Reply.Header.Size = sizeof(Reply.Data);
-	strcpy(Reply.Data.Version, "1o11");
+	//strcpy(Reply.Data.Version, "1o11");
+	strcpy(Reply.Data.Version, AUTHOR_STRING " " VERSION_STRING);
 	Reply.Data.bHasCustomAesKey = bHasCustomAesKey;
 	Reply.Data.bIsInLockScreen = bIsInLockScreen;
 	Reply.Data.Challenge[0] = gChallenge[0];
@@ -548,7 +549,7 @@ bool UART_IsCommandAvailable(void)
 			return false;
 
 #if defined(ENABLE_MESSENGER) || defined(ENABLE_MESSENGER_UART)
-
+if (gEeprom.UART_MODE == UART_SMS) {
 		if ( UART_DMA_Buffer[gUART_WriteIndex] == 'S' && UART_DMA_Buffer[gUART_WriteIndex + 1] == 'M' && UART_DMA_Buffer[ gUART_WriteIndex + 2] == 'S' && UART_DMA_Buffer[gUART_WriteIndex + 3] == ':') {
 			txtStart = gUART_WriteIndex;
 			newTxtMsg = true;
@@ -575,7 +576,7 @@ bool UART_IsCommandAvailable(void)
 			gUART_WriteIndex = 0;
 			return false;			
 		}
-		
+}
 		while (gUART_WriteIndex != DmaLength && UART_DMA_Buffer[gUART_WriteIndex] != 0xABU && UART_DMA_Buffer[gUART_WriteIndex] != 'S')
 			gUART_WriteIndex = DMA_INDEX(gUART_WriteIndex, 1);
 #else  

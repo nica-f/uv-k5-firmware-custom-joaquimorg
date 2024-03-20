@@ -220,7 +220,11 @@ void ST7565_WriteByte(uint8_t Value)
 #ifdef ENABLE_CONTRAST
 	void ST7565_SetContrast(const uint8_t value)
 	{
-		contrast = (value > 45) ? 45 : (value < 26) ? 26 : value;
+		contrast = (value & 0x3f) + 20;
+		/* values <20 and >45 are close to unreadable,
+		   so limit to 20<=value<=45 to keep it being usable */
+		if (contrast > 45)
+			contrast = 45;
 		SPI_ToggleMasterMode(&SPI0->CR, false);
 		ST7565_WriteByte(ST7565_CMD_SET_EV);
 		ST7565_WriteByte(contrast);

@@ -679,11 +679,15 @@ void UI_DisplayMain(void)
 			int i = vfoInfo->OUTPUT_POWER % 3;
 
 #ifdef ENABLE_SMALL_BOLD
-			const char *powerNames[] = {"LOW", "MID", "HIGH"};
-			GUI_DisplaySmallest(powerNames[i], 34, line == 0 ? 17 : 49, false, true);
+//#ifdef ENABLE_REDUCE_LOW_MID_TX_POWER
+			const char *powerNames[] = {"L 1.5W", "M 3W", "H 5W", "L 10mW", "M 0.5W", "H 5W"};
+//#else
+			//const char *powerNames[] = {"L 1.5W", "M 3W", "H 5W"};
+//#endif
+			GUI_DisplaySmallest(powerNames[i + (gEeprom.TX_POWER_LIMIT ? 3 : 0)], 34, line == 0 ? 17 : 49, false, true);
 #else
-			const char pwr_list[][2] = {"L","M","H"};			
-			UI_PrintStringSmallNormal(pwr_list[i], LCD_WIDTH + 46, 0, line + 1);
+			const char *pwr_list[][] = {"L","M","H","Ll","Ml","Hl"};			
+			UI_PrintStringSmallNormal(pwr_list[i] + (gEeprom.TX_POWER_LIMIT ? 3 : 0), LCD_WIDTH + 46, 0, line + 1);
 #endif				
 
 		}

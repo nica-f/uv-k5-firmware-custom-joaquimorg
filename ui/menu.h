@@ -33,6 +33,7 @@ enum
 {
 	MENU_SQL = 0,
 	MENU_STEP,
+	MENU_TXP_LIMIT,
 	MENU_TXP,
 	MENU_R_DCS,
 	MENU_R_CTCS,
@@ -107,6 +108,7 @@ enum
 #ifdef ENABLE_NOAA
 	MENU_NOAA_S,
 #endif
+	MENU_UART,
 	MENU_RESET,
 	MENU_F_LOCK,
 	MENU_200TX,
@@ -129,7 +131,7 @@ enum
 extern const uint8_t FIRST_HIDDEN_MENU_ITEM;
 extern const t_menu_item MenuList[];
 
-extern const char        gSubMenu_TXP[3][5];
+extern const char        gSubMenu_TXP[6][9];
 extern const char        gSubMenu_SFT_D[3][4];
 extern const char        gSubMenu_W_N[3][9];
 extern const char        gSubMenu_OFF_ON[2][4];
@@ -158,6 +160,7 @@ extern const char        gSubMenu_RX_TX[4][6];
 extern const char        gSubMenu_BAT_TXT[3][8];
 extern const char 		 gSubMenu_BATTYP[2][9];
 extern const char        gSubMenu_SCRAMBLER[11][7];
+extern const char        gSubMenu_UART[6][6];
 
 typedef struct {const char* name; uint8_t id;} t_sidefunction;
 extern const uint8_t 		 gSubMenu_SIDEFUNCTIONS_size;

@@ -40,6 +40,7 @@ const t_menu_item MenuList[] =
 {
 //   text,     voice ID,                               menu ID
 	{"Step",   VOICE_ID_FREQUENCY_STEP,                MENU_STEP          },
+	{"TxLmt",  VOICE_ID_INVALID,                       MENU_TXP_LIMIT     }, // was "TXP"
 	{"TxPwr",  VOICE_ID_POWER,                         MENU_TXP           }, // was "TXP"
 	{"RxDCS",  VOICE_ID_DCS,                           MENU_R_DCS         }, // was "R_DCS"
 	{"RxCTCS", VOICE_ID_CTCSS,                         MENU_R_CTCS        }, // was "R_CTCS"
@@ -107,7 +108,7 @@ const t_menu_item MenuList[] =
 	{"PTT ID", VOICE_ID_INVALID,                       MENU_PTT_ID        },
 	{"D ST",   VOICE_ID_INVALID,                       MENU_D_ST          },
 #ifdef ENABLE_DTMF_CALLING
-    {"D Resp", VOICE_ID_INVALID,                       MENU_D_RSP         },
+	{"D Resp", VOICE_ID_INVALID,                       MENU_D_RSP         },
 	{"D Hold", VOICE_ID_INVALID,                       MENU_D_HOLD        },
 #endif
 	{"D Prel", VOICE_ID_INVALID,                       MENU_D_PRE         },
@@ -122,6 +123,7 @@ const t_menu_item MenuList[] =
 	{"BatVol", VOICE_ID_INVALID,                       MENU_VOL           }, // was "VOL"
 	{"RxMode", VOICE_ID_DUAL_STANDBY,                  MENU_TDR           },
 	{"Sql",    VOICE_ID_SQUELCH,                       MENU_SQL           },
+	{"UART",   VOICE_ID_INVALID,                       MENU_UART          },
 
 	// hidden menu items from here on
 	// enabled if pressing both the PTT and upper side button at power-on
@@ -143,11 +145,17 @@ const t_menu_item MenuList[] =
 
 const uint8_t FIRST_HIDDEN_MENU_ITEM = MENU_F_LOCK;
 
-const char gSubMenu_TXP[][5] =
+const char gSubMenu_TXP[][9] =
 {
-	"LOW",
-	"MID",
-	"HIGH"
+//#ifndef ENABLE_REDUCE_LOW_MID_TX_POWER
+	"LOW 1.5W",
+	"MID 3W",
+	"HIGH 5W",
+//#else
+	"LOW 10mW",
+	"MID 0.5W",
+	"HIGH 5W"
+//#endif
 };
 
 const char gSubMenu_SFT_D[][4] =
@@ -266,7 +274,7 @@ const char gSubMenu_ROGER[][11] =
 	"OFF",
 	"DEFAULT",
 	"MOTOTRBO",
-    "MOTO TPT",
+	"MOTO TPT",
 	"MOTO T40",
 	"MOTO T80",
 	"C.AM845",
@@ -338,6 +346,16 @@ const char gSubMenu_SCRAMBLER[][7] =
 	"3300Hz",
 	"3400Hz",
 	"3500Hz"
+};
+
+const char gSubMenu_UART[][6] =
+{
+	"off",  // slience
+	"CPS",  // normal EEPROM "code plug", e.g. for CHIRP
+	"SMS",  // the "SMS:..." messenger
+	"RMT",  // remote control the radio
+	"KISS", // KISS protocol as TNC
+	"DBG"   // debugging? Who doesn't love printf()s!?
 };
 
 const t_sidefunction gSubMenu_SIDEFUNCTIONS[] =
@@ -521,8 +539,13 @@ void UI_DisplayMenu(void)
 			break;
 		}
 
+		case MENU_TXP_LIMIT:
+			// strcpy(String, gSubMenu_OFF_ON[gEeprom.TX_POWER_LIMIT]);
+			strcpy(String, gSubMenu_OFF_ON[gSubMenuSelection]);
+			break;
+
 		case MENU_TXP:
-			strcpy(String, gSubMenu_TXP[gSubMenuSelection]);
+			strcpy(String, gSubMenu_TXP[gEeprom.TX_POWER_LIMIT ? (gSubMenuSelection + 3) : gSubMenuSelection]);
 			break;
 
 		case MENU_R_DCS:
@@ -641,6 +664,9 @@ void UI_DisplayMenu(void)
 		#ifdef ENABLE_NOAA
 			case MENU_NOAA_S:
 		#endif
+		case MENU_UART:
+			strcpy(String, gSubMenu_UART[gSubMenuSelection]);
+			break;
 		case MENU_350TX:
 		case MENU_200TX:
 		case MENU_500TX:

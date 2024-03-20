@@ -68,8 +68,8 @@ ENABLE_SCREEN_DUMP			  ?= 0
 
 #------------------------------------------------------------------------------
 AUTHOR_STRING ?= NICA-F
-VERSION_STRING ?= V0.3.5
-PROJECT_NAME := cfw_nica-f_oefw_V0.3.5
+VERSION_STRING ?= V0.3.6
+PROJECT_NAME := cfw_nica-f_oefw_V0.3.6
 
 BUILD := _build
 BIN := firmware
