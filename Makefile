@@ -462,7 +462,7 @@ clean:
 
 clean-all:
 	@-$(RM) $(call FixPath,$(BUILD))
-	@-$(DEL) $(call FixPath,$(BIN)/*)
+	@-$(RM) $(call FixPath,$(BIN)/*)
 
 -include $(OBJECTS:.o=.d)
 
@@ -486,6 +486,7 @@ $(BUILD)/$(PROJECT_NAME).out: $(OBJECTS)
 #	@$(SIZE) $@
 #------------------- Binary generator -------------------	
 	@echo Create $(notdir $@)
+	@$(call MKDIR,$(BIN))
 	@$(OBJCOPY) -O binary $(BUILD)/$(PROJECT_NAME).out $(BIN)/$(PROJECT_NAME).bin
 	@echo Create $(PROJECT_NAME).packed.bin
 	@-$(MY_PYTHON) fw-pack.py $(BIN)/$(PROJECT_NAME).bin $(AUTHOR_STRING) $(VERSION_STRING) $(BIN)/$(PROJECT_NAME).packed.bin
